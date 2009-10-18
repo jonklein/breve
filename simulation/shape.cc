@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 #include "simulation.h"
-#include "glIncludes.h"
+#include "mesh.h"
 #include "camera.h"
 #include "volInt.h"
 #include "vclip.h"

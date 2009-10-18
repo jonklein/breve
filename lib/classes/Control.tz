@@ -25,6 +25,7 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 	+ variables:
 		simTime (float).
+		_startTime (float).
 		simStep (float).
 		xRot (float).
 		yRot (float).
@@ -149,6 +150,8 @@ Abstract : Control (aka Controls) [version 2.3] {
 		genericShape = (new Sphere init-with radius 1.0).
 		genericLinkShape = (new Cube init-with size (.1, 1, .1)).
 
+		_startTime = getRealTime().
+
 	- to toggle-recording-to-movie:
 		if movie: {
 			movieMenu uncheck.
@@ -224,6 +227,11 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% precision.
 
 		return getRealTime().
+
+	+ to get-real-elapsed-time:
+		% Returns the number of seconds the start of the simulation.
+
+		return getRealTime() - _startTime.
 
 	+ to get-time:
 		% Returns the simulation time of the world.

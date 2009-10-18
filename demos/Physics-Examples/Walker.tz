@@ -57,14 +57,22 @@ PhysicalControl : WalkerSim {
 		locked (int).
 
 		lockMenu, symMenu (object).
+		startTimeSim, startTimeReal (float).
 
 	+ to init:
 		floor (object).
 		number (int).
 		item (object).
-		outline (object).
 
-		state = new WalkerState.
+		state = ( self dearchive-xml file "WalkerState.xml" ).
+
+		if !state: {
+			state = new WalkerState.
+			print state.
+		}
+
+		startTimeReal = state::runningTimeReal.
+		startTimeSim = state::runningTimeSim.
 
 		locked = 0.
 
@@ -102,15 +110,13 @@ PhysicalControl : WalkerSim {
 		# The "WalkerController" are the individuals that will control the Walker.
 		# Create the WalkerController and assign them numbers.
 
-		state::controllers = 15 new WalkerController.
-		state::controllers = state::controllers.
-		state save.
-
 		foreach item in state::controllers: {
 			state add-dependency on item.
 			(item set-number to number).
 			number += 1.
 		}
+
+		state save.
 
 		self pick-drivers.
 
@@ -140,17 +146,29 @@ PhysicalControl : WalkerSim {
 		return state::bestDistance.
 
 	+ to get-current-distance:
-		return |(walker get-location)|.
+		distance (vector).
+		distance = (walker get-location).
+		distance::y = 0.
+
+		if |distance| > state::bestDistance: {
+			state::bestDistance = |distance|.
+		}
+
+		return |distance|.
 
 	+ to iterate:
 		seats{ currentSeat } control robot walker at-time (self get-time).
 
-		state::runningTime = ( self get-time ).
+		state::runningTimeSim = startTimeSim + ( self get-time ).
+		state::runningTimeReal = startTimeReal + ( self get-real-elapsed-time ).
 
 		super iterate.
 
-	+ to get-running-time:
-		return state::runningTime.
+	+ to get-simulation-time:
+		return state::runningTimeSim.
+
+	+ to get-clock-time:
+		return state::runningTimeReal.
 
 	+ to pick-drivers:
 		# pick 4 new drivers at random.  we do this by sorting the 
@@ -192,10 +210,6 @@ PhysicalControl : WalkerSim {
 		# turn.  if we have seen the last controller , breed them together.
 
 		seats{currentSeat} set-distance to |(walker get-location)|.
-
-		if |(walker get-location)| > state::bestDistance: {
-			state::bestDistance = |(walker get-location)|.
-		}
 
 		walker center.
 
@@ -266,13 +280,16 @@ Object : WalkerState {
 	+ variables:
 		controllers (list).
 		bestDistance (float).
-		runningTime (float).
+		runningTimeSim (float).
+		runningTimeReal (float).
+
+	+ to init:
+		print "WalkerState init...".
+		controllers = 15 new WalkerController.
 
 	+ to save:
 		self archive-as-xml file "WalkerState.xml".
 
-	+ to restore:	
-		self dearchive-xml file "WalkerState.xml".
 }
 
 Object : WalkerController {
@@ -288,6 +305,7 @@ Object : WalkerController {
 		return number.
 	
 	+ to init:
+		print "Walker controller init...".
 		genome = new WalkerGenome.
 		self add-dependency on genome.
 		self randomize.

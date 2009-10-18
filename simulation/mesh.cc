@@ -578,47 +578,15 @@ void sl3DSShape::draw( const slRenderGL& inRenderer ) {
 			material -> _texture = new slTexture2D( &material -> _texturePath );
 	}
 
-
-	slMaterial *material = NULL;
-
-	glPushAttrib( GL_TRANSFORM_BIT );
-
 	for ( int n = 0; n < _indexCount; n += 3 ) {
 		int materialIndex = n / 3;
 
-		if( _materials[ materialIndex ] > -1 && &_materialList[ _materials[ materialIndex ] ] != material ) {
-			material = &_materialList[ _materials[ materialIndex ] ];
-		
-			glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, material -> _ambient );
-			glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, material -> _diffuse );
-			glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, material -> _specular );
-
-			float shine = pow( 2.0, 10.0 * material -> _shininess );
-
-			if( shine > 128.0 )
-				shine = 128.0;
-
-			glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, shine ); 
-
-			glColor4fv( material -> _diffuse );
-
-			// I CAN HAZ TEXTURZ?
-
-			if( material -> _texture ) {
-			 	material -> _texture -> bind();
-				glMatrixMode( GL_TEXTURE );
-				glLoadIdentity();
-				glScalef( material -> _texture -> _unitX, material -> _texture -> _unitY, 1 );
-			} else 
-				glDisable( GL_TEXTURE_2D );
-
-			glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-		}
+		if( _materials[ materialIndex ] > -1 )
+			inRenderer.BindMaterial( _materialList[ _materials[ materialIndex ] ] );
 
 		int i1 = _indices[ n ];
 		int i2 = _indices[ n + 1 ];
 		int i3 = _indices[ n + 2 ];
-
 
 		glBegin( GL_TRIANGLES );
 		glNormal3fv( &_normals[ n * 3 ] );
@@ -633,9 +601,8 @@ void sl3DSShape::draw( const slRenderGL& inRenderer ) {
 		glTexCoord2fv( &_texcoords[ i3 * 2 ] );
 		glVertex3fv( &_vertices[ i3 * 3 ] );
 		glEnd();
-	 }
 
-	glPopAttrib();
+	 }
 }
 
 #endif

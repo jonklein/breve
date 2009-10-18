@@ -5,8 +5,8 @@
 
 enum allocStatus { 
 	AS_RELEASED = -1,	// still allocated, but ready to be freed
-	AS_FREED,		// all memory freed--don't try to use 
-	AS_ACTIVE		// active object
+	AS_FREED,			// all memory freed--don't try to use 
+	AS_ACTIVE			// active object
 };
 
 typedef struct brObjectType brObjectType;
@@ -85,7 +85,7 @@ struct brObjectType {
 	/**
 	 * Creates a new instance of the given class.  The constructor arguments are currently unused.
 	 */
-	brInstance	  	*(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount );
+	brInstance	  	*(*instantiate)( brEngine *inEngine, brObject *inObject, const brEval **inArguments, int inArgCount, bool inSkipInit );
 
 	/**
 	 * Calls a method in the language frontend
@@ -332,7 +332,7 @@ DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, const char *, const brEva
 DLLEXPORT brObject *brEngineAddObject(brEngine *, brObjectType *, const char *, void *);
 DLLEXPORT void brEngineAddObjectAlias(brEngine *, char *, brObject *);
 
-DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int);
+DLLEXPORT brInstance *brObjectInstantiate(brEngine *, brObject *, const brEval **, int, bool inSkipInit );
 
 DLLEXPORT char *brInstanceEncodeToString( brEngine *inEngine, brInstance *inInstance, brEvalHash *inInstanceToIndexMapping );
 DLLEXPORT brInstance *brInstanceDecodeFromString( brEngine *inEngine, int inTypeSignature, const char *inData );

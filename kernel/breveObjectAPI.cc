@@ -455,8 +455,8 @@ bool brObjectIsSubclass( brObject *inA, brObject *inB ) {
  * The constructur args and argCount are currently unused.
  */
 
-brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, int argCount ) {
-	return o->type->instantiate( e, o, args, argCount );
+brInstance *brObjectInstantiate( brEngine *e, brObject *o, const brEval **args, int argCount, bool inSkipInit ) {
+	return o->type->instantiate( e, o, args, argCount, inSkipInit );
 }
 
 /**

@@ -1701,6 +1701,11 @@ RTC_INLINE int stEvalIndexLookup( stListIndexExp *l, stRunInstance *i, brEval *t
 			return EC_ERROR;
 		}
 	} else if( list.type() == AT_INSTANCE ) {
+		if( !BRINSTANCE( &list ) ) {
+			stEvalError( i -> instance, EE_NULL_INSTANCE, "uninitialized instance in index lookup" );
+			return EC_ERROR;
+		}
+        
 		stInstance *lookupInstance = ( stInstance * )BRINSTANCE( &list )->userData;
         
 		// Find the variable for this instance
@@ -3349,7 +3354,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 
 	if ( BRINT( &count ) == 1 ) {
 
-		t->set( brObjectInstantiate( i->instance->type->engine, object, NULL, 0 ) );
+		t->set( brObjectInstantiate( i->instance->type->engine, object, NULL, 0, false ) );
 
 		if ( BRINSTANCE( t ) == NULL ) {
 			stEvalError( i->instance, EE_UNKNOWN_OBJECT, "error creating instance of class %s", ie->name.c_str() );
@@ -3365,7 +3370,7 @@ RTC_INLINE int stEvalNewInstance( stInstanceExp *ie, stRunInstance *i, brEval *t
 		list = new brEvalListHead();
 
 		for ( n = 0;n < BRINT( &count );n++ ) {
-			brInstance *instance = brObjectInstantiate( i->instance->type->engine, object, NULL, 0 );
+			brInstance *instance = brObjectInstantiate( i->instance->type->engine, object, NULL, 0, false );
 			listItem.set( instance );
 
 			if ( instance == NULL ) {

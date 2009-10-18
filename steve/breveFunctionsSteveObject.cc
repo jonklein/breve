@@ -152,7 +152,7 @@ int stNewInstanceForClassString( brEval args[], brEval *target, brInstance *bi )
 		return EC_ERROR;
 	}
 
-	target->set( brObjectInstantiate( bi->engine, o, NULL, 0 ) );
+	target->set( brObjectInstantiate( bi->engine, o, NULL, 0, false ) );
 
 	return EC_OK;
 }

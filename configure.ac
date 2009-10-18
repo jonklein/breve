@@ -324,6 +324,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
 	AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
+	AC_CHECK_LIB([assimp], [aiImportFile])
 
 	AC_CHECK_LIB([FLAC], [FLAC__seekable_stream_encoder_init])
 	AC_CHECK_LIB([sndfile], [sf_open])

@@ -1,6 +1,44 @@
 
+#include <map>
+
 #include "config.h"
 #include "shape.h"
+#include "texture.h"
+#include "render.h"
+
+class slMeshShape : public slShape {
+	public:
+		slMeshShape();
+		~slMeshShape();
+		
+		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
+
+		virtual void				finishShape( double inDensity );
+		virtual void				finishShapeWithMaxLength( double inDensity, float inMaxLength );
+
+		virtual void				updateLastPosition( slPosition *inPosition );
+
+	protected:
+		int							createODEGeom();
+
+		int*						_materials;
+	
+		float*						_vertices;
+		float*						_normals;
+		float*						_texcoords;
+
+		int*						_indices;
+
+		std::vector< slMaterial >	_materialList;
+
+		int 						_vertexCount;
+		int 						_indexCount;
+
+		dMatrix4                    _lastPositions[ 2 ];
+		int                         _lastPositionIndex;
+
+		float						_maxReach;
+};
 
 #ifdef HAVE_LIB3DS
 
@@ -13,33 +51,6 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/light.h>
 
-#include "texture.h"
-
-#ifndef WINDOWS
-	#include <libgen.h>
-#endif
-
-struct slMaterial {
-	slMaterial() {
-					_texture = NULL;
-	}
-
-	~slMaterial() {
-					if( _texture ) 
-						delete _texture;
-	}
-
-	float 					_specular[ 4 ];
-	float 					_ambient[ 4 ];
-	float					_diffuse[ 4 ];
-	float					_shininess;
-
-	bool					_twosided;
-
-	std::string				_texturePath;
-	slTexture2D*			_texture;
-};
-
 class sl3DSShape : public slMeshShape {
 	public:
 		sl3DSShape( char *, char *, float inSize = 1.0 );
@@ -50,11 +61,8 @@ class sl3DSShape : public slMeshShape {
 		virtual void 					draw( const slRenderGL& inRender );
 
 		Lib3dsMesh*						_mesh;
-
-		int*							_materials;
 		Lib3dsMatrix*					_transforms;
 
-		std::vector< slMaterial >		_materialList;
 
 		slVector						_center;
 		slVector						_max;
@@ -65,9 +73,6 @@ class sl3DSShape : public slMeshShape {
 		void							processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart );
 
 		int								addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial );
-
-		float*							_normals;
-		float*							_texcoords;
 
 		std::map< std::string, int > 	_materialIndices;
 		std::string						_directory;

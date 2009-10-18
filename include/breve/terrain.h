@@ -22,6 +22,7 @@
 #define _TERRAIN_H
 
 #include "worldObject.h"
+#include "mesh.h"
 #include "vclip.h"
 #include "vclipData.h"
 

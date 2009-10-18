@@ -1086,7 +1086,7 @@ int brXMLPrepareInstanceMap( brXMLDOMElement *inRoot, brXMLParserState *inState 
 		}
 
 		if( typeSignature == STEVE_TYPE_SIGNATURE ) {
-			brInstance *instance = brObjectInstantiate( inState->engine, object, NULL, 0 );
+			brInstance *instance = brObjectInstantiate( inState->engine, object, NULL, 0, true );
 		
 			brEval key, value;
 	

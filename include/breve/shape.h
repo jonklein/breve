@@ -37,6 +37,8 @@ enum shapeTypes {
 	ST_SPHERE
 };
 
+class slMeshShape;
+
 /**
  * \brief A struct containing rotation and location information.
  */
@@ -253,34 +255,6 @@ class slSphere : public slShape {
 		void 						drawShadowVolume(slCamera *camera, slPosition *position);
 		double 						_radius;
 };
-
-class slMeshShape : public slShape {
-	public:
-		slMeshShape();
-		~slMeshShape();
-		
-		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
-
-		virtual void				finishShape( double inDensity );
-		virtual void				finishShapeWithMaxLength( double inDensity, float inMaxLength );
-
-		virtual void				updateLastPosition( slPosition *inPosition );
-
-	protected:
-		int							createODEGeom();
-	
-		float*						_vertices;
-		int*						_indices;
-
-		int 						_vertexCount;
-		int 						_indexCount;
-
-		dMatrix4                    _lastPositions[ 2 ];
-		int                         _lastPositionIndex;
-
-		float						_maxReach;
-};
-
 
 /*!
  * A header used when serializing face data.  

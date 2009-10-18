@@ -84,16 +84,17 @@ int stCallMethodBreveCallback( void *instanceData, void *methodData, const brEva
  * \brief The steve callback to create a new instance.
  */
 
-brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brEval **constructorArgs, int argCount ) {
+brInstance *stInstanceNewCallback( brEngine *engine, brObject *object, const brEval **constructorArgs, int argCount, bool inSkipInit ) {
 	stInstance *i = stInstanceNew( ( stObject* )object->userData );
 
-	i->breveInstance = brEngineAddInstance( engine, object, i );
+	i -> breveInstance = brEngineAddInstance( engine, object, i );
 
-	if( stInstanceInit( i ) != EC_OK ) 
-		return NULL;
+	if( !inSkipInit ) {
+		if( stInstanceInit( i ) != EC_OK ) 
+			return NULL;
+	}
 
-	return i->breveInstance;
-
+	return i -> breveInstance;
 }
 
 /**

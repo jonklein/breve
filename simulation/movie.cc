@@ -115,8 +115,8 @@ slMovie *slMovieCreate( char *filename, int width, int height ) {
 
 	m->_rgb_buf = new uint8_t[ m->_rgb_len ];
 
-	avpicture_fill(( AVPicture * )m->_rgb_pic, m->_rgb_buf, PIX_FMT_RGB24,
-	               width, height );
+	AVPicture *p = ( AVPicture * )m->_rgb_pic;
+	avpicture_fill( p, m->_rgb_buf, PIX_FMT_RGB24, width, height );
 
 	// yuv_buf holds the unencoded frame in codec's native pixel format.
 
@@ -124,18 +124,16 @@ slMovie *slMovieCreate( char *filename, int width, int height ) {
 
 	m->_yuv_buf = new uint8_t[m->_yuv_len];
 
-	avpicture_fill(( AVPicture * )m->_yuv_pic, m->_yuv_buf, m->_context->pix_fmt,
-	               width, height );
+	avpicture_fill(( AVPicture * )m->_yuv_pic, m->_yuv_buf, m->_context->pix_fmt, width, height );
 
 	m->_line = new uint8_t[width * 3]; /* one line of packed RGB pixels */
 
 	return m;
 }
 
-/*!
-	\brief Encodes a frame and potentially writes it to the movie file.
-*/
-
+/**
+ * \brief Encodes a frame and potentially writes it to the movie file.
+ */
 
 int slMovieEncodeFrame( slMovie *m ) {
 	AVCodecContext *c;
@@ -151,18 +149,23 @@ int slMovieEncodeFrame( slMovie *m ) {
 	 */
 	 
 	// Old code:
-	// img_convert(( AVPicture * )m->_yuv_pic, c->pix_fmt,
-	  //           ( AVPicture * )m->_rgb_pic, PIX_FMT_RGB24, c->width, c->height );
+	 // img_convert(( AVPicture * )m->_yuv_pic, c->pix_fmt,
+	   //         ( AVPicture * )m->_rgb_pic, PIX_FMT_RGB24, c->width, c->height );
 
 	static SwsContext *sws_context = NULL;
-	sws_context = sws_getCachedContext(sws_context, c->width, c->height, c->pix_fmt, c->width, c->height, PIX_FMT_RGB24, 0, NULL, NULL, NULL);
-	if(!sws_context)
-		slMessage( DEBUG_ALL, "Error opening sws_context for encoding movie [size %d x %d]\n", c->width, c->height );
-	 else 
-		if(sws_scale(sws_context, (( AVPicture * )m->_rgb_pic)->data, (( AVPicture * )m->_rgb_pic)->linesize, 0, c->height, (( AVPicture * )m->_yuv_pic)->data, (( AVPicture * )m->_yuv_pic)->linesize)<0)
- 	  slMessage( DEBUG_ALL, "Encoding movie failed: [size %d x %d]\n", c->width, c->height );
+	sws_context = sws_getCachedContext(sws_context, c->width, c->height, PIX_FMT_RGB24, c->width, c->height, c -> pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
 
-	/* Encode the frame yuv_pic storing the output in enc_buf. */
+	if(!sws_context) {
+		slMessage( DEBUG_ALL, "Error opening sws_context for encoding movie [size %d x %d]\n", c->width, c->height );
+		return -1;
+	} 
+
+	if( sws_scale(sws_context, (( AVPicture * )m->_rgb_pic)->data, (( AVPicture * )m->_rgb_pic)->linesize, 0, c->height, (( AVPicture * )m->_yuv_pic)->data, (( AVPicture * )m->_yuv_pic)->linesize)< 0) {
+		slMessage( DEBUG_ALL, "Encoding frame failed: [size %d x %d]\n", c->width, c->height );
+		return -1;
+	}
+
+	// Encode the frame yuv_pic storing the output in enc_buf. 
 
 	size = avcodec_encode_video( c, m->_enc_buf, m->_enc_len, m->_yuv_pic );
 
@@ -186,11 +189,12 @@ int slMovieAddWorldFrame( slMovie *m, slWorld *w, slCamera *cam ) {
 		return -1;
 	}
 
-	if ( cam->_renderContextCallback ) cam->_renderContextCallback( w, cam );
+	if( cam -> _renderContextCallback ) 
+		cam -> _renderContextCallback( w, cam );
 
 	glReadPixels( 0, 0, c->width, c->height, GL_RGB, GL_UNSIGNED_BYTE, m->_rgb_buf );
 
-	/* OpenGL reads bottom-to-top, but encoder expects top-to-bottom. */
+	// OpenGL reads bottom-to-top, but encoder expects top-to-bottom.
 
 	len = c->width * 3;
 
