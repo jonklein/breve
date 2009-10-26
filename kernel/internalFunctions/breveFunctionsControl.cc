@@ -473,12 +473,20 @@ int brIFindFile( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-/*!
-	\brief Returns the current real-time time with micro-second precision.
-*/
+/**
+ * \brief Returns the current running time with micro-second precision.
+ */
+
+int brIGetRunningTime( brEval args[], brEval *target, brInstance *i ) {
+	target->set( i -> engine -> runningTime() );
+	return EC_OK;
+}
+
+/**
+ * \brief Returns the current real with micro-second precision.
+ */
 
 int brIGetRealTime( brEval args[], brEval *target, brInstance *i ) {
-
 	struct timeval now;
 	double seconds;
 
@@ -556,6 +564,7 @@ void breveInitControlFunctions( brNamespace *n ) {
 
 	brNewBreveCall( n, "findFile", brIFindFile, AT_STRING, AT_STRING, 0 );
 	brNewBreveCall( n, "getRealTime", brIGetRealTime, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "getRunningTime", brIGetRunningTime, AT_DOUBLE, 0 );
 
 	brNewBreveCall( n, "setOutputFilter", brISetOutputFilter, AT_NULL, AT_INT, 0 );
 

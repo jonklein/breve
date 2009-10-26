@@ -68,7 +68,7 @@ struct brXMLDOMElement {
 
 int brXMLAssignIndices( brEngine *, std::map< brInstance*, int>&, brEvalHash *inMap );
 
-int brXMLWriteObjectToFile( brInstance *, char *, int );
+int brXMLWriteObjectToFile( brInstance *, const char *, int );
 int brXMLWriteObject( brXMLArchiveRecord *, FILE *, brInstance *, int, int );
 int brXMLWriteObjectToStream( brInstance *, FILE *, int );
 

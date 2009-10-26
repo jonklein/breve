@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#if MACOSX
+#if DARWIN
 	#if IPHONE
         #include <OpenGLES/ES1/gl.h>
         #include <OpenGLES/ES1/glext.h>

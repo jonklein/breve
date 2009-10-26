@@ -10,6 +10,8 @@
 #include "mesh.h"
 
 slMeshShape::slMeshShape() : slShape() {
+	_rootNode = NULL;
+
 	_vertices = NULL;
 	_indices  = NULL;
 
@@ -27,11 +29,11 @@ int slMeshShape::createODEGeom() {
 	if( !_indices || !_vertices ) 
 		return -1;
 
-	slVectorSet( &_max, 0, 0, 0 );
-	slVectorSet( &_min, 0, 0, 0 );
+	slVectorSet( &_max, -FLT_MAX, -FLT_MAX, -FLT_MAX );
+	slVectorSet( &_min,  FLT_MAX,  FLT_MAX,  FLT_MAX );
 
 	for( int n = 0; n < _vertexCount; n++ ) {
-		float x = _vertices[ n * 3 ];
+		float x = _vertices[ n * 3     ];
 		float y = _vertices[ n * 3 + 1 ];
 		float z = _vertices[ n * 3 + 2 ];
 
@@ -54,6 +56,11 @@ int slMeshShape::createODEGeom() {
 			_min.z = z;
 	}
 
+	_maxReach = slMAX( slVectorLength( &_max ), slVectorLength( &_min ) );
+	
+	// We "double buffer" the ODE geoms here because ODE (GIMPACT?) does not
+	// seem to correctly handle a trimesh collision test with itself
+
 	if( _odeGeomID[ 0 ] )
 		dGeomDestroy( _odeGeomID[ 0 ] );
 	if( _odeGeomID[ 1 ] ) 
@@ -75,7 +82,7 @@ int slMeshShape::createODEGeom() {
 
 	dGeomSetData( _odeGeomID[ 0 ], triMeshID1 );
 	dGeomSetData( _odeGeomID[ 1 ], triMeshID2 );
-
+	
 	dMass m;
 	dMassSetTrimesh( &m, _density, _odeGeomID[ 0 ] );
 
@@ -133,127 +140,6 @@ void slMeshShape::updateLastPosition( slPosition *inPosition ) {
 	dGeomTriMeshSetLastTransform( _odeGeomID[ 1 ], _lastPositions[ _lastPositionIndex ] );
 
 	_lastPositionIndex = !_lastPositionIndex;
-}
-
-struct slTriangleIndex {
-	int _i1, _i2, _i3;
-};
-
-struct slTriangleBreakdownData {
-	std::vector< slVector > 			_vertices;
-	std::vector< slTriangleIndex > 		_indices;
-
-	void 								breakdown( int inA, int inB, int inStart );
-};
-
-#define TRYSPLIT( I1, I2 ) \
-	if( ( _indices[ n ].I1 == inA && _indices[ n ].I2 == inB ) || ( _indices[ n ].I1 == inB && _indices[ n ].I2 == inA ) ) {	\
-		newtri.I2 = newindex;					\
-		_indices[ n ].I1 = newindex;			\
-		_indices.push_back( newtri );			\
-		count++; \
-	} 
-
-
-void slTriangleBreakdownData::breakdown( int inA, int inB, int inStart ) {
-	slVector newpt;
-	slVectorAdd( &_vertices[ inA ], &_vertices[ inB ], &newpt );
-	slVectorMul( &newpt, .5, &newpt );
-	_vertices.push_back( newpt );
-	int newindex = _vertices.size() - 1;
-	int count = 0;
-
-	for( unsigned int n = inStart; n < _indices.size(); n++ ) {
-		slTriangleIndex newtri = _indices[ n ];
-
-		TRYSPLIT( _i1, _i2 )
-		TRYSPLIT( _i1, _i3 )
-		TRYSPLIT( _i2, _i3 )
-	}
-}
-
-void slMeshShape::finishShapeWithMaxLength( double inDensity, float inMaxSize ) {
-	slTriangleBreakdownData d;
-
-	for( int i = 0; i < _vertexCount * 3; i += 3 ) { 
-		slVector v;
-
-		slVectorSet( &v, _vertices[ i ], _vertices[ i + 1 ], _vertices[ i + 2 ] );
-		d._vertices.push_back( v );
-	}
-
-	for( int i = 0; i < _indexCount; i += 3 ) { 
-		slTriangleIndex t;
-
-		t._i1 = _indices[ i ];
-		t._i2 = _indices[ i + 1 ];
-		t._i3 = _indices[ i + 2 ];
-
-		d._indices.push_back( t );
-	}
-
-	int breakdowns = 0;
-
-	do {
-		breakdowns = 0;
-		
-		for( unsigned int n = 0; n < d._indices.size(); n++ ) {
-			slTriangleIndex *triangle = &d._indices[ n ];
-			int maxIndex = -1;
-			float size, maxSize = inMaxSize;
-
-			if( ( size = slVectorDist( &d._vertices[ triangle -> _i1 ], &d._vertices[ triangle -> _i2 ] ) ) > maxSize ) {
-				maxSize = size;
-				maxIndex = 0;
-			}
-
-			if( ( size = slVectorDist( &d._vertices[ triangle -> _i2 ], &d._vertices[ triangle -> _i3 ] ) ) > maxSize ) {
-				maxSize = size;
-				maxIndex = 1;
-			}
-
-			if( ( size = slVectorDist( &d._vertices[ triangle -> _i1 ], &d._vertices[ triangle -> _i3 ] ) ) > maxSize ) {
-				maxSize = size;
-				maxIndex = 2;
-			}
-
-			switch( maxIndex )  {
-				case 0:
-					breakdowns++;
-					d.breakdown( triangle -> _i1, triangle -> _i2, n );
-					break;
-				case 1:
-					breakdowns++;
-					d.breakdown( triangle -> _i2, triangle -> _i3, n );
-					break;
-				case 2:
-					breakdowns++;
-					d.breakdown( triangle -> _i1, triangle -> _i3, n );
-					break;
-			}
-		}
-
-	} while( breakdowns > 0 );
-
-	_vertexCount = d._vertices.size();	
-	_indexCount = d._indices.size() * 3;
-	delete[] _vertices;
-	delete[] _indices;
-
-	_vertices = new float[ _vertexCount * 3 ];
-	_indices  = new int[ _indexCount ];
-
-	for( int n = 0; n < _vertexCount; n++ ) {
-		_vertices[ n * 3     ] = d._vertices[ n ].x;
-		_vertices[ n * 3 + 1 ] = d._vertices[ n ].y;
-		_vertices[ n * 3 + 2 ] = d._vertices[ n ].z;
-	}
-
-	for( unsigned int i = 0; i < d._indices.size(); i++ ) {
-		_indices[ i * 3     ] = d._indices[ i ]._i1;
-		_indices[ i * 3 + 1 ] = d._indices[ i ]._i2;
-		_indices[ i * 3 + 2 ] = d._indices[ i ]._i3;
-	}
 }
 
 void slMeshShape::finishShape( double density ) {
@@ -326,283 +212,287 @@ void slMeshShape::finishShape( double density ) {
 	slShape::finishShape( density );
 }
 
-#ifdef HAVE_LIB3DS
+void slMeshShape::draw( const slRenderGL& inRenderer ) {
+	if( _rootNode ) {
+		_rootNode -> draw( inRenderer );
+	}
+	else 
+		slShape::draw( inRenderer );
+}
 
-sl3DSShape::sl3DSShape( char *inFilename, char *inMeshname, float inSize ) : slMeshShape() {
-	_normals = NULL;
-	_materials = NULL;
+#ifdef HAVE_LIBASSIMP
 
-	if( !inFilename ) 
-		throw slException( std::string( "Cannot locate 3DS Mesh file" ) );
+#include <assimp/assimp.hpp>
+#include <assimp/aiScene.h>
+#include <assimp/aiPostProcess.h> 
 
-	slMessage( 20, "Reading 3DS file \"%s\"\n", inFilename );
+void slMeshNode::draw( const slRenderGL& inRenderer ) {
+	inRenderer.PushMatrix( slMatrixGeometry );
+	inRenderer.MulMatrix4( slMatrixGeometry, _transform );
 
-	Lib3dsFile *file = lib3ds_file_load( inFilename );
+	for( unsigned int n = 0; n < _meshes.size(); n++ ) {
+		slMesh *mesh = _meshes[ n ];
+		
+		if( mesh -> _material )
+			inRenderer.BindMaterial( *mesh -> _material );
 
-	if ( !file ) 
-		throw slException( std::string( "Cannot open file \"" ) + inFilename + "\"" );
+		mesh -> _vertexBuffer.bind();
+		mesh -> _vertexBuffer.draw( mesh -> _indexBuffer );
+		mesh -> _vertexBuffer.unbind();
 
-	lib3ds_file_eval( file, 0.0 );
-
-	_directory = slDirname( inFilename );
+		if( mesh -> _material )
+			inRenderer.UnbindMaterial( *mesh -> _material );
 	
-	_vertexCount = 0;
-	_indexCount = 0;
+	}
 
-	calculateSizes( file, file -> nodes, &_vertexCount, &_indexCount );
+	for( unsigned int n = 0; n < _children.size(); n++ )
+		 _children[ n ] -> draw( inRenderer );
+		 
 
-	_vertices = new float[ 3 * _vertexCount ];
-	_texcoords = new float[ 2 * _vertexCount ];
-	_indices = new int[ _indexCount ];
-	_normals = new float[ _indexCount * 3 ];
-	_materials = new int[ _indexCount ];
+	inRenderer.PopMatrix( slMatrixGeometry );
+}
 
-	memset( _materials, 0, sizeof( int ) * _indexCount );
-	memset( _normals,   0, sizeof( float ) * _indexCount * 3 );
+slMaterial *slAIImport::ImportMaterial( const aiMaterial *inMaterial, slMeshShape *inMeshShape, const char *inBaseDir ) {
+	slMaterial *material = new slMaterial;
+	
+	aiString path;
+	inMaterial -> GetTexture( aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL );
+	
+	if( path.length > 0 ) {
+		material -> _texturePath = std::string( inBaseDir ) + std::string( "/" ) + path.data;
+		material -> _texture = new slTexture2D( &material -> _texturePath );
+	} 
+	
+	aiColor4D color;
 
-	_maxReach = 0.0;
+	inMaterial -> Get( AI_MATKEY_COLOR_SPECULAR, color );
+	material -> _specular[ 0 ] = color.r;
+	material -> _specular[ 1 ] = color.g;
+	material -> _specular[ 2 ] = color.b;
+	material -> _specular[ 3 ] = 1;
 
-	// First pass through the data, translate to the origin and get the length
+	inMaterial -> Get( AI_MATKEY_COLOR_AMBIENT, color );	
+	material -> _ambient[ 0 ] = color.r;
+	material -> _ambient[ 1 ] = color.g;
+	material -> _ambient[ 2 ] = color.b;
+	material -> _ambient[ 3 ] = 1;
 
-	int pointStart = 0, indexStart = 0;
+	inMaterial -> Get( AI_MATKEY_COLOR_DIFFUSE, color );
+	material -> _diffuse[ 0 ] = color.r;
+	material -> _diffuse[ 1 ] = color.g;
+	material -> _diffuse[ 2 ] = color.b;
+	material -> _diffuse[ 3 ] = 1;
+		
+	inMeshShape -> _materialList.push_back( material );
+	
+	return material;
+}
 
-	slVectorSet( &_max, 0, 0, 0 );
-	slVectorSet( &_center, 0, 0, 0 );
+slMesh *slAIImport::ImportMesh( const aiMesh *inMesh, slMeshShape *inMeshShape ) {
+	if( !inMesh -> HasFaces() ) 
+		return NULL;
+		
+	slMesh *mesh = new slMesh;
+	slVector center;
 
-	processNodes( file, file -> nodes, &pointStart, &indexStart );
+	int pixelFormat = VB_XYZ;
+	
+	if( inMesh -> HasNormals() ) 
+		pixelFormat |= VB_NORMAL;	
 
-	// slVectorMul( &_center, 1.0 / _vertexCount, &_center );
-	slVectorSub( &_max, &_center, &_max );
-	_maxReach = slVectorLength( &_max );
+	if( inMesh -> HasTextureCoords( 0 ) ) 
+		pixelFormat |= VB_UV;
+		
+	mesh -> _vertexBuffer.resize( inMesh -> mNumVertices, pixelFormat );
+						
+	for( unsigned int i = 0; i < inMesh -> mNumVertices; i++ ) {
+		const aiVector3D& vertex = inMesh -> mVertices[ i ];
+		float *v = mesh -> _vertexBuffer.vertex( i );
+		
+		v[ 0 ] = vertex[ 0 ];
+		v[ 1 ] = vertex[ 1 ];
+		v[ 2 ] = vertex[ 2 ];
+		
+		center.x += vertex[ 0 ];
+		center.y += vertex[ 1 ];
+		center.z += vertex[ 1 ];
 
-	for( int n = 0; n < _vertexCount; n++ ) {
-		_vertices[ n * 3     ] -= _center.x;
-		_vertices[ n * 3 + 1 ] -= _center.y;
-		_vertices[ n * 3 + 2 ] -= _center.z;
+		if( pixelFormat & VB_NORMAL ) {
+			const aiVector3D& normal = inMesh -> mNormals[ i ];
+			float *n = mesh -> _vertexBuffer.normal( i );
+			
+			n[ 0 ] = normal[ 0 ];
+			n[ 1 ] = normal[ 1 ];
+			n[ 2 ] = normal[ 2 ];
+		}
+		
+		if( pixelFormat & VB_UV ) {
+			const aiVector3D& texcoord = inMesh -> mTextureCoords[ 0 ][ i ];
+			float *t = mesh -> _vertexBuffer.texcoord( i );
 
-		if( inSize > 0.0f ) {
-			_vertices[ n * 3     ] *= ( inSize / _maxReach );
-			_vertices[ n * 3 + 1 ] *= ( inSize / _maxReach );
-			_vertices[ n * 3 + 2 ] *= ( inSize / _maxReach );
+			t[ 0 ] = texcoord[ 0 ];
+			t[ 1 ] = texcoord[ 1 ];
+		}
+	}
+	
+	mesh -> _indexBuffer.resize( inMesh -> mNumFaces * 3 );
+	unsigned short *indices = mesh -> _indexBuffer.indices();
+
+	for( unsigned int i = 0; i < inMesh -> mNumFaces; i++ ) {
+		aiFace &f = inMesh -> mFaces[ i ];
+		
+		indices[ i * 3 + 0 ] = f.mIndices[ 0 ];
+		indices[ i * 3 + 1 ] = f.mIndices[ 1 ];
+		indices[ i * 3 + 2 ] = f.mIndices[ 2 ];
+	}
+	
+	mesh -> _material = inMeshShape -> _materialList[ inMesh -> mMaterialIndex ];
+	
+	slVectorMul( &center, 1.0 / inMesh -> mNumVertices, &center );
+	// slMessage( DEBUG_ALL, "Center: %f, %f, %f\n", center.x, center.y, center.z );
+	// slVectorCopy( &center, &mesh -> _center );
+	
+	inMeshShape -> _meshes.push_back( mesh );
+	
+	return mesh;
+}
+
+slMeshNode *slAIImport::BuildNodeHierarchy( const aiNode* inNode, slMeshShape *inMeshShape ) {
+	slMeshNode *node = new slMeshNode;
+
+	node -> _transform[ 0 ] = inNode -> mTransformation.a1;
+	node -> _transform[ 1 ] = inNode -> mTransformation.a2;
+	node -> _transform[ 2 ] = inNode -> mTransformation.a3;
+	node -> _transform[ 3 ] = inNode -> mTransformation.a4;
+
+	node -> _transform[ 4 ] = inNode -> mTransformation.b1;
+	node -> _transform[ 5 ] = inNode -> mTransformation.b2;
+	node -> _transform[ 6 ] = inNode -> mTransformation.b3;
+	node -> _transform[ 7 ] = inNode -> mTransformation.b4;
+
+	node -> _transform[ 8 ] = inNode -> mTransformation.c1;
+	node -> _transform[ 9 ] = inNode -> mTransformation.c2;
+	node -> _transform[ 10 ] = inNode -> mTransformation.c3;
+	node -> _transform[ 11 ] = inNode -> mTransformation.c4;
+
+	node -> _transform[ 12 ] = inNode -> mTransformation.d1;
+	node -> _transform[ 13 ] = inNode -> mTransformation.d2;
+	node -> _transform[ 14 ] = inNode -> mTransformation.d3;
+	node -> _transform[ 15 ] = inNode -> mTransformation.d4;
+	
+	// slMessage( DEBUG_ALL, "Node %p has %d children and %d meshes\n", inNode, inNode -> mNumChildren, inNode -> mNumMeshes );
+	
+	for( unsigned int n = 0; n < inNode -> mNumChildren; n++ ) {
+		slMeshNode *child = BuildNodeHierarchy( inNode -> mChildren[ n ], inMeshShape );
+		
+		node -> _children.push_back( child );
+	}
+	
+	for( unsigned int m = 0; m < inNode -> mNumMeshes; m++ ) {
+		unsigned int meshIndex = inNode -> mMeshes[ m ] ;
+		// slMessage( DEBUG_ALL, "Mesh index: %d of %d\n", meshIndex, inMeshShape -> _meshes.size() );
+		
+		if( meshIndex < inMeshShape -> _meshes.size() )
+			node -> _meshes.push_back( inMeshShape -> _meshes[ meshIndex ] );
+	}
+		
+	return node;
+}
+
+void slAIGeometryBuilder::Build( const aiScene* inScene, const aiNode* inNode, aiMatrix4x4 *inTransformation  ) {
+
+	aiMatrix4x4 transform;
+
+	if( inTransformation )
+		transform = *inTransformation * inNode -> mTransformation;
+	else 
+		transform = inNode -> mTransformation;
+	
+	for( unsigned int m = 0; m < inNode -> mNumMeshes; m++ ) {
+		aiMesh *mesh = inScene -> mMeshes[ inNode -> mMeshes[ m ] ];
+		int indexBase = _vertices.size();
+		
+		for( unsigned int v = 0; v < mesh -> mNumVertices; v++ ) {
+			const aiVector3D& vertex = mesh -> mVertices[ v ];
+			
+			aiVector3D transformed = transform * vertex;	
+			
+			_vertices.push_back( transformed );
+			_center.x += transformed.x;
+			_center.y += transformed.y;
+			_center.z += transformed.z;
+		}
+		
+
+		for( unsigned int i = 0; i < mesh -> mNumFaces; i++ ) {
+			aiFace &f = mesh -> mFaces[ i ];
+			
+			_indices.push_back( indexBase + f.mIndices[ 0 ] );
+			_indices.push_back( indexBase + f.mIndices[ 1 ] );
+			_indices.push_back( indexBase + f.mIndices[ 2 ] );
 		}
 	}
 
-	if( inSize > 0.0f )
-		_maxReach = 1.2 * inSize;
-
-	_maxReach = 100;
-
-	slMessage( 20, "%d points and %d indices processed, max reach = %f\n", pointStart, indexStart, _maxReach );
-
-	setDensity( 1 );
-	createODEGeom();
+	for( unsigned int n = 0; n < inNode -> mNumChildren; n++ ) {
+		Build( inScene, inNode -> mChildren[ n ], &transform );
+	}	
 }
 
-void sl3DSShape::processNodes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *ioPointStart, int *ioIndexStart ) {
-	unsigned int n;
+void slAIGeometryBuilder::SetShapeGeometry( slMeshShape *inMeshShape ) {
+	slVectorMul( &_center, 1.0 / _vertices.size(), &_center );
 
-	while( inNode ) {
-		processNodes( inFile, inNode -> childs, ioPointStart, ioIndexStart );
+	inMeshShape -> _vertices = new float[ 3 * _vertices.size() ];
+	inMeshShape -> _indices = new int[ _indices.size() ];
+	
+	inMeshShape -> _indexCount = _indices.size();
+	inMeshShape -> _vertexCount = _vertices.size();
 
-		if( inNode -> type == LIB3DS_OBJECT_NODE ) {
-			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
-				return;
-
-			Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
-
-			Lib3dsMatrix M, N;
-			lib3ds_matrix_copy( M, mesh->matrix );
-			lib3ds_matrix_inv( M );
-			lib3ds_matrix_copy( N, inNode->matrix );
-
-			slMessage( 20, "Node %s\n", inNode -> name );
-			slMessage( 20, "Node translation: %f, %f, %f\n", inNode->matrix[ 3 ][ 0 ],  inNode->matrix[ 3 ][ 1 ], inNode->matrix[ 3 ][ 2 ] );
-			slMessage( 20, "Mesh translation: %f, %f, %f\n", M[ 3 ][ 0 ],  M[ 3 ][ 1 ], M[ 3 ][ 2 ] );
-			slMessage( 20, "Pivot translation: %f, %f, %f\n", inNode->data.object.pivot[ 0 ], inNode->data.object.pivot[ 1 ], inNode->data.object.pivot[ 2 ] );
-
-			for ( n = 0; n < mesh -> points; n++ ) {
-				slVector v1, v2;
-
-				v1.x = mesh->pointL[ n ].pos[ 0 ];
-				v1.y = mesh->pointL[ n ].pos[ 1 ];
-				v1.z = mesh->pointL[ n ].pos[ 2 ];
-
-				v2.x = M[ 0 ][ 0 ] * v1.x + M[ 1 ][ 0 ] * v1.y + M[ 2 ][ 0 ] * v1.z + M[ 3 ][ 0 ];
-				v2.y = M[ 0 ][ 1 ] * v1.x + M[ 1 ][ 1 ] * v1.y + M[ 2 ][ 1 ] * v1.z + M[ 3 ][ 1 ];
-				v2.z = M[ 0 ][ 2 ] * v1.x + M[ 1 ][ 2 ] * v1.y + M[ 2 ][ 2 ] * v1.z + M[ 3 ][ 2 ];
-
-				slVectorCopy( &v2, &v1 );
-
-				v2.x = N[ 0 ][ 0 ] * v1.x + N[ 1 ][ 0 ] * v1.y + N[ 2 ][ 0 ] * v1.z + N[ 3 ][ 0 ];
-				v2.y = N[ 0 ][ 1 ] * v1.x + N[ 1 ][ 1 ] * v1.y + N[ 2 ][ 1 ] * v1.z + N[ 3 ][ 1 ];
-				v2.z = N[ 0 ][ 2 ] * v1.x + N[ 1 ][ 2 ] * v1.y + N[ 2 ][ 2 ] * v1.z + N[ 3 ][ 2 ];
-
-				// slVectorCopy( &v2, &v1 );
-				// slVectorXform( trans, &v1, &v2 );
-
-				_vertices[ ( *ioPointStart + n ) * 3     ] = v2.x;
-				_vertices[ ( *ioPointStart + n ) * 3 + 1 ] = v2.y;
-				_vertices[ ( *ioPointStart + n ) * 3 + 2 ] = v2.z;
-
-				float tx = 0, ty = 0;
-
-				if( mesh->texelL ) {
-					tx = mesh->texelL[ n ][ 0 ];
-					ty = mesh->texelL[ n ][ 1 ];
-				}
-
-				_texcoords[ ( *ioPointStart + n ) * 2     ] = tx;
-				_texcoords[ ( *ioPointStart + n ) * 2 + 1 ] = ty;
-
-				if( slVectorLength( &v2 ) > slVectorLength( &_max ) )
-					slVectorCopy( &v2, &_max );
-
-				slVectorMul( &v2, 1.0 / _vertexCount, &v2 );
-				slVectorAdd( &_center, &v2, &_center );
-			}
-
-			Lib3dsVector *normals = new Lib3dsVector[ _indexCount ];
-			lib3ds_mesh_calculate_normals( mesh, normals );
-
-			for( unsigned int n = 0; n < mesh -> faces; n++ ) {
-				Lib3dsFace *f = &mesh -> faceL[ n ];
-
-				for ( int m = 0; m < 3; m++ ) {
-					_indices[ *ioIndexStart + n * 3 + m ] = f -> points[ m ] + *ioPointStart;
-
-					_normals[ ( *ioIndexStart + n * 3 + m ) * 3     ] = normals[ n * 3 + m ][ 0 ];
-					_normals[ ( *ioIndexStart + n * 3 + m ) * 3 + 1 ] = normals[ n * 3 + m ][ 1 ];
-					_normals[ ( *ioIndexStart + n * 3 + m ) * 3 + 2 ] = normals[ n * 3 + m ][ 2 ];
-				}
-
-				// check for the material
-
-				if( f -> material && strlen( f -> material ) ) {
-					std::string materialName = std::string( f -> material );
-
-					if( !_materialIndices[ materialName ] ) {
-						Lib3dsMaterial *faceMaterial = lib3ds_file_material_by_name( inFile, f -> material );
-						_materialIndices[ materialName ] = addMaterial( materialName, faceMaterial );
-
-					}
-				
-					_materials[ *ioIndexStart / 3 + n ] = _materialIndices[ materialName ] - 1;
-
-					if( _materialList[ _materialIndices[ materialName ] - 1 ]._texturePath.size() > 0 && !mesh -> texelL ) 
-						printf( "found a texture for the face, but no tex coords\n" );
-				}
-
-			}
-
-			*ioPointStart += mesh->points;
-			*ioIndexStart += mesh->faces * 3;
-   		}
-
-		inNode = inNode -> next;
+	for( unsigned int i = 0; i < _indices.size(); i++ ) {
+		inMeshShape -> _indices[ i ] = _indices[ i ];
 	}
+	
+	for( unsigned int i = 0; i < _vertices.size(); i++ ) {
+		inMeshShape -> _vertices[ i * 3 + 0 ] = _vertices[ i ].x;
+		inMeshShape -> _vertices[ i * 3 + 1 ] = _vertices[ i ].y;
+		inMeshShape -> _vertices[ i * 3 + 2 ] = _vertices[ i ].z;
+	}
+	
+	
 }
 
-int sl3DSShape::addMaterial( std::string &inMaterialName, Lib3dsMaterial *inMaterial ) {
-	if( !inMaterial ) 
-		return 0;
+slMeshShape *slAIImport::Import( char *inFilename ) {
 
-	slMaterial material;
+	slMeshShape *shape = new slMeshShape();
+	char *directory = slDirname( inFilename );
 
-	slMessage( 20, "Found material: %s\n", inMaterialName.c_str() );
-	memcpy( material._specular, inMaterial -> specular, sizeof( float ) * 4 );
-	memcpy( material._diffuse, inMaterial -> diffuse, sizeof( float ) * 4 );
-	memcpy( material._ambient, inMaterial -> ambient, sizeof( float ) * 4 );
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile( inFilename, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_GenUVCoords );
 
-	material._ambient[ 3 ]  = 1.0 - inMaterial -> transparency;
-	material._diffuse[ 3 ]  = 1.0 - inMaterial -> transparency;
-	material._specular[ 3 ] = 1.0 - inMaterial -> transparency;
-	material._twosided = inMaterial -> two_sided;
-
-	// printf( "material transparency: %f\n", inMaterial -> transparency );
-
-	material._shininess = inMaterial -> shininess;
-
-	if( inMaterial -> texture1_map.name && strlen( inMaterial -> texture1_map.name ) ) {
-		material._texturePath = _directory + "/";
-		material._texturePath += inMaterial -> texture1_map.name;
-
-		printf( "Texture name = %s\n", material._texturePath.c_str() );
+	slMessage( 0, "%s NUM Anim %d, Cam %d, Lig %d, Material %d, Mesh %d, Tex %d\n", inFilename,
+		scene -> mNumAnimations,
+		scene -> mNumCameras,
+		scene -> mNumLights,
+		scene -> mNumMaterials,
+		scene -> mNumMeshes,
+		scene -> mNumTextures
+	);
+	
+	for( unsigned int n = 0; n < scene -> mNumMaterials; n++ ) {
+		ImportMaterial( scene -> mMaterials[ n ], shape, directory );
 	}
 
-	_materialList.push_back( material );
-
-	return _materialList.size();
-}
-
-sl3DSShape::~sl3DSShape() {
-	if( _normals )
-		delete[] _normals;
-
-	if( _texcoords )
-		delete[] _texcoords ;
-
-	if( _materials )
-		delete[] _materials;
-}
-
-void sl3DSShape::calculateSizes( Lib3dsFile *inFile, Lib3dsNode *inNode, int *outPoints, int *outIndices ) {
-
-	while( inNode ) {
-		calculateSizes( inFile, inNode -> childs, outPoints, outIndices );
-
-		if( inNode -> type == LIB3DS_OBJECT_NODE ) {
-			if( !strcmp( inNode -> name, "$$$DUMMY" ) )
-				return;
-
-			Lib3dsMesh *mesh = lib3ds_file_mesh_by_name( inFile, inNode->name );
-
-			if( mesh ) {
-				*outPoints += mesh->points;
-				*outIndices += mesh->faces * 3;
-			}
-		}
-
-		inNode = inNode -> next;
+	for( unsigned int n = 0; n < scene -> mNumMeshes; n++ ) {
+		ImportMesh( scene -> mMeshes[ n ], shape );
 	}
-}
-
-double sl3DSShape::maxReach() {
-	return _maxReach;
-}
-
-void sl3DSShape::draw( const slRenderGL& inRenderer ) {
-	for( unsigned int n = 0; n < _materialList.size(); n++ ) {
-		slMaterial *material = &_materialList[ n ];
-
-		if( !material -> _texture && material -> _texturePath.size() > 0 )
-			material -> _texture = new slTexture2D( &material -> _texturePath );
-	}
-
-	for ( int n = 0; n < _indexCount; n += 3 ) {
-		int materialIndex = n / 3;
-
-		if( _materials[ materialIndex ] > -1 )
-			inRenderer.BindMaterial( _materialList[ _materials[ materialIndex ] ] );
-
-		int i1 = _indices[ n ];
-		int i2 = _indices[ n + 1 ];
-		int i3 = _indices[ n + 2 ];
-
-		glBegin( GL_TRIANGLES );
-		glNormal3fv( &_normals[ n * 3 ] );
-		glTexCoord2fv( &_texcoords[ i1 * 2 ] );
-		glVertex3fv( &_vertices[ i1 * 3 ] );
-
-		glNormal3fv( &_normals[ n * 3 + 3 ] );
-		glTexCoord2fv( &_texcoords[ i2 * 2 ] );
-		glVertex3fv( &_vertices[ i2 * 3 ] );
-
-		glNormal3fv( &_normals[ n * 3 + 6 ] );
-		glTexCoord2fv( &_texcoords[ i3 * 2 ] );
-		glVertex3fv( &_vertices[ i3 * 3 ] );
-		glEnd();
-
-	 }
+	
+	shape -> _rootNode = BuildNodeHierarchy( scene -> mRootNode, shape );
+	
+	slAIGeometryBuilder builder;
+	builder.Build( scene, scene -> mRootNode );
+	builder.SetShapeGeometry( shape );
+	shape -> createODEGeom();
+	
+	return shape;
 }
 
 #endif

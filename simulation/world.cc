@@ -371,11 +371,6 @@ slStationary::slStationary( slShape *s, slVector *loc, double rot[3][3], void *d
 
 double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 	double total = 0.0;
-#if HAVE_LIBENET
-
-	static int lastSecond = 0;
-
-#endif
 
 	removeEmptyObjects();
 
@@ -388,32 +383,6 @@ double slWorld::runWorld( double deltaT, double timestep, int *error ) {
 	}
 
 	_age += total;
-
-#if HAVE_LIBENET
-	if ( _netsimData._server && _netsimData._isMaster && ( int )_age >= lastSecond ) {
-		lastSecond = ( int )_age + 1;
-
-		slNetsimBroadcastSyncMessage( _netsimData._server, _age );
-	}
-
-	if ( _netsimData._server && !_netsimData._isMaster && _detectCollisions ) {
-		int maxIndex;
-		slVector max, min;
-
-		maxIndex = ( _clipData->_count * 2 ) - 1;
-
-		min.x = *_clipData->boundListPointers[0][0]->value;
-		min.y = *_clipData->boundListPointers[2][0]->value;
-		min.z = *_clipData->boundListPointers[2][0]->value;
-
-		max.x = *_clipData->boundListPointers[0][maxIndex]->value;
-		max.y = *_clipData->boundListPointers[1][maxIndex]->value;
-		max.z = *_clipData->boundListPointers[2][maxIndex]->value;
-
-		slNetsimSendBoundsMessage( _netsimClient, &min, &max );
-	}
-
-#endif
 
 	return total;
 }
@@ -445,7 +414,7 @@ double slWorld::step( double stepSize, int *error ) {
 			_clipGrid->assignObjectsToPatches( this );
 			result = 0;
 		} else {
-			_clipData->pruneAndSweep();
+			_clipData -> pruneAndSweep();
 			result = _clipData->clip( 0.0, 0, _boundingBoxOnlyCollisions );
 		}
 

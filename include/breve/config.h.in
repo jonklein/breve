@@ -18,17 +18,20 @@
 /* Define to 1 if you have the `3ds' library (-l3ds). */
 #undef HAVE_LIB3DS
 
+/* Define to 1 if you have the `assimp' library (-lassimp). */
+#undef HAVE_LIBASSIMP
+
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
 #undef HAVE_LIBAVCODEC
 
 /* Define to 1 if you have the `avformat' library (-lavformat). */
 #undef HAVE_LIBAVFORMAT
 
-/* Define to 1 if you have the `swscale' library (-lswscale). */
-#undef HAVE_LIBSWSCALE
-
 /* Define to 1 if you have the `avutil' library (-lavutil). */
 #undef HAVE_LIBAVUTIL
+
+/* Define to 1 if you have the `bz2' library (-lbz2). */
+#undef HAVE_LIBBZ2
 
 /* Define to 1 if you have the `curl' library (-lcurl). */
 #undef HAVE_LIBCURL
@@ -110,6 +113,9 @@
 
 /* Define to 1 if you have the `sndfile' library (-lsndfile). */
 #undef HAVE_LIBSNDFILE
+
+/* Define to 1 if you have the `swscale' library (-lswscale). */
+#undef HAVE_LIBSWSCALE
 
 /* Define to 1 if you have the `termcap' library (-ltermcap). */
 #undef HAVE_LIBTERMCAP

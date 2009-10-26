@@ -29,14 +29,13 @@
 #include "config.h"
 
 #ifndef WINDOWS
-#include <libgen.h>
+    #include <libgen.h>
 #endif
 
 #include "simulation.h"
 #include "steve.h"
 #include "breve.h"
 #include "world.h"
-// #include "gldraw.h"
 #include "format.h"
 
 #include "pyconvert.h"
@@ -100,14 +99,14 @@ int brGLUTSoundCallback() {
 
 int brGLUTPause() {
 	gPaused = 1;
-	brPauseTimer( gEngine );
+	gEngine -> pauseTimer();
 	glutIdleFunc( NULL );
 	return 0;
 }
 
 int brGLUTUnpause() {
 	gPaused = 0;
-	brUnpauseTimer( gEngine );
+	gEngine -> unpauseTimer();
 	glutIdleFunc( brGlutLoop );
 	return 0;
 }
@@ -332,9 +331,9 @@ void brQuit( brEngine *e ) {
 		brEngineUnlock( gEngine );
 	}
 
-	brPauseTimer( e );
+	e -> pauseTimer();
 
-	diff = e->realTime.tv_sec + ( e->realTime.tv_usec / 1000000.0 );
+	diff = e->accumulatedTime.tv_sec + ( e->accumulatedTime.tv_usec / 1000000.0 );
 
 	age = e->world->getAge();
 
@@ -745,7 +744,7 @@ void brInterrupt( brEngine *gEngine ) {
 		return;
 	}
 
-	brPauseTimer( gEngine );
+	gEngine -> pauseTimer();
 
 	fflush( stdin );
 	printf( "\n\nSimulation interupted.  Type a steve command, 'x' to quit, or hit enter to continue\n" );
@@ -778,7 +777,7 @@ void brInterrupt( brEngine *gEngine ) {
 	if ( gOptionFull )
 		glutFullScreen();
 
-	brUnpauseTimer( gEngine );
+	gEngine -> unpauseTimer();
 }
 
 /**

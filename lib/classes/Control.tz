@@ -228,10 +228,12 @@ Abstract : Control (aka Controls) [version 2.3] {
 
 		return getRealTime().
 
-	+ to get-real-elapsed-time:
-		% Returns the number of seconds the start of the simulation.
+	+ to get-real-running-time:
+		% Returns the number of seconds the start of the simulation.  The value returned by 
+		% this method is typically adjusted for pausing and unpausing of the simulation
+		% if supported by the simulation frontnend.
 
-		return getRealTime() - _startTime.
+		return getRunningTime().
 
 	+ to get-time:
 		% Returns the simulation time of the world.

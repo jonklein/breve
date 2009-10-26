@@ -5,7 +5,7 @@ Object : QSystem {
 	% a quantum computing simulator. 
 	% <p><b>Note: the QGAME library is not built-in to the standard breve 
 	% distribution.  Use of this class may require compiling breve from the 
-	% source code with support for QGAME.
+	% source code with support for QGAME.</b>
 
 	+ variables:
 		systemPointer (pointer).
@@ -39,7 +39,7 @@ Object : QProgram {
 	% a quantum computing simulator.  To be used in conjunction with OBJECT(QSystem).
 	% <p><b>Note: the QGAME library is not built-in to the standard breve 
 	% distribution.  Use of this class may require compiling breve from the 
-	% source code with support for QGAME.
+	% source code with support for QGAME.</b>
 
 	+ variables:
 		programPointer (pointer).

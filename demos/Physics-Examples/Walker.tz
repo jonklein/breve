@@ -81,9 +81,9 @@ PhysicalControl : WalkerSim {
 		# self set-mountain-skybox.
 
         self set-skybox-images to {
-            "images/MountainBoxFront.png", "images/MountainBoxBack.png",
-            "images/MountainBoxLeft.png", "images/MountainBoxRight.png",
-            "images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
+            "images/MountainBoxFront.jpg", "images/MountainBoxBack.jpg",
+            "images/MountainBoxLeft.jpg", "images/MountainBoxRight.jpg",
+            "images/MountainBoxTop.jpg", "images/MountainBoxBottom.jpg" }.
 
 		self set-fast-physics-iterations to 10.
 	
@@ -116,8 +116,6 @@ PhysicalControl : WalkerSim {
 			number += 1.
 		}
 
-		state save.
-
 		self pick-drivers.
 
 		# set up the menus...
@@ -134,6 +132,18 @@ PhysicalControl : WalkerSim {
 		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
 
 		self display-current-driver.
+
+	+ to reset-evolution:
+		item (object).
+
+		foreach item in state::controllers: {
+			item randomize.		
+			state::bestDistance = 0.
+			state::runningTimeReal = 0.
+			state::runningTimeSim = 0.
+		}
+
+		self change-drivers.
 
 	+ to display-current-driver:
 		currentNumber (int).
@@ -160,7 +170,7 @@ PhysicalControl : WalkerSim {
 		seats{ currentSeat } control robot walker at-time (self get-time).
 
 		state::runningTimeSim = startTimeSim + ( self get-time ).
-		state::runningTimeReal = startTimeReal + ( self get-real-elapsed-time ).
+		state::runningTimeReal = startTimeReal + ( self get-real-running-time ).
 
 		super iterate.
 

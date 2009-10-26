@@ -108,10 +108,10 @@ int brIMeshShapeNew( brEval args[], brEval *target, brInstance *i ) {
 		return EC_ERROR;
 	}
 
-#ifdef HAVE_LIB3DS
-	target->set( new sl3DSShape( path, BRSTRING( &args[1] ), BRDOUBLE( &args[ 2 ] ) ) );
+#ifdef HAVE_LIBASSIMP
+	target -> set( slAIImport::Import( path ) );
 #else
-	slMessage( DEBUG_ALL, "Cannot load mesh shape -- this binary was built without lib3ds" );
+	slMessage( DEBUG_ALL, "Cannot load mesh shape -- this binary was built without libassimp" );
 	return EC_ERROR;
 #endif
 

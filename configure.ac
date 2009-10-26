@@ -80,17 +80,15 @@ case ${host_os} in
 				AC_DEFINE([MACOSX], [1], [Mac OS X])
 				custom_cblas="-framework vecLib"
 				LIBS="-framework Foundation -framework vecLib -framework OpenGL -framework GLUT"
+				EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
+				PLATFORM="macosx"
 			;;
 		esac
-
-		AC_DEFINE([MACOSX], [1], [Mac OS X])
 
 		PLUGINFLAGS="-bundle -undefined suppress -flat_namespace"
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		ARCHIVER="tar czf"
 		ARCHIVE_SUFFIX="tar.gz"
-		PLATFORM="macosx"
-		EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
 
 		if test "x$osxcompat104" = "xyes"; then 
 			CPPFLAGS="${CPPFLAGS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
@@ -337,7 +335,6 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([termcap], [tputs])
 	AC_CHECK_LIB([history], [add_history])
 	AC_CHECK_LIB([readline], [readline])
-	AC_CHECK_LIB([3ds], [lib3ds_io_new])
 
 	AC_CHECK_LIB([freetype], [FT_Init_FreeType])
 

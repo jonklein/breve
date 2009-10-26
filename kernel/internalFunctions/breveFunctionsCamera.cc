@@ -46,7 +46,6 @@ int brICameraSetZClip( brEval args[], brEval *target, brInstance *i ) {
 
 int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
 	slCamera *camera = BRCAMERAPOINTER( &args[0] );
-	slWorld *w = i -> engine-> world;
 
 	if ( camera->_activateContextCallback ) 
 		camera -> _activateContextCallback();

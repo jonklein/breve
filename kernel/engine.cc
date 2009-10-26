@@ -91,6 +91,12 @@ brEngine::brEngine() {
 	renderWindowCallback = NULL;
 
 	_controller = NULL;
+
+
+	gettimeofday( &unpauseTime, NULL );
+	accumulatedTime.tv_sec = 0;
+	accumulatedTime.tv_usec = 0;
+
 }
 
 brEngine *brEngineNew() {
@@ -150,11 +156,6 @@ brEngine *brEngineNew() {
 
 	e->world->setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
 	//  e->world->setNetworkHandler();
-
-	gettimeofday( &e->startTime, NULL );
-
-	e->realTime.tv_sec = 0;
-	e->realTime.tv_usec = 0;
 
 	if ( pthread_mutex_init( &e->lock , NULL ) ) {
 		slMessage( 0, "warning: error creating lock for breve engine\n" );
@@ -373,33 +374,45 @@ char *brOutputPath( brEngine *e, const char *filename ) {
  * Used in conjunction with \ref brUnpauseTimer.
  */
 
-void brPauseTimer( brEngine *e ) {
-
-	struct timeval tv;
-
-	if ( e->startTime.tv_sec == 0 && e->startTime.tv_usec == 0 )
+void brEngine::pauseTimer() {
+	if ( unpauseTime.tv_sec == 0 && unpauseTime.tv_usec == 0 )
 		return;
 
+	struct timeval tv;
 	gettimeofday( &tv, NULL );
 
-	e->realTime.tv_sec += ( tv.tv_sec - e->startTime.tv_sec );
-	e->realTime.tv_usec += ( tv.tv_usec - e->startTime.tv_usec );
+	accumulatedTime.tv_sec += ( tv.tv_sec - unpauseTime.tv_sec );
+	accumulatedTime.tv_usec += ( tv.tv_usec - unpauseTime.tv_usec );
 
-	e->startTime.tv_sec = 0;
-	e->startTime.tv_usec = 0;
+	unpauseTime.tv_sec = 0;
+	unpauseTime.tv_usec = 0;
 }
 
-/*!
-    \brief Unpause the simulation timer.
+/**
+ * \brief Unpause the simulation timer.
+ *
+ * Optional call to be made when the engine is running at fullspeed,
+ * so that information about simulation speed can be measured.
+ *
+ * Used in conjunction with \ref brPauseTimer.
+ */
 
-    Optional call to be made when the engine is running at fullspeed,
-    so that information about simulation speed can be measured.
+void brEngine::unpauseTimer() {
+	gettimeofday( &unpauseTime, NULL );
+}
 
-	Used in conjunction with \ref brPauseTimer.
-*/
+/**
+ * Gets the accumulated running time.
+ */
 
-void brUnpauseTimer( brEngine *e ) {
-	gettimeofday( &e->startTime, NULL );
+double brEngine::runningTime() {
+	struct timeval tv, current;
+
+	gettimeofday( &tv, NULL );
+	current.tv_sec  = accumulatedTime.tv_sec  + ( tv.tv_sec  - unpauseTime.tv_sec );
+	current.tv_usec = accumulatedTime.tv_usec + ( tv.tv_usec - unpauseTime.tv_usec );
+
+	return (double)current.tv_sec + current.tv_usec / 1000000.0;
 }
 
 /*!

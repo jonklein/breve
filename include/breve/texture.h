@@ -81,7 +81,8 @@ enum slVertexBufferType {
 	VB_XYZ		= 1 << 1,
 	VB_UV		= 1 << 2,
 	VB_UVW		= 1 << 3,
-	VB_NORMAL	= 1 << 4
+	VB_RGBA		= 1 << 4,
+	VB_NORMAL	= 1 << 5
 };
 
 enum slVertexBufferDrawType {
@@ -90,33 +91,47 @@ enum slVertexBufferDrawType {
 	VB_LINE_STRIP		= 1 << 2
 };
 
+class slIndexBufferGL {
+	public:
+		void					resize( int inN ) { _count = inN; _data.resize( _count * sizeof( unsigned short ) ); }
+		unsigned short*			indices() const { return (unsigned short*)_data.data(); }
+		int						count() const { return _count; }
+
+	private:
+		slBuffer				_data;
+		int						_count;
+};
+
 class slVertexBufferGL {
 	public:
-							slVertexBufferGL( int inVertexCount = 0, int inPixelFormat = 0 );
-							~slVertexBufferGL() {}
+								slVertexBufferGL( int inVertexCount = 0, int inPixelFormat = 0 );
+								~slVertexBufferGL() {}
 							
-		void				resize( int inVertexCount, int inPixelFormat );
+		void					resize( int inVertexCount, int inPixelFormat );
 
-		inline float*		vertex( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _vertexOffset ] ); }
-		inline float*		normal( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _normalOffset ] ); }
-		inline float*		texcoord( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _texOffset ] ); }
+		inline float*			vertex( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _vertexOffset ] ); }
+		inline float*			normal( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _normalOffset ] ); }
+		inline float*			texcoord( int inN ) const { return (float*)( &_data.data()[ _vertexSize * inN + _texOffset ] ); }
+		inline unsigned char*	color( int inN ) const { return (unsigned char*)( &_data.data()[ _vertexSize * inN + _colorOffset ] ); }
 		
-		void 				draw( slVertexBufferDrawType inType = VB_TRIANGLES ) const;
+		void 					draw( slVertexBufferDrawType inType = VB_TRIANGLES ) const;
+		void 					draw( const slIndexBufferGL& inIndices ) const;
 		
-		void				bind();
-		void				unbind();
+		void					bind();
+		void					unbind();
 		
-		unsigned int		size() const { return _vertexCount; }
+		unsigned int			size() const { return _vertexCount; }
 		
 	private:
-		slBuffer			_data;
-		unsigned int		_vertexSize;
-		unsigned int		_vertexCount;
-		unsigned int		_vertexFormat;
+		slBuffer				_data;
+		unsigned int			_vertexSize;
+		unsigned int			_vertexCount;
+		unsigned int			_vertexFormat;
 		
-		unsigned int		_vertexOffset;
-		unsigned int		_normalOffset;
-		unsigned int		_texOffset;
+		unsigned int			_vertexOffset;
+		unsigned int			_normalOffset;
+		unsigned int			_texOffset;
+		unsigned int			_colorOffset;
 };
 
 #endif // _TEXTURE_H

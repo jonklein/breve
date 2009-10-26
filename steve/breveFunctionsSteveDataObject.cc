@@ -231,8 +231,6 @@ int stDDataWriteObjectWithDialog( brEval *args, brEval *result, brInstance *bi )
 
 	result->set( brXMLWriteObjectToFile( bi, filename, 1 ) );
 
-	slFree( filename );
-
 	return EC_OK;
 }
 
@@ -295,8 +293,6 @@ int stDDataReadObjectWithDialog( brEval *args, brEval *result, brInstance *bi ) 
 	if ( BRINT( result ) < 0 ) {
 		slMessage( DEBUG_ALL, "load failed for file \"%s\"\n", filename );
 	}
-
-	slFree( filename );
 
 	return EC_OK;
 }

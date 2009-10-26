@@ -170,6 +170,11 @@ class brEngine {
 		const char 				*runLoadDialog();
 		void					setMouseLocation( int inX, int inY );
 
+		double 					runningTime();
+
+		void 					pauseTimer();
+		void 					unpauseTimer();
+
 #ifdef HAVE_LIBCURL
 		brURLFetcher			_url;
 #endif
@@ -227,8 +232,8 @@ public:
 
 		unsigned char 				drawEveryFrame;
 
-		struct timeval 				startTime;
-		struct timeval 				realTime;
+		struct timeval 				unpauseTime;
+		struct timeval 				accumulatedTime;
 
 		int 					_argc;
 		char**					_argv;
@@ -325,9 +330,6 @@ brEngine *brEngineNew();
 brEngine *brEngineNewWithArguments( int inArgc, char **inArgv );
 
 void brEngineFree(brEngine *);
-
-void brPauseTimer(brEngine *);
-void brUnpauseTimer(brEngine *);
 
 void brAddToInstanceLists(brInstance *);
 void brRemoveFromInstanceLists(brInstance *);

@@ -127,6 +127,9 @@ slVertexBufferGL::slVertexBufferGL( int inVertexCount, int inPixelFormat ) {
 	_vertexSize = 0;
 	_vertexCount = 0;
 	_vertexFormat = 0;
+
+	_colorOffset = 0;
+	_texOffset = 0;
 	
 	if( inVertexCount && inPixelFormat )
 		resize( inVertexCount, inPixelFormat );
@@ -148,6 +151,11 @@ void slVertexBufferGL::draw( slVertexBufferDrawType inType ) const {
 	}
 	
 	glDrawArrays( drawType, 0, _vertexCount ); 
+}
+
+
+void slVertexBufferGL::draw( const slIndexBufferGL& inIndices ) const { 
+	glDrawElements( GL_TRIANGLES, inIndices.count(), GL_UNSIGNED_SHORT, inIndices.indices() ); 
 }
 
 void slVertexBufferGL::bind() {

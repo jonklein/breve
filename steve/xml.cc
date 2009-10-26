@@ -78,7 +78,7 @@ int brXMLCleanupFailedImport( brXMLParserState *inState ) {
 	return 0;
 }
 
-int brXMLWriteObjectToFile( brInstance *i, char *filename, int isDataObject ) {
+int brXMLWriteObjectToFile( brInstance *i, const char *filename, int isDataObject ) {
 	FILE *file;
 	int r;
 
