@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -631,7 +631,7 @@
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = macosx10.4;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -683,7 +683,7 @@
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = macosx10.4;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -769,7 +769,7 @@
 				OTHER_CFLAGS = "$(CPPFLAGS)";
 				OTHER_LDFLAGS = "$(LIBS)";
 				PRODUCT_NAME = breve;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = macosx10.4;
 				SECTORDER_FLAGS = "";
 				UNSTRIPPED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wmost";

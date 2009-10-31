@@ -121,7 +121,7 @@ class Shape( breve.Abstract ):
 	def setInertiaMatrix( self, newInertia ):
 		'''Sets the 3x3 matrix representing the shape's inertia.  Appropriate intertia matrices are automatically computed for all shapes, so this method is for advanced customization only.  Any calls that change the shape's density, mass or structure will recompute the inertia matrix, so this method should be called only after the final structure, mass and density of the shape have been set.'''
 
-                breve.breveInternalFunctionFinder.shapeSetInertiaMatrix( shapePointer, newInertia )
+                breve.breveInternalFunctionFinder.shapeSetInertiaMatrix( self, self.shapePointer, newInertia )
 
 
 breve.Shape = Shape

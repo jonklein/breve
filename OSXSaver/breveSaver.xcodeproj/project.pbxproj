@@ -87,8 +87,8 @@
 
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "breveSwarm-info.plist"; sourceTree = "<group>"; };
-		4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "breveWalker-Info.plist"; sourceTree = "<group>"; };
+		4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "breveSwarm-info.plist"; sourceTree = "<group>"; };
+		4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "breveWalker-Info.plist"; sourceTree = "<group>"; };
 		4818574F05CABEEB00C48BE6 /* breveCreatures.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveCreatures.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		4818575605CABFE300C48BE6 /* classes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = classes; path = ../lib/classes; sourceTree = SOURCE_ROOT; };
 		4842D87207F9A72700140407 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = ../lib/libbreve.a; sourceTree = SOURCE_ROOT; };
@@ -116,11 +116,11 @@
 		489D8CB706B5554900740D0A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		489D8D5D06B5558A00740D0A /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = /usr/local/lib/libode.a; sourceTree = "<absolute>"; };
 		489DE21706B5587300740D0A /* brevePainter.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = brevePainter.saver; sourceTree = BUILT_PRODUCTS_DIR; };
-		489DE21806B5587400740D0A /* brevePainter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "brevePainter-Info.plist"; path = "/Users/jk/dev/breveSaver/brevePainter-Info.plist"; sourceTree = "<absolute>"; };
+		489DE21806B5587400740D0A /* brevePainter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "brevePainter-Info.plist"; path = "/Users/jk/dev/breveSaver/brevePainter-Info.plist"; sourceTree = "<absolute>"; };
 		489DE2B006B5598B00740D0A /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Digitizer.tz; sourceTree = SOURCE_ROOT; };
 		489DE2B806B559C100740D0A /* PainterSaver.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = PainterSaver.tz; sourceTree = "<group>"; };
 		48B9BDBC05EA6004002C7A42 /* breveResearcher.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveResearcher.saver; sourceTree = BUILT_PRODUCTS_DIR; };
-		48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "breveResearcher-Info.plist"; path = "/Users/jk/dev/breveSaver/breveResearcher-Info.plist"; sourceTree = "<absolute>"; };
+		48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "breveResearcher-Info.plist"; path = "/Users/jk/dev/breveSaver/breveResearcher-Info.plist"; sourceTree = "<absolute>"; };
 		48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slBreveResearcher.h; sourceTree = "<group>"; };
 		48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveResearcher.mm; sourceTree = "<group>"; };
 		48BB26B20B2285DF006FA9E9 /* libpython.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpython.dylib; path = /usr/lib/libpython.dylib; sourceTree = "<absolute>"; };
@@ -532,7 +532,6 @@
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -563,12 +562,11 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = 4;
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
-				OPTIMIZATION_CFLAGS = "-O4";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -604,7 +602,6 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "breveResearcher-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -625,6 +622,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 4;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
@@ -632,7 +630,6 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "breveResearcher-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
-				OPTIMIZATION_CFLAGS = "-O4";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -663,7 +660,6 @@
 				INFOPLIST_FILE = "brevePainter-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -685,6 +681,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 4;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
@@ -692,7 +689,6 @@
 				INFOPLIST_FILE = "brevePainter-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
-				OPTIMIZATION_CFLAGS = "-O4";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",

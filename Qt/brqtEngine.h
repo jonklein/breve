@@ -3,24 +3,15 @@
 #define BRQTENGINE
 
 #include "brqtGLWidget.h"
-
 #include "kernel.h"
+
+#include <QMenu>
 
 class brqtEngine : public QObject {
 	public:
-		brqtEngine( const char *inSimulationText, const char *inSimulationName, brqtGLWidget *inGLView );
+		brqtEngine( const char *inSimulationText, const char *inSimulationName, brqtGLWidget *inGLView, QMenu *inSimMenu );
 	
-		~brqtEngine() {
-			_stop = 1;
-
-			if( _glwidget )
-				_glwidget->setEngine( NULL );
-
-			if( _timerID != -1 )
-				killTimer( _timerID );
-
-			brEngineFree( _engine );
-		}
+		~brqtEngine();
 
 		void timerEvent( QTimerEvent* ) {
 			brEngineIterate( _engine );
@@ -57,6 +48,12 @@ class brqtEngine : public QObject {
 		}
 
 	private:
+		static int		pauseCallback();
+		static int		unpauseCallback();
+		static void		updateSimulationMenuCallback( brInstance *inObject );
+
+		void			updateSimulationMenu( brInstance *inObject );
+
 		int 			_timerID;
 		bool 			_stop;
 		bool 			_paused;
@@ -64,6 +61,10 @@ class brqtEngine : public QObject {
 		int 			_timerDelay;
 
 		bool			_error;
+
+		QMenu*			_simulationMenu;
+
+		static brqtEngine*	_currentEngine;		
 };
 
 #endif

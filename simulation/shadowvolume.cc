@@ -120,12 +120,11 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 
 #if 0
 	slVector light, lNormal, x1, x2, lastV;
-	int n, first = 1;
+	int n;
 	double diff;
 	int divisions;
 
 	static int inited;
-
 	static float sineTable[361], cosineTable[361];
 
 	slVectorSub( &c->_lights[0]._location, &p->location, &light );
@@ -150,8 +149,6 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	slVectorNormalize( &x1 );
 	slVectorNormalize( &x2 );
 
-	glBegin( GL_QUADS );
-
 	divisions = ( int )( _radius * 5.0 );
 
 	if ( divisions < MIN_SPHERE_VOLUME_DIVISIONS ) 
@@ -171,18 +168,25 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 
 	diff = 2.0 * M_PI / ( double )divisions;
 
-	int step = ( 360 / divisions );
+	double step = ( 360.0f / divisions );
 
-	for ( n = 0;n < divisions + 1;n++ ) {
+	glBegin( GL_QUADS );
+
+	for ( n = 0; n < divisions + 1; n++ ) {
 		slVector dx, dy, v, vBottom, lBottom;
 
-		slVectorMul( &x1, _radius * cosineTable[ n * step], &dx );
-		slVectorMul( &x2, _radius * sineTable[n * step], &dy );
+		// make the last index line up with the first -- otherwise, rounding 
+		// error can make it so that the rays don't line up.
+
+		int index = ( n == divisions ) ? 0 : (int)( n * step );
+
+		slVectorMul( &x1, _radius * cosineTable[ index ], &dx );
+		slVectorMul( &x2, _radius * sineTable[   index ], &dy );
 
 		slVectorAdd( &p->location, &dx, &v );
 		slVectorAdd( &v, &dy, &v );
 
-		if ( !first ) {
+		if ( n != 0 ) {
 			slVectorSub( &v, &light, &vBottom );
 			slVectorSub( &lastV, &light, &lBottom );
 
@@ -191,8 +195,6 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 			glVertex3f( vBottom.x, vBottom.y, vBottom.z );
 			glVertex3f( v.x, v.y, v.z );
 		}
-
-		first = 0;
 
 		slVectorCopy( &v, &lastV );
 	}
@@ -204,8 +206,9 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	for ( n = 0;n < divisions + 1;n++ ) {
 		slVector dx, dy, v;
 
-		slVectorMul( &x1, _radius * cosineTable[ n * step], &dx );
-		slVectorMul( &x2, _radius * sineTable[n * step], &dy );
+		int index = ( n == divisions ) ? 0 : (int)( n * step );
+		slVectorMul( &x1, _radius * cosineTable[  index ], &dx );
+		slVectorMul( &x2, _radius * sineTable[    index ], &dy );
 
 		slVectorAdd( &p->location, &dx, &v );
 		slVectorAdd( &v, &dy, &v );

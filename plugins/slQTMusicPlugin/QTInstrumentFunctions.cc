@@ -168,8 +168,6 @@ int brQTInstrumentStopNote( brEval args[], brEval *result, void *i ) {
 	return EC_OK;
 }
 
-extern "C" {
-
 void slInitQTInstrumentFuncs( void *n ) {
 	brNewBreveCall( n, "instrumentNew", brQTInstrumentNew, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "instrumentFree", brQTInstrumentFree, AT_NULL, AT_POINTER, 0 );
@@ -178,6 +176,4 @@ void slInitQTInstrumentFuncs( void *n ) {
 	brNewBreveCall( n, "instrumentStopNote", brQTInstrumentStopNote, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "instrumentPlayChord", brQTInstrumentPlayChord, AT_NULL, AT_POINTER, AT_LIST, AT_INT, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "instrumentSetController", brQTInstrumentSetController, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
-}
-
 }

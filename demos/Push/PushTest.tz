@@ -35,11 +35,15 @@ Object : PushTest {
 		interpreter add-instruction for-instance self for-method "callback" named "CALLBACK-TEST".
 
 	+ to test-set-from-list:
-		code = ( new PushProgram parse program "( INTEGER./ 1 1 1 1 1 1 1 1)" ).
+		code = ( new PushProgram parse program "( ( INTEGER./ 1 1 1 1 1 1 1 1) )" ).
 
-		code2 set-from code-list { "X", code, "Y", code, "Z", code }.
+		code2 copy-from program code.
+		# code2 set-from code-list { "X", code, "Y", code, "Z", code }.
 
-		code mutate with-interpreter interpreter.
+		code2 mutate with-interpreter interpreter.
+		code2 mutate with-interpreter interpreter.
+		code2 mutate with-interpreter interpreter.
+		code2 mutate with-interpreter interpreter.
 
 		print "c2: ", (code2 get-string).
 		print "c1: ", (code get-string).

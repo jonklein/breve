@@ -335,6 +335,7 @@ if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([termcap], [tputs])
 	AC_CHECK_LIB([history], [add_history])
 	AC_CHECK_LIB([readline], [readline])
+	AC_CHECK_LIB([obj], [main])
 
 	AC_CHECK_LIB([freetype], [FT_Init_FreeType])
 

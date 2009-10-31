@@ -253,7 +253,7 @@ void brqtMainWindow::toggleSimulation() {
 
 		printf( "%s\n", params );
 
-		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget );
+		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget, _ui.menuSimulation );
 
 		slFree( str );
 
@@ -298,5 +298,7 @@ void brqtMainWindow::updateSimulationPopup() {
 	for( int n = 0; n < _documents.size(); n++ ) 
 		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( _documents[ n ] ) );
 
-	// _ui.simulationPopup -> activated( _documents.size() - 1 );
+	_ui.simulationPopup -> setCurrentIndex( _documents.size() - 1 );
 }
+
+
