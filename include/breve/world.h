@@ -152,7 +152,6 @@ class slWorld {
 		slCamera 				*getLightExposureCamera() { return &_lightExposureCamera; }
 		
 		void					drawObjects( slRenderGL& inRenderer );
-		void					draw( slRenderGL& inRenderer, slCamera *inCamera );
 
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
@@ -187,41 +186,43 @@ class slWorld {
 		void					setCFM( double inCFM ) {
 								if( _odeWorldID ) 
 									dWorldSetCFM( _odeWorldID, inCFM );
-							}
+								}
+
+		void								drawPatchGrids( slRenderGL& inRenderer, slCamera *inCamera );
+		void								draw( slRenderGL& inRenderer, slCamera *inCamera );
 
 		// integration vectors -- DV_VECTOR_COUNT depends on the requirements
 		// of the integration algorithm we're using... mbEuler requires only 
 		// a single derivation vector, while RK4 needs about 6.
 	
-		double 					*dv[ DV_VECTOR_COUNT ];
-	
-		int 					(*integrator)(slWorld *w, slLink *m, double *dt, int skip);
+		double 								*dv[ DV_VECTOR_COUNT ];
+		int 								(*integrator)( slWorld *w, slLink *m, double *dt, int skip );
 	
 		// the collision callback is called when the collision is detected --
 		// at the estimated time of collision.  
 	
-		void 					(*_collisionCallback)(void *body1, void *body2, int type, slVector *position, slVector *face);
+		void 								(*_collisionCallback)(void *body1, void *body2, int type, slVector *position, slVector *face);
 	
 		// the collisionCheckCallback is a callback defined by the program
 		// using the physics engine.  it takes two userData (see slWorldObject)
 		// pointers and returns whether collision detection should be preformed
 		// on the objects or not.
 	
-		int 					(*_collisionCheckCallback)(void *body1, void *body2, int type);
+		int 								(*_collisionCheckCallback)(void *body1, void *body2, int type);
 	
-		slObjectLine 				*addObjectLine( slWorldObject*, slWorldObject*, int, slVector* );
+		slObjectLine 						*addObjectLine( slWorldObject*, slWorldObject*, int, slVector* );
 
-		slPatchGrid 				*addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
-		void 					removePatchGrid( slPatchGrid *g );
+		slPatchGrid 						*addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
+		void 								removePatchGrid( slPatchGrid *g );
 
-		slGISData*				loadTigerFile( char *, slTerrain * );
+		slGISData*							loadTigerFile( char *, slTerrain * );
 		// age is the simulation time of the world.
 	
-		double 					_age;
+		double 								_age;
 	
 		std::vector< slWorldObject* > 		_objects;
 		std::vector< slPatchGrid* > 		_patches;
-		std::vector< slCamera* > 		_cameras;
+		std::vector< slCamera* > 			_cameras;
 		std::vector< slObjectConnection* > 	_connections;
 		std::vector< slDrawCommandList* > 	_drawings;
 	

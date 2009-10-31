@@ -242,12 +242,6 @@ class Control( breve.Abstract ):
 		self.shadowFlag = 0
 		breve.breveInternalFunctionFinder.setDrawShadow( self, self.shadowFlag )
 
-	def disableSmoothDrawing( self ):
-		'''Disable smooth drawing for the main camera.  See METHOD(enable-smooth-drawing) for more information.'''
-
-		self.smoothFlag = 0
-		breve.breveInternalFunctionFinder.cameraSetDrawSmooth( self, self.cameraPointer, self.smoothFlag )
-		self.drawMenu.uncheck()
 
 	def disableText( self ):
 		'''Disable the timestamp and camera position texts (which appear when  changing the camera angle or position).  The text is on by default.   The text can be re-enabled using METHOD(enable-text).'''
@@ -332,13 +326,6 @@ class Control( breve.Abstract ):
 
 		self.shadowFlag = 1
 		breve.breveInternalFunctionFinder.setDrawShadow( self, self.shadowFlag )
-
-	def enableSmoothDrawing( self ):
-		'''Enable smooth drawing for the main camera.  Smooth drawing enables  a smoother blending of colors, textures and lighting.  This feature is especially noticeable when dealing with spheres or large objects. <p> It is strongly recommended that smooth drawing be enabled whenever  lighting is enabled (see METHOD(enable-lighting)).  Otherwise, major artifacts may be visible, especially on larger polygons. <p> The disadvantage of smooth drawing is a potential performance hit. The degree of this performance hit depends on the number of polygons in the scene.  If speed is an issue, it is often best to disable  both lighting and smooth drawing.'''
-
-		self.smoothFlag = 1
-		breve.breveInternalFunctionFinder.cameraSetDrawSmooth( self, self.cameraPointer, self.smoothFlag )
-		self.drawMenu.check()
 
 	def enableText( self ):
 		'''enables the timestamp and camera position texts (which appear when changing  the camera angle or position).  This is the default setting.  The text can  be disabled using METHOD(disable-text).'''
@@ -483,7 +470,6 @@ class Control( breve.Abstract ):
 		self.addMenu( '''End Simulation''', 'endSimulation' )
 		self.addMenuSeparator()
 		self.lightMenu = self.addMenu( '''Use Lighting''', 'toggleLighting' )
-		self.drawMenu = self.addMenu( '''Use Smooth Shading''', 'toggleSmooth' )
 		self.shadowMenu = self.addMenu( '''Draw Shadows''', 'toggleShadows' )
 		self.fogMenu = self.addMenu( '''Draw Fog''', 'toggleFog' )
 		self.reflectMenu = self.addMenu( '''Draw Reflections''', 'toggleReflections' )
@@ -491,7 +477,6 @@ class Control( breve.Abstract ):
 		self.addMenuSeparator()
 		self.movieMenu = self.addMenu( '''Record Movie to "simulation.mpeg"''', 'toggleRecordingToMovie' )
 		self.addMenu( '''Save Snapshot to "simulation.png"''', 'saveSnapshotToFile' )
-		self.enableSmoothDrawing()
 		self.disableLighting()
 		self.addMenuSeparator()
 		self.genericShape = breve.createInstances( breve.Sphere, 1 ).initWith( 1.000000 )
@@ -875,16 +860,6 @@ class Control( breve.Abstract ):
 			self.disableShadowVolumes()
 		else:
 			self.enableShadowVolumes()
-
-
-	def toggleSmooth( self ):
-		'''Toggle smooth drawing for the main camera.  See METHOD(enable-smooth-drawing) and  METHOD(disable-smooth-drawing) for more information.'''
-
-		if ( self.smoothFlag == 1 ):
-			self.disableSmoothDrawing()
-		else:
-			self.enableSmoothDrawing()
-
 
 	def uniqueColor( self, n ):
 		'''Returns a unique color for each different value of n up  to 198.  These colors are allocated according to an  algorithm which attempts to give distinguishable colors, though this is subjective and not always possible.'''

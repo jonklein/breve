@@ -95,14 +95,14 @@ class slWorldObject {
 		int _lightExposure;
 
 		bool _drawAsPoint;
-		bool _drawShadow;
+		bool 						_drawShadow;
 		slTexture2D*				_texture;
-		char _textureMode;
-		unsigned char _drawMode;
-		float _billboardRotation;
-		float _alpha;
+		char 						_textureMode;
+		unsigned char 				_drawMode;
+		float 						_billboardRotation;
+		float 						_alpha;
 	
-		float _textureScaleX, _textureScaleY;
+		float 						_textureScaleX, _textureScaleY;
 
 		// bounding box information here is used for "proximity" data
 	
@@ -112,7 +112,7 @@ class slWorldObject {
 		double _mu;
 
 		std::vector<slWorldObject*> _neighbors;
-		std::vector< void* > _neighborData;
+		std::vector< void* > 		_neighborData;
 
 		// the list of lines that this object makes to other objects
 

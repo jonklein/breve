@@ -212,6 +212,7 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 
 	_skybox.draw( inRenderer, inCamera );
 	
+	drawPatchGrids( inRenderer, inCamera );
 
 	if( inCamera -> _drawLights ) {
 		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
@@ -246,6 +247,15 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 	}
 }
 
+
+void slWorld::drawPatchGrids( slRenderGL& inRenderer, slCamera *inCamera ) {
+	for ( unsigned int n = 0; n < _patches.size(); n++ ) {
+		slPatchGrid *pg = _patches[ n ];
+		
+		if( pg )
+			pg -> draw( inRenderer, inCamera );
+	}
+}
 
 void slWorld::drawObjects( slRenderGL& inRenderer ) {
 	for ( unsigned int n = 0; n < _objects.size(); n++ ) {

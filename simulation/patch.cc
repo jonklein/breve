@@ -76,11 +76,11 @@ void slPatch::setColor( slVector *color ) {
 	if ( color->z > 1.0 ) color->z = 1.0;
 	else if ( color->z < 0.0 ) color->z = 0.0;
 
-	grid->colors[ this->colorOffset     ] = ( unsigned char )( 255 * color->x );
-	grid->colors[ this->colorOffset + 1 ] = ( unsigned char )( 255 * color->y );
-	grid->colors[ this->colorOffset + 2 ] = ( unsigned char )( 255 * color->z );
+	grid -> colors[ this->colorOffset     ] = ( unsigned char )( 255 * color->x );
+	grid -> colors[ this->colorOffset + 1 ] = ( unsigned char )( 255 * color->y );
+	grid -> colors[ this->colorOffset + 2 ] = ( unsigned char )( 255 * color->z );
 
-	grid->_textureNeedsUpdate = true;
+	grid -> _textureNeedsUpdate = true;
 }
 
 /**
@@ -128,9 +128,7 @@ void slPatch::getLocation( slVector *location ) {
 
 slPatchGrid::slPatchGrid() {
 	_drawWithTexture = 1;
-	_cubeDrawList = -1;
 	_texture = NULL;
-	_cubeDrawList = -1;
 	_textureNeedsUpdate = true;
 }
 
@@ -148,10 +146,10 @@ slPatchGrid::slPatchGrid( const slVector *center, const slVector *patchSize, con
 		_zSize( z ) {
 	int a, b, c;
 
-	_drawWithTexture = 1;
-	_cubeDrawList = -1;
+	_drawWithTexture = true;
 	_texture = NULL;
-	_cubeDrawList = -1;
+	
+	fillCubeBuffer();
 
 #ifdef WINDOWS
 	// oh windows, why do you have to be such a douchebag about everything?!
@@ -355,20 +353,13 @@ void slPatchGrid::copyColorFrom3DMatrix( slBigMatrix3DGSL *m, int channel, doubl
  *	\brief Draws the patch grid without using 3D textures.
  */
 
-void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
-#ifndef OPENGLES
+void slPatchGrid::drawWithout3DTexture( slRenderGL &inRenderer, slCamera *camera ) {
 	int z, y, x;
 	unsigned int zVal, yVal, xVal;
 	int zMid = 0, yMid = 0, xMid = 0;
 	slPatch *patch;
 	slVector translation, origin;
-
-	glDisable( GL_LIGHTING );
-	glDisable(GL_CULL_FACE);
-	glDepthMask( GL_FALSE );
-
-	if ( _cubeDrawList == -1 ) this->compileCubeList();
-
+		
 	// we want to always draw from back to front for the
 	// alpha blending to work.  figure out the points
 	// closest to the camera.
@@ -387,8 +378,8 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 	if ( zMid < 0 ) zMid = 0;
 	if ( zMid >= (int)_zSize ) zMid = _zSize - 1;
 
-	glEnable( GL_BLEND );
-
+	inRenderer.SetBlendMode( slBlendAlpha );
+	
 	for ( z = 0; z < ( int )_zSize; z++ ) {
 		if ( z < ( int )zMid ) zVal = z;
 		else zVal = ( _zSize - 1 ) - ( z - zMid );
@@ -408,25 +399,23 @@ void slPatchGrid::drawWithout3DTexture( slCamera *camera ) {
 				patch = &patches[ zVal ][ xVal ][ yVal ];
 
 				if ( colors[ patch->colorOffset + 3 ] != 255 ) {
-					glPushMatrix();
-
 					translation.y = startPosition.y + patchSize.y * yVal;
 
-					glColor4ubv( &colors[patch->colorOffset] );
-					glTranslatef( translation.x, translation.y, translation.z );
-					glScalef( patchSize.x, patchSize.y, patchSize.z );
+					inRenderer.PushMatrix( slMatrixGeometry );
 
-					glCallList( _cubeDrawList );
+					inRenderer.SetBlendColor( &colors[ patch->colorOffset ] );
+					inRenderer.Translate( slMatrixGeometry, translation.x, translation.y, translation.z );
+					inRenderer.Scale( slMatrixGeometry, patchSize.x, patchSize.y, patchSize.z );
 
-					glPopMatrix();
+					_cubeBuffer.bind();
+					_cubeBuffer.draw( VB_TRIANGLE_STRIP );		
+					_cubeBuffer.unbind();
+
+					inRenderer.PopMatrix( slMatrixGeometry );
 				}
 			}
 		}
 	}
-
-	glDepthMask( GL_TRUE );
-	glEnable( GL_CULL_FACE );
-#endif
 }
 
 
@@ -443,18 +432,22 @@ void slPatchGrid::setDrawWithTexture( bool t ) {
  *	is slower than drawing with a 3D texture.
  */
 
-void slPatchGrid::draw( slCamera *camera ) {
-#ifndef OPENGLES
+void slPatchGrid::draw( slRenderGL &inRenderer, slCamera *camera ) {
 	slVector origin, diff, adiff, size;
-
-	if ( !_drawWithTexture ) return drawWithout3DTexture( camera );
-
-	glDisable( GL_LIGHTING );
 
 #ifdef WINDOWS
 	if( !glTexImage3D || !glTexSubImage3D ) 
-		return drawWithout3DTexture( camera );
+		_drawWithTexture = false;
 #endif
+
+
+#ifdef OPENGLES
+	// No GL_TEXTURE_3D support with OpenGL ES
+	_drawWithTexture = false;
+#endif
+
+	if ( !_drawWithTexture ) 
+		return drawWithout3DTexture( inRenderer, camera );
 
 	if ( !_texture ) {
 		_texture = new slTexture2D();
@@ -496,7 +489,6 @@ void slPatchGrid::draw( slCamera *camera ) {
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	if( _textureNeedsUpdate ) { 
-		// glPixelStorei( GL_UNPACK_ROW_LENGTH, _ySize );
 		glPixelTransferf( GL_ALPHA_SCALE, 3.0f );
 		glTexSubImage3D( GL_TEXTURE_3D, 0, 0, 0, 0, _ySize, _xSize, _zSize, GL_RGBA, GL_UNSIGNED_BYTE, colors );
 		glPixelTransferf( GL_ALPHA_SCALE, 1.0f );
@@ -504,6 +496,7 @@ void slPatchGrid::draw( slCamera *camera ) {
 		_textureNeedsUpdate = false;
 	}
 
+	_quadBuffer.bind();
 	glBegin( GL_QUADS );
 
 	size.x = patchSize.x * _xSize;
@@ -519,12 +512,11 @@ void slPatchGrid::draw( slCamera *camera ) {
 
 	glEnd();
 
+	_quadBuffer.unbind();
+
 	glDisable( GL_TEXTURE_3D );
 
-	glDisable( GL_LIGHTING );
-
 	return;
-#endif
 }
 
 void slPatchGrid::textureDrawYPass( slVector &size, int dir ) {
@@ -644,30 +636,71 @@ void slPatchGrid::setDataAtIndex( int x, int y, int z, void *data ) {
 	this->patches[ z ][ x ][ y ].data = data;
 }
 
-void slPatchGrid::compileCubeList() {
-#ifndef OPENGLES
-	_cubeDrawList = glGenLists( 1 );
+void slPatchGrid::fillCubeBuffer() {
+	_cubeBuffer.resize( 14, VB_XYZ );
+	
+	float *v;
+	
+	v = _cubeBuffer.vertex( 0 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5; v[ 2 ] = -.5;
 
-	glNewList( _cubeDrawList, GL_COMPILE );
+	v = _cubeBuffer.vertex( 1 );
+	v[ 0 ] =  .5; v[ 1 ] = -.5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 2 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 3 );
+	v[ 0 ] =  .5; v[ 1 ] = -.5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 4 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 5 );
+	v[ 0 ] =  .5; v[ 1 ] = -.5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 6 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 7 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 8 );
+	v[ 0 ] = -.5; v[ 1 ] =  .5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 9 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 10 );
+	v[ 0 ] = -.5; v[ 1 ] =  .5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 11 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5; v[ 2 ] =  .5;
+	
+	v = _cubeBuffer.vertex( 12 );
+	v[ 0 ] = -.5; v[ 1 ] =  .5; v[ 2 ] = -.5;
+	
+	v = _cubeBuffer.vertex( 13 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5; v[ 2 ] = -.5;
 
-	glBegin( GL_TRIANGLE_STRIP );
-	glVertex3f( 0.0, 0.0, 0.0 );
-	glVertex3f( 1.0, 0.0, 0.0 );
-	glVertex3f( 0.0, 0.0, 1.0 );
-	glVertex3f( 1.0, 0.0, 1.0 );
-	glVertex3f( 1.0, 1.0, 1.0 );
-	glVertex3f( 1.0, 0.0, 0.0 );
-	glVertex3f( 1.0, 1.0, 0.0 );
-	glVertex3f( 0.0, 0.0, 0.0 );
-	glVertex3f( 0.0, 1.0, 0.0 );
-	glVertex3f( 0.0, 0.0, 1.0 );
-	glVertex3f( 0.0, 1.0, 1.0 );
-	glVertex3f( 1.0, 1.0, 1.0 );
-	glVertex3f( 0.0, 1.0, 0.0 );
-	glVertex3f( 1.0, 1.0, 0.0 );
 
-	glEnd();
+	_quadBuffer.resize( 6, VB_XY );
+	v = _quadBuffer.vertex( 0 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5;
 
-	glEndList();
-#endif
+	v = _quadBuffer.vertex( 1 );
+	v[ 0 ] = -.5; v[ 1 ] =  .5;
+
+	v = _quadBuffer.vertex( 2 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5;
+
+	v = _quadBuffer.vertex( 3 );
+	v[ 0 ] =  .5; v[ 1 ] =  .5;
+
+	v = _quadBuffer.vertex( 4 );
+	v[ 0 ] =  .5; v[ 1 ] = -.5;
+
+	v = _quadBuffer.vertex( 5 );
+	v[ 0 ] = -.5; v[ 1 ] = -.5;
+
 }

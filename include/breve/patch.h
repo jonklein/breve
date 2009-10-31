@@ -21,12 +21,8 @@
 #ifndef _PATCH_H
 #define _PATCH_H
 
-/**
- * \brief Data associated with a certain region of 3D space.
- */
-
 #include "bigMatrix.hh"
-#include "glIncludes.h"
+#include "render.h"
 #include "texture.h"
 
 class slPatchGrid;
@@ -102,11 +98,14 @@ class slPatch {
 		std::vector< slPatch* > _neighbors;
 };
 
-/*!
-	\brief A grid of \ref slPatch objects.
-*/
+/**
+ * \brief A grid of \ref slPatch objects, data associated with a certain region of 3D space.
+ */
+
 
 class slPatchGrid {
+	friend class slPatch;
+	
 	public:
 		slPatchGrid();
 
@@ -118,10 +117,9 @@ class slPatchGrid {
 
 		~slPatchGrid();
 
-		void compileCubeList();
 
-		void draw(slCamera *camera);
-		void drawWithout3DTexture(slCamera *camera);
+		void draw( slRenderGL &inRenderer, slCamera *camera );
+		void drawWithout3DTexture( slRenderGL &inRenderer, slCamera *camera );
 
 		void setSmoothDrawing( bool inSmooth ) { drawSmooth = inSmooth; }
 
@@ -141,6 +139,7 @@ class slPatchGrid {
 		 */
 		void setDrawWithTexture(bool t);
 
+	protected:
 		// below should be private/protected
 
 		unsigned int _xSize;
@@ -155,16 +154,19 @@ class slPatchGrid {
 		// colors holds all of the color information for the patches.  it is a raw 
 		// array of char values so that we can use it as texture data if desired.
 
-		unsigned char *colors;
+		unsigned char 			*colors;
 
-		unsigned int _textureX;
-		unsigned int _textureY;
-		unsigned int _textureZ;
+		unsigned int 			_textureX;
+		unsigned int 			_textureY;
+		unsigned int 			_textureZ;
 
-		bool drawSmooth;
+	private:
+		bool 					drawSmooth;
+		void 					fillCubeBuffer();
 
 		slTexture2D*			_texture;
-		int 					_cubeDrawList;
+		slVertexBufferGL		_cubeBuffer;
+		slVertexBufferGL		_quadBuffer;
 		
 		bool 					_drawWithTexture;
 		bool 					_textureNeedsUpdate;
