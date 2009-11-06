@@ -29,7 +29,6 @@
 #include "camera.h"
 #include "skybox.h"
 
-#ifdef __cplusplus
 #include <vector>
 #include <algorithm> 
 #include <stdexcept>
@@ -42,9 +41,6 @@ class slDrawCommandList;
 class slLink;
 class slTerrain;
 class slMultibody;
-#else
-#endif
-
 
 #define DV_VECTOR_COUNT	10
 
@@ -214,9 +210,6 @@ class slWorld {
 
 		slPatchGrid 						*addPatchGrid( slVector *center, slVector *patchSize, int x, int y, int z );
 		void 								removePatchGrid( slPatchGrid *g );
-
-		slGISData*							loadTigerFile( char *, slTerrain * );
-		// age is the simulation time of the world.
 	
 		double 								_age;
 	

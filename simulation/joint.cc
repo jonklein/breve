@@ -97,14 +97,15 @@ void slJoint::setNormal( slVector *normal ) {
 
 	// transform the normal to the parent's frame
 
-	if ( _parent ) slVectorXform( _parent->_position.rotation, normal, &tn );
-	else slVectorCopy( normal, &tn );
+	if ( _parent ) 
+		slVectorXform( _parent->_position.rotation, normal, &tn );
+	else 
+		slVectorCopy( normal, &tn );
 
-	if ( _type == JT_REVOLUTE ) {
+	if ( _type == JT_REVOLUTE )
 		dJointSetHingeAxis( _odeJointID, tn.x, tn.y, tn.z );
-	} else if ( _type == JT_PRISMATIC ) {
+	else if ( _type == JT_PRISMATIC )
 		dJointSetSliderAxis( _odeJointID, tn.x, tn.y, tn.z );
-	}
 }
 
 slJoint::~slJoint() {

@@ -60,7 +60,7 @@ PhysicalControl : VirtualCreatures {
 		blockTexture = ( new Image load from "images/noise.png" ).
 
 		floor = new Floor.
-		floor set-texture-image to ( new Image load from "images/ground.png" ).
+		floor set-texture-image to ( new Image load from "images/ground.jpg" ).
 		floor set-color to ( .8, .8, .8 ).
 
 		self enable-fast-physics.

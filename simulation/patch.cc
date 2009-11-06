@@ -419,11 +419,6 @@ void slPatchGrid::drawWithout3DTexture( slRenderGL &inRenderer, slCamera *camera
 }
 
 
-void slPatchGrid::setDrawWithTexture( bool t ) {
-
-	_drawWithTexture = t;
-}
-
 /**
  *	\brief Draws a set of patches using a volumetric 3D texture.
  *
@@ -449,6 +444,7 @@ void slPatchGrid::draw( slRenderGL &inRenderer, slCamera *camera ) {
 	if ( !_drawWithTexture ) 
 		return drawWithout3DTexture( inRenderer, camera );
 
+#ifndef OPENGLES
 	if ( !_texture ) {
 		_texture = new slTexture2D();
 		_texture -> createTextureID();
@@ -468,6 +464,8 @@ void slPatchGrid::draw( slRenderGL &inRenderer, slCamera *camera ) {
 	adiff.z = fabs( diff.z );
 
 	glDisable( GL_CULL_FACE );
+	
+//	inRenderer.SetBlendColor()
 
 	glColor4f( 1, 1, 1, 1 );
 
@@ -517,6 +515,7 @@ void slPatchGrid::draw( slRenderGL &inRenderer, slCamera *camera ) {
 	glDisable( GL_TEXTURE_3D );
 
 	return;
+#endif
 }
 
 void slPatchGrid::textureDrawYPass( slVector &size, int dir ) {

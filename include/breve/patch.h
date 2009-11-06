@@ -107,49 +107,45 @@ class slPatchGrid {
 	friend class slPatch;
 	
 	public:
-		slPatchGrid();
+								slPatchGrid();
 
-        slPatchGrid(const slVector *center,
-                    const slVector *patchSize,
-                    const int x,
-                    const int y,
-                    const int z);
+								slPatchGrid( const slVector *center, const slVector *patchSize, int x, int y, int z);
 
-		~slPatchGrid();
+								~slPatchGrid();
 
+		void 					draw( slRenderGL &inRenderer, slCamera *camera );
 
-		void draw( slRenderGL &inRenderer, slCamera *camera );
-		void drawWithout3DTexture( slRenderGL &inRenderer, slCamera *camera );
+		slPatch* 				getPatchAtIndex( int x, int y, int z );
+		slPatch* 				getPatchAtLocation( const slVector *location );
+		void 					setDataAtIndex(int x, int y, int z, void *data);
+		void 					copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
 
-		void setSmoothDrawing( bool inSmooth ) { drawSmooth = inSmooth; }
-
-		void textureDrawXPass( slVector &size, int dir );
-		void textureDrawYPass( slVector &size, int dir );
-		void textureDrawZPass( slVector &size, int dir );
-
-		slPatch* getPatchAtIndex( int x, int y, int z );
-		slPatch* getPatchAtLocation( const slVector *location );
-		void setDataAtIndex(int x, int y, int z, void *data);
-		void copyColorFrom3DMatrix(slBigMatrix3DGSL *m, int channel, double scale);
-
-		void assignObjectsToPatches(slWorld *w);
+		void 					assignObjectsToPatches( slWorld *w );
         
 		/**
 		 * Sets the PatchGrid to be drawn with or without volumetric texturing.
 		 */
-		void setDrawWithTexture(bool t);
+		void 					setDrawWithTexture( bool inUseTexture ) { _drawWithTexture = inUseTexture; }
+		void 					setSmoothDrawing( bool inSmooth ) { drawSmooth = inSmooth; }
+
 
 	protected:
+		void 					drawWithout3DTexture( slRenderGL &inRenderer, slCamera *camera );
+
+		void 					textureDrawXPass( slVector &size, int dir );
+		void 					textureDrawYPass( slVector &size, int dir );
+		void 					textureDrawZPass( slVector &size, int dir );
+
 		// below should be private/protected
 
-		unsigned int _xSize;
-		unsigned int _ySize;
-		unsigned int _zSize;
+		unsigned int 			_xSize;
+		unsigned int 			_ySize;
+		unsigned int 			_zSize;
 
-		slVector startPosition;
-		slVector patchSize;
+		slVector 				startPosition;
+		slVector 				patchSize;
 
-		slPatch ***patches;
+		slPatch 				***patches;
 
 		// colors holds all of the color information for the patches.  it is a raw 
 		// array of char values so that we can use it as texture data if desired.
@@ -160,7 +156,6 @@ class slPatchGrid {
 		unsigned int 			_textureY;
 		unsigned int 			_textureZ;
 
-	private:
 		bool 					drawSmooth;
 		void 					fillCubeBuffer();
 

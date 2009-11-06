@@ -112,11 +112,6 @@ slWorld::slWorld() {
 
 }
 
-slGISData *slWorld::loadTigerFile( char *f, slTerrain *t ) {
-	gisData = new slGISData( f, t );
-	return gisData;
-}
-
 /**
  *	Startup a netsim server.
  */
@@ -724,9 +719,7 @@ void slWorld::setCollisionCallbacks( int( *check )( void*, void*, int t ), void(
 }
 
 slWorldObject *slWorld::getObject( unsigned int n ) {
-	if ( n > _objects.size() ) return NULL;
-
-	return _objects[n];
+	return ( n >= _objects.size() ) ? NULL : _objects[ n ];
 }
 
 void slWorld::setQuickstepIterations( int n ) {

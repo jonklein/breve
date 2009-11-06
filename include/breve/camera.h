@@ -119,7 +119,7 @@ class slCamera {
 		void setActivateContextCallback( int (*f)() );
 		void setCameraText( int n, char *string, float x, float y, slVector *v );
 	
-		int select( slWorld *inWorld, int inScreenX, int inScreenY ) const { slMessage( DEBUG_ALL, "Selection not implemented." ); return 0; }
+		slWorldObject *select( slWorld *inWorld, int inScreenX, int inScreenY ) const { slMessage( DEBUG_ALL, "Selection not implemented." ); return NULL; }
 		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
 
 		void renderShadowVolume( slWorld *w );

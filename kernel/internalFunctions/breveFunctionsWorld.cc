@@ -41,17 +41,6 @@ int brIWorldSetERP( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /**
- * \brief Loads a GIS data file.
- */
-
-int brIWorldLoadTigerFile( brEval args[], brEval *target, brInstance *i ) {
-
-	target->set( i->engine->world -> loadTigerFile( BRSTRING( &args[0] ), ( slTerrain* )BRPOINTER( &args[1] ) ) );
-
-	return EC_OK;
-}
-
-/**
  * \brief Enables or disables fast-physics.
  *
  * setStepFast(int).
@@ -784,8 +773,6 @@ int brICreateUserSensor(brEval args[], brEval *target, brInstance *i) {
 void breveInitWorldFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "worldSetERP", brIWorldSetERP, AT_NULL, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "worldSetCFM", brIWorldSetCFM, AT_NULL, AT_DOUBLE, 0 );
-
-	brNewBreveCall( n, "worldLoadTigerFile", brIWorldLoadTigerFile, AT_POINTER, AT_STRING, AT_POINTER, 0 );
 
 	brNewBreveCall( n, "setStepFast", brISetStepFast, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setStepFastIterations", brISetStepFastIterations, AT_NULL, AT_INT, 0 );

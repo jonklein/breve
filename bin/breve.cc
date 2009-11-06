@@ -363,10 +363,10 @@ void brContextMenu( int n ) {
 	glutPostRedisplay();
 }
 
-void brClick( int n ) {
+void brClick( int inX, int inY ) {
 	unsigned int m, total;
 
-	gSelected = brClickCallback( gEngine, n );
+	gSelected = brClickAtLocation( gEngine, inX, inY );
 
 	if ( gSelected ) {
 		glutSetMenu( contextMenu );
@@ -580,7 +580,7 @@ void slDemoDisplay() {
 	glutSwapBuffers();
 }
 
-void slDemoMouse( int button, int state, int x, int y ) {
+void slDemoMouse( int inButton, int state, int x, int y ) {
 	gMods = glutGetModifiers();
 
 	if ( state == GLUT_DOWN ) {
@@ -588,7 +588,7 @@ void slDemoMouse( int button, int state, int x, int y ) {
 		gLastY = y;
 		gStartCamX = gEngine->camera->_rx;
 
-		brClick( gEngine->camera->select( gEngine->world, x, y ) );
+		brClick( x, y );
 		brGlutMenuUpdate( gEngine -> getController() );
 
 		gMotionCrosshair = 1;
@@ -603,10 +603,11 @@ void slDemoMouse( int button, int state, int x, int y ) {
 
 	if( state == GLUT_UP ) { 
 		// mouse wheel 
-		if ( button == 3 )
-			gEngine->camera->zoomWithMouseMovement( 0, 15 );
-		else if ( button == 4 )
-			gEngine->camera->zoomWithMouseMovement( 0, -15 );
+		if ( inButton == 3 )
+			gEngine -> camera -> zoomWithMouseMovement( 0,  15 );
+		else if ( inButton == 4 )
+			gEngine -> camera -> zoomWithMouseMovement( 0, -15 );
+			
 	}
 
 	slDemoDisplay();

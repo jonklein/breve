@@ -43,9 +43,12 @@ class slMeshShape;
  * \brief A struct containing rotation and location information.
  */
 
-struct slPosition {
-	double rotation[ 3 ][ 3 ];
-	slVector location;
+class slPosition {
+	public:
+		double 				rotation[ 3 ][ 3 ];
+		slVector 			location;
+		
+		// double 				_transform[ 4 ][ 4 ];
 };
 
 /**

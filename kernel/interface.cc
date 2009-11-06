@@ -96,59 +96,50 @@ int brMenuCallback( brEngine *e, brInstance *i, unsigned int n ) {
 }
 
 brInstance *brClickAtLocation( brEngine *e, int x, int y ) {
-	return brClickCallback( e, e->camera->select( e->world, x, y ) );
+	slWorldObject *clicked = e -> camera -> select( e->world, x, y );
+	
+	brInstance *clickedInstance = clicked ? (brInstance*)clicked -> getCallbackData() : NULL;
+	return brClickCallback( e, clickedInstance );
 }
 
-/*!
-	\brief Called when the user clicks in the breve graphical window.
+/**
+ * \brief Called when the user clicks in the breve graphical window.
+ *
+ * The interface detects when an object = has been clicked on in the
+ * simulation, then calls this function to pass that instance the
+ * "click" method.
+ */
 
-	The interface detects when an object = has been clicked on in the
-	simulation, then calls this function to pass that instance the
-	"click" method.
-
-	Be careful calling this method from another thread--the engine is
-	not thread safe, so you must externally make sure that the engine
-	is not being iterated, preferably by a lock.
-*/
-
-brInstance *brClickCallback( brEngine *e, int n ) {
+brInstance *brClickCallback( brEngine *inEngine, brInstance *inClickedObject ) {
 	brEval eval, theArg;
 	const brEval *argPtr[1];
 	brMethod *method;
 	unsigned char types[] = { AT_INSTANCE };
 
-	slWorldObject *o;
+	method = brMethodFind( inEngine -> getController() ->object, "click", types, 1 );
 
-	if ( n == -1 ) o = NULL;
-	else o = e->world->getObject( n );
+	if ( !method ) 
+		return NULL;
 
-	method = brMethodFind( e-> getController() ->object, "click", types, 1 );
+	theArg.set( inClickedObject );
 
-	if ( !method ) return NULL;
+	argPtr[ 0 ] = &theArg;
 
-	if ( o ) theArg.set(( brInstance* )o->getCallbackData() );
-	else theArg.set(( brInstance* )NULL );
-
-	argPtr[0] = &theArg;
-
-	brEngineLock( e );
-
-	brMethodCall( e-> getController() , method, argPtr, &eval );
-
-	brEngineUnlock( e );
+	brEngineLock( inEngine );
+	brMethodCall( inEngine -> getController() , method, argPtr, &eval );
+	brEngineUnlock( inEngine );
 
 	brMethodFree( method );
 
-	if ( !o ) return NULL;
-
-	return ( brInstance* )o->getCallbackData();
+	return inClickedObject;
 }
 
 void brBeginDrag( brEngine *e, brInstance *i ) {
 	brEval result;
 	brMethodCallByName( e-> getController() , "get-drag-object", &result );
 
-	if ( !BRINSTANCE( &result ) ) return;
+	if ( !BRINSTANCE( &result ) ) 
+		return;
 
 	brMethodCallByName( BRINSTANCE( &result ), "suspend-physics", &result );
 }
