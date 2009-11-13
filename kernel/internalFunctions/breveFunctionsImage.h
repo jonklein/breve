@@ -24,11 +24,13 @@ class brImageData {
         }
 
         void                    updateTexture();
+        slTexture2D*			getTexture();
 
         unsigned char*          _data;
         int                     _width;
         int                     _height;
 
+	protected:
         slTexture2D*            _texture;
 };
 

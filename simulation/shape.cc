@@ -1161,3 +1161,83 @@ double slShape::getMass() {
 double slShape::getDensity() {
 	return _density;
 }
+
+
+
+
+
+
+#define X .525731112119133606 
+#define Z .850650808352039932
+
+static GLfloat sphereVertexData[12][3] = {    
+	{-X, 0.0, Z}, {X, 0.0, Z}, {-X, 0.0, -Z}, {X, 0.0, -Z},	
+	{0.0, Z, X}, {0.0, Z, -X}, {0.0, -Z, X}, {0.0, -Z, -X},	
+	{Z, X, 0.0}, {-Z, X, 0.0}, {Z, -X, 0.0}, {-Z, -X, 0.0} 
+};
+
+static GLuint sphereIndices[20][3] = { 
+	{0,4,1}, {0,9,4}, {9,5,4}, {4,5,8}, {4,8,1},	
+	{8,10,1}, {8,3,10}, {5,3,8}, {5,2,3}, {2,7,3},	
+	{7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6}, 
+	{6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11} };
+
+void normalize(GLfloat *a) {
+	GLfloat d=sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]);
+	a[0]/=d; a[1]/=d; a[2]/=d;
+}
+
+int	slSphere::addTriangles( GLfloat *inX, GLfloat *inY, GLfloat *inZ, int inDiv, float inR, int inIndex ) {
+	if ( inDiv <= 0 ) {
+		float *v;
+
+		v = _vertexBuffer.normal( inIndex	 );
+		v[ 0 ] = inX[ 0 ]; v[ 1 ] = inX[ 1 ]; v[ 2 ] = inX[ 2 ];
+
+		v = _vertexBuffer.normal( inIndex + 1 );
+		v[ 0 ] = inY[ 0 ]; v[ 1 ] = inY[ 1 ]; v[ 2 ] = inY[ 2 ];
+
+		v = _vertexBuffer.normal( inIndex + 2 );
+		v[ 0 ] = inZ[ 0 ]; v[ 1 ] = inZ[ 1 ]; v[ 2 ] = inZ[ 2 ];
+
+		v = _vertexBuffer.vertex( inIndex	 );
+		v[ 0 ] = inR * inX[ 0 ]; v[ 1 ] = inR * inX[ 1 ]; v[ 2 ] = inR * inX[ 2 ];
+
+		v = _vertexBuffer.vertex( inIndex + 1 );
+		v[ 0 ] = inR * inY[ 0 ]; v[ 1 ] = inR * inY[ 1 ]; v[ 2 ] = inR * inY[ 2 ];
+
+		v = _vertexBuffer.vertex( inIndex + 2 );
+		v[ 0 ] = inR * inZ[ 0 ]; v[ 1 ] = inR * inZ[ 1 ]; v[ 2 ] = inR * inZ[ 2 ];
+		
+		inIndex += 3;
+
+    } else {
+        GLfloat ab[3], ac[3], bc[3];
+
+        for( int i = 0; i < 3; i++ ) {
+            ab[ i ]=( inX[ i ] + inY[ i ] ) / 2;
+            ac[ i ]=( inX[ i ] + inZ[ i ] ) / 2;
+            bc[ i ]=( inY[ i ] + inZ[ i ] ) / 2;
+        }
+
+        normalize( ab ); normalize( ac ); normalize( bc );
+        inIndex = addTriangles( inX, ab, ac, inDiv - 1, inR, inIndex );
+        inIndex = addTriangles( inY, bc, ab, inDiv - 1, inR, inIndex );
+        inIndex = addTriangles( inZ, ac, bc, inDiv - 1, inR, inIndex );
+        inIndex = addTriangles(  ab, bc, ac, inDiv - 1, inR, inIndex );  
+    }  
+	
+	return inIndex;
+}
+
+void slSphere::fillVertexBuffer() {
+	int divisions = 1;
+	int vertices = 0;
+
+ 	_vertexBuffer.resize( 20 * 3 * (int)pow( 4, ( divisions ) ), VB_XYZ | VB_NORMAL );
+
+    for( int i = 0; i < 20; i++ )
+        vertices = addTriangles( sphereVertexData[ sphereIndices[ i ][ 0 ] ], sphereVertexData[ sphereIndices[ i ][ 1 ] ], sphereVertexData[ sphereIndices[ i ][ 2 ] ], divisions, _radius, vertices );
+		
+	printf( "%d vertices added (%d)\n", vertices, 20 * 3 * (int)pow( 4, ( divisions ) ) );
+}

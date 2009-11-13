@@ -34,6 +34,15 @@ void brImageData::updateTexture() {
 	_texture -> loadPixels( _data, _width, _height, 4 );
 }
 
+slTexture2D *brImageData::getTexture() {
+	if( !_texture )
+		_texture = new slTexture2D;
+
+	return _texture;
+}
+
+#define BRIMAGEDATAPOINTER(p)	((brImageData*)BRPOINTER(p))
+
 #define BRIMAGEDATAPOINTER(p)	((brImageData*)BRPOINTER(p))
 
 /**
@@ -265,10 +274,8 @@ int brIImageLoadFromFile( brEval args[], brEval *result, brInstance *i ) {
 int brIImageUpdateTexture( brEval args[], brEval *result, brInstance *i ) {
 	brImageData *image = BRIMAGEDATAPOINTER( &args[0] );
 
-	if ( !image ) {
-		result->set( -1 );
+	if ( !image )
 		return EC_OK;
-	}
 
 	if( i -> engine -> camera -> _activateContextCallback )
 		i -> engine -> camera -> _activateContextCallback();
@@ -500,7 +507,7 @@ void breveInitImageFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "imageWriteToFile", brIImageWriteToFile, AT_INT, AT_POINTER, AT_STRING, AT_INT, AT_INT,  0 );
 	brNewBreveCall( n, "imageDataFree", brIImageDataFree, AT_NULL, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageDataInit", brIImageDataInit, AT_POINTER, AT_INT, AT_INT, 0 );
-	brNewBreveCall( n, "imageUpdateTexture", brIImageUpdateTexture, AT_INT, AT_POINTER, 0 );
+	brNewBreveCall( n, "imageUpdateTexture", brIImageUpdateTexture, AT_NULL, AT_POINTER, 0 );
 	brNewBreveCall( n, "imageReadPixels", brIImageReadPixels, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
 	brNewBreveCall( n, "imageReadDepthBuffer", brIImageReadDepthBuffer, AT_NULL, AT_POINTER, AT_INT, AT_INT, AT_INT, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "snapshot", brISnapshot, AT_INT, AT_STRING, 0 );

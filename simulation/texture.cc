@@ -67,7 +67,6 @@ void slTexture2D::loadPixels( const unsigned char *pixels, int inWidth, int inHe
 	createTextureID();
 	
 	bind();
-
 	resize( inWidth, inHeight );
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -97,13 +96,15 @@ void slTexture2D::loadPixels( const unsigned char *pixels, int inWidth, int inHe
 	} else {
 		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, inWidth, inHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 	}
+
+	unbind();
 }
 
 void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
-	bind();
-
 	if( inWidth == _texX && inHeight == _texY ) 
 		return;
+
+	bind();
 
 	_texX = inWidth;
 	_texY = inHeight;
@@ -120,8 +121,6 @@ void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
 
 	glTexImage2D( GL_TEXTURE_2D, 0, format, _sizeX, _sizeY, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 }
-
-
 
 slVertexBufferGL::slVertexBufferGL( int inVertexCount, int inPixelFormat ) {
 	_vertexSize = 0;

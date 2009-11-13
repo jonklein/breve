@@ -76,7 +76,8 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 
 			for ( n = 0;n < topFace -> _pointCount;n++ ) {
 				if ( topFace -> neighbors[n] == e ) {
-					if ( e->neighbors[0] == topFace->points[n] ) flip = 1;
+					if ( e->neighbors[0] == topFace->points[n] ) 
+						flip = 1;
 
 					n = topFace -> _pointCount;
 				}

@@ -148,6 +148,7 @@ void slRenderGL::DrawQuad( const slTexture2D& inTexture, const slVector &inCente
 }
 
 void slRenderGL::ApplyCamera( slCamera *inCamera ) const {
+
 	slgl( glViewport( inCamera -> _originx, inCamera -> _originy, inCamera -> _width, inCamera -> _height ) );
 
 	SetMatrixMode( slMatrixProjection );	

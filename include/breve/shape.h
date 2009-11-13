@@ -202,7 +202,6 @@ class slShape {
 
 		double 								getMass();
 		double 								getDensity();
-		void 								fillVertexBuffer();
 
 		slMatrix							_transform;
 
@@ -223,6 +222,8 @@ class slShape {
 		dGeomID								_odeGeomID[ 2 ];
 
 	protected:
+		virtual void 						fillVertexBuffer();
+
 		slVector 							_max, _min;
 		int 								_referenceCount;
 		slVertexBufferGL					_vertexBuffer;
@@ -256,6 +257,11 @@ class slSphere : public slShape {
 		slSerializedShapeHeader 	*serialize(int *length);
 
 		void 						drawShadowVolume(slCamera *camera, slPosition *position);
+
+	protected:
+		virtual void 				fillVertexBuffer();
+
+		int 						addTriangles( GLfloat *inX, GLfloat *inY, GLfloat *inZ, int inDiv, float inR, int inIndex );
 		double 						_radius;
 };
 

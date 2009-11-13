@@ -354,7 +354,7 @@ int brILinkSetTexture( brEval args[], brEval *target, brInstance *i ) {
 		return EC_ERROR;
 	}
 
-	m->setTexture( image -> _texture );
+	m -> setTexture( image -> getTexture() );
 
 	return EC_OK;
 }

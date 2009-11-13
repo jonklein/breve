@@ -17,8 +17,8 @@ PhysicalControl : MeshTest {
 
 		new Floor.
 
-		# self make-body with-filename "car.3ds".
-		# self make-body with-filename "knot.3ds".
+		self make-body with-filename "car.3ds".
+		self make-body with-filename "knot.3ds".
 		self make-body with-filename "teddy.3ds".
 
 	+ to make-body with-filename name (string):

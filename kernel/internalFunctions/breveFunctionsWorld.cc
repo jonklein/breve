@@ -396,7 +396,7 @@ int brISetBackgroundTextureColor( brEval args[], brEval *target, brInstance *i )
 */
 
 int brISetBackgroundTexture( brEval args[], brEval *target, brInstance *i ) {
-	i->engine->world->setBackgroundTexture( ( (brImageData*)BRPOINTER( &args[0] ) ) -> _texture );
+	i->engine->world->setBackgroundTexture( ( (brImageData*)BRPOINTER( &args[0] ) ) -> getTexture() );
 	return EC_OK;
 }
 
