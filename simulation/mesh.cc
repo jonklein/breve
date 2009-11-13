@@ -213,10 +213,12 @@ void slMeshShape::finishShape( double density ) {
 }
 
 void slMeshShape::draw( const slRenderGL& inRenderer ) {
+#ifdef HAVE_LIBASSIMP
 	if( _rootNode ) {
 		_rootNode -> draw( inRenderer );
 	}
 	else 
+#endif
 		slShape::draw( inRenderer );
 }
 

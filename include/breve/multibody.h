@@ -24,7 +24,7 @@
 #include "simulation.h"
 #include "link.h"
 
-#include "ode/ode.h"
+#include <ode/ode.h>
 
 class slVclipData;
 class slJoint;

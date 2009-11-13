@@ -94,22 +94,16 @@ slWorld::slWorld() {
 	_clipGrid = NULL;
 	_clipData = new slVclipData();
 
-	gisData = NULL;
-
 	slVector g;
 	slVectorSet( &g, 0.0, -9.81, 0.0 );
 
 	setGravity( &g );
-
-
 
 	_lights[ 0 ]._type = LightInfinite;
 	slVectorSet( &_lights[0]._location, 0, 0, 0 );
 	slVectorSet( &_lights[0]._ambient, .2, .2, .2 );
 	slVectorSet( &_lights[0]._diffuse, .6, .9, .9 );
 	slVectorSet( &_lights[0]._specular, 1, 1, 1 );
-	
-
 }
 
 /**

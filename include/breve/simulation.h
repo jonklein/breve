@@ -42,8 +42,6 @@
 	#define M_PI 3.14159265
 #endif
 
-// do not change the order of the includes--they depend on eachother
-
 #include "slutil.h"
 
 #endif /* _SIMULATION_H */

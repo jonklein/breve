@@ -1001,7 +1001,7 @@ brObjectCallbackData *brPythonFindObject( brFrontendCallbackData *inData, const 
  */
 
 
-brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount ) {
+brInstance *brPythonInstantiate( brEngine *inEngine, brObject* inObject, const brEval **inArgs, int inArgCount, bool inDearchive ) {
 	PyObject *object = ( PyObject* )inObject->userData;
 
 	PyObject *args = PyTuple_New( 0 );

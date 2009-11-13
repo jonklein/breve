@@ -110,8 +110,6 @@ struct slLight {
 	as a pointer to the actual object type (stationary, mobile, terrain, etc).
 */
 
-#ifdef __cplusplus
-
 /**
  * A stationary object in the simulated world.
  */
@@ -121,14 +119,9 @@ class slStationary: public slWorldObject {
 		slStationary( slShape *s, slVector *loc, double rot[3][3], void *data );
 };
 
-#endif
-
 /**
  * A structure holding the simulated world.
  */
-
-#ifdef __cplusplus
-class slGISData;
 
 class slWorld {
 	public:
@@ -238,8 +231,6 @@ class slWorld {
 		
 		slTexture2D*			backgroundTexture;
 
-		slGISData 				*gisData;
-
 		void 					updateNeighbors();
 
 		double 					getAge();
@@ -283,18 +274,12 @@ class slWorld {
 
 		slCamera 				_lightExposureCamera;
 
-#if HAVE_LIBENET
-		slNetsimData 				_netsimData;
-		slNetsimClient	 			*_netsimClient;
-#endif
-
 	private:
 		bool 					_detectLightExposure;
 		bool 					_drawLightExposure;
 
 
 };
-#endif
 
 void slInitProximityData(slWorld *);
 
