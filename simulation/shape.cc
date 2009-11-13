@@ -159,8 +159,6 @@ slSphere::slSphere( double radius, double density ) : slShape() {
 	if ( density <= 0.0 ) 
 		throw slException( std::string( "invalid density for new sphere (radius <= 0.0)" ) );
 
-	slVectorSet( &_max, _radius, _radius, _radius );
-
 	_mass = _density * M_PI * _radius * _radius * _radius * 4.0 / 3.0;
 
 	_odeGeomID[ 0 ] = dCreateSphere( 0, _radius );
@@ -1115,15 +1113,14 @@ slShape *slShape::deserialize( slSerializedShapeHeader *header ) {
 }
 
 void slSphere::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
+	slVector min, max;
 	float r = _radius * _transform[ 0 ][ 0 ];
 
-	slVector min, max;
-
-	slVectorSet( &max, r, r, r );
+	slVectorSet( &max,  r,  r,  r );
 	slVectorSet( &min, -r, -r, -r );
 
-	slVectorAdd( &max, &position -> location, outMin );
-	slVectorAdd( &min, &position -> location, outMax );
+	slVectorAdd( &max, &position -> location, outMax );
+	slVectorAdd( &min, &position -> location, outMin );
 }
 
 void slShape::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {

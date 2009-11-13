@@ -85,8 +85,6 @@ Control : DLA {
 	+ to hit at location (vector) color c (vector) with-agent agent (object):
 		newParticle (object).
 
-		print "Hit!".
-
 		# When a collision occurs, we create a new Stationary object 
 		# at the collision point.  Why a Stationary object?  Because 
 		# once an object is frozen, we know it will never move again--by

@@ -63,6 +63,7 @@ Mobile : Ball (aka Balls) {
 
 	+ to init:
 		self set-shape to (new Sphere init-with radius .05 + random[ .15 ] ).
+		# self set-shape to (new Cube init-with size ( .1, .1, .1 ) ).
 		self enable-physics.
 		self reset.
 
