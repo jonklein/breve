@@ -15,7 +15,6 @@ void slCamera::initGL() {
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_FASTEST );
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
 	glHint( GL_FOG_HINT, GL_NICEST );
-	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
 #endif
 
 	glLineWidth( 2 );
@@ -298,8 +297,8 @@ void slRenderGL::MulMatrix4( slMatrixMode inMode, float inMatrix[ 16 ] ) const {
 	d[ 6 ] = inMatrix[ 9  ];
 	d[ 7 ] = inMatrix[ 13 ];
 
-	d[ 8 ] = inMatrix[ 2  ];
-	d[ 9 ] = inMatrix[ 6  ];
+	d[ 8 ] =  inMatrix[ 2  ];
+	d[ 9 ] =  inMatrix[ 6  ];
 	d[ 10 ] = inMatrix[ 10 ];
 	d[ 11 ] = inMatrix[ 14 ];
 
@@ -377,6 +376,8 @@ void slRenderGL::PopLight() {
 
 void slRenderGL::BeginFlatShadows( slCamera *inCamera, slVector *inLight, float inAlpha ) {
 	float color[] = { 0.0, 0.0, 0.0, inAlpha };
+	
+//	inCamera
 	 
 	glEnable( GL_POLYGON_OFFSET_FILL );
 	 
@@ -399,28 +400,27 @@ void slRenderGL::EndFlatShadows() {
 
 void slRenderGL::MulShadowMatrix( slPlane *inPlane, slVector *inLight ) {
 	GLfloat matrix[ 16 ];
-
+	GLfloat lDot =  slVectorDot( &inPlane -> normal, inLight );
 	GLfloat vDot = -slVectorDot( &inPlane -> normal, &inPlane -> vertex );
-	GLfloat lDot = inPlane -> normal.x * inLight -> x + inPlane -> normal.y * inLight -> y + inPlane -> normal.z * inLight -> z;
 
 	matrix[ 0  ] = lDot - inLight -> x * inPlane -> normal.x;
-	matrix[ 4  ] = 0.f  - inLight -> x * inPlane -> normal.y;
-	matrix[ 8  ] = 0.f  - inLight -> x * inPlane -> normal.z;
-	matrix[ 12 ] = 0.f  - inLight -> x * vDot;
+	matrix[ 1  ] = 0.f  - inLight -> x * inPlane -> normal.y;
+	matrix[ 2  ] = 0.f  - inLight -> x * inPlane -> normal.z;
+	matrix[ 3  ] = 0.f  - inLight -> x * vDot;
 
-	matrix[ 1  ] = 0.f  - inLight -> y * inPlane -> normal.x;
+	matrix[ 4  ] = 0.f  - inLight -> y * inPlane -> normal.x;
 	matrix[ 5  ] = lDot - inLight -> y * inPlane -> normal.y;
-	matrix[ 9  ] = 0.f  - inLight -> y * inPlane -> normal.z;
-	matrix[ 13 ] = 0.f  - inLight -> y * vDot;
+	matrix[ 6  ] = 0.f  - inLight -> y * inPlane -> normal.z;
+	matrix[ 7  ] = 0.f  - inLight -> y * vDot;
 
-	matrix[ 2  ] = 0.f  - inLight -> z * inPlane -> normal.x;
-	matrix[ 6  ] = 0.f  - inLight -> z * inPlane -> normal.y;
+	matrix[ 8  ] = 0.f  - inLight -> z * inPlane -> normal.x;
+	matrix[ 9  ] = 0.f  - inLight -> z * inPlane -> normal.y;
 	matrix[ 10 ] = lDot - inLight -> z * inPlane -> normal.z;
-	matrix[ 14 ] = 0.f  - inLight -> z * vDot;
+	matrix[ 11 ] = 0.f  - inLight -> z * vDot;
 
-	matrix[ 3  ] = 0.f;
-	matrix[ 7  ] = 0.f;
-	matrix[ 11 ] = 0.f;
+	matrix[ 12 ] = 0.f;
+	matrix[ 13 ] = 0.f;
+	matrix[ 14 ] = 0.f;
 	matrix[ 15 ] = lDot;
 	
 	MulMatrix4( slMatrixGeometry, matrix );
