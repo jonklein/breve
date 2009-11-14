@@ -19,8 +19,8 @@
  *****************************************************************************/
 
 #include "slutil.h"
-#include "glIncludes.h"
 #include "texture.h"
+#include "worldObject.h"
 
 #ifndef _CAMERA_H
 #define _CAMERA_H
@@ -40,8 +40,8 @@ enum billboardType {
 
 
 /*!
-	\brief A string of text printed to the GL view.
-*/
+ * brief A string of text printed to the GL view.
+ */
 
 class slCameraText {
 	public:
@@ -54,16 +54,38 @@ class slCameraText {
 		unsigned char size;
 };
 
-/*!
-	\brief Data for billboarded bitmaps.
+class slSceneNode {
+	public:
+		
+	private:
+		slTransform 		_transform;
+};
 
-	Billboards, no matter how damn simple they should be, turn out to be 
-	a huge pain in the ass.  It is very hard to handle the billboards 
-	properly when they contain alpha info, and also on multiple pass 
-	algorithms.  Therefore, we make a first pass through to find the 
-	billboards and compute their current coordinates, sort them back 
-	to front and then finally draw them.
-*/
+class slSceneObject : public slSceneNode {
+
+};
+
+class slSceneImage : public slSceneObject {
+	public: 
+							slSceneImage( slTexture2D* inTexture ) { _texture = inTexture; }
+
+	private:
+		slTexture2D* 		_texture;
+};
+
+class slSceneText : public slSceneObject {
+
+};
+
+class slSceneGroup : public slSceneNode {
+	public:
+	private:
+		std::vector< slSceneNode* > _nodes;
+};
+
+/*!
+ * \brief Data for billboarded bitmaps.
+ */
 
 struct slBillboardEntry {
 	float size;
@@ -72,12 +94,11 @@ struct slBillboardEntry {
 	slWorldObject *object;
 };
 
-/*!
-	\brief The camera for the graphical display.
-
-	Holds camera position/location, as well as a variety of other
-	rendering data.
-*/
+/** 
+ * \brief The camera for the graphical display.
+ * Holds camera position/location, as well as a variety of other
+ * rendering data.
+ */
 
 #include <vector>
 
@@ -150,25 +171,27 @@ class slCamera {
 		unsigned char _recompile;
 	
 		slVector _textColor;
+		
+		slSceneNode*				_overlay;
 
-		std::vector<slCameraText> _text;
+		std::vector<slCameraText> 	_text;
 	
-		double _textScale;
+		float						_textScale;
 	
-		bool _drawLights;
-		bool _drawFog;
-		bool _drawShadow;
-		bool _drawShadowVolumes;
-		bool _drawOutline;
-		bool _drawReflection;
-		bool _drawText;
-		bool _drawBlur;
+		bool						_drawLights;
+		bool						_drawFog;
+		bool						_drawShadow;
+		bool						_drawShadowVolumes;
+		bool						_drawOutline;
+		bool						_drawReflection;
+		bool						_drawText;
+		bool						_drawBlur;
 
-		double _blurFactor;
+		double						_blurFactor;
 	
-		slVector _fogColor;
+		slVector					_fogColor;
 	
-		double _fogIntensity;
+		double						_fogIntensity;
 		double						_fogStart;
 		double						_fogEnd;
 	

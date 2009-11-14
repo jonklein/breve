@@ -6,6 +6,11 @@
 #include "render.h"
 #include "world.h"
 
+
+void slTransform::updateTransform( const slTransform& inParent ) {
+
+}
+
 slWorldObject::slWorldObject() {
 	_drawMode = 0;
 	_texture = NULL;

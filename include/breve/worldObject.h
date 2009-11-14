@@ -9,13 +9,25 @@ class slRenderGL;
 class slVertexBufferGL;
 class slObjectConnection;
 
+class slTransform {
+	public:
+		void				updateTransform( const slTransform& inParent );
+	
+		float				_color[ 4 ];
+
+		double 				_rotation[ 3 ][ 3 ];
+		slVector 			_location;
+
+		double 				_transform[ 4 ][ 4 ];
+		double 				_globalTransform[ 4 ][ 4 ];
+};
+
 class slWorldObject {
 	public:
 		friend class slCamera;
 		friend class slJoint;
 		friend class slWorld;
 		friend class slSpring;
-		friend class slTerrain;
 		friend class slVclipData;
 
 		slWorldObject();
@@ -83,6 +95,8 @@ class slWorldObject {
 		bool 						_simulate;
 		bool 						_update;
 
+		slTransform 				_transform;
+
 		slPosition 					_position;
 
 		// type is one of the slWorldObjectTypes -- a stationary or a multibody
@@ -90,7 +104,6 @@ class slWorldObject {
 
 		unsigned char _type;
 
-		slVector _color;
 
 		int _lightExposure;
 
@@ -100,6 +113,7 @@ class slWorldObject {
 		char 						_textureMode;
 		unsigned char 				_drawMode;
 		float 						_billboardRotation;
+		slVector 					_color;
 		float 						_alpha;
 	
 		float 						_textureScaleX, _textureScaleY;

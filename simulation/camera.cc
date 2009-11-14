@@ -23,7 +23,7 @@
 #include "camera.h"
 #include "world.h"
 #include "shape.h"
-#include "gldraw.h"
+#include "glIncludes.h"
 
 /*!
 	\brief Creates a new camera of a given size.
@@ -120,7 +120,7 @@ void slCamera::updateFrustum() {
 	float proj[16], frust[16], modl[16];
 
 	glGetFloatv( GL_PROJECTION_MATRIX, proj );
-	glGetFloatv( GL_MODELVIEW_MATRIX, modl );
+	glGetFloatv( GL_MODELVIEW_MATRIX,  modl );
 
 	// combine the two matrices (multiply projection by modelview)
 	frust[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
