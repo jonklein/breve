@@ -180,11 +180,16 @@ int brIShapeForData( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
-int brIScaleShape( brEval args[], brEval *target, brInstance *i ) {
+int brIShapeSetScale( brEval args[], brEval *target, brInstance *i ) {
 	slShape *s = BRSHAPEPOINTER( &args[0] );
-	slVector *scaleValue = &BRVECTOR( &args[1] );
+	s -> setScale( &BRVECTOR( &args[ 1 ] ) );
 
-	s->scale( scaleValue );
+	return EC_OK;
+}
+
+int brIShapeGetScale( brEval args[], brEval *target, brInstance *i ) {
+	slShape *s = BRSHAPEPOINTER( &args[0] );
+	target -> set( *s -> scale() );
 
 	return EC_OK;
 }
@@ -231,7 +236,8 @@ void breveInitShapeFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "shapeSetDensity", brIShapeSetDensity, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "shapeSetMass", brIShapeSetMass, AT_NULL, AT_POINTER, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "shapeSetInertiaMatrix", brIShapeSetInertiaMatrix, AT_NULL, AT_POINTER, AT_MATRIX, 0 );
-	brNewBreveCall( n, "scaleShape", brIScaleShape, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "shapeSetScale", brIShapeSetScale, AT_NULL, AT_POINTER, AT_VECTOR, 0 );
+	brNewBreveCall( n, "shapeGetScale", brIShapeGetScale, AT_VECTOR, AT_POINTER, 0 );
 	brNewBreveCall( n, "newSphere", brISphereNew, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "meshShapeNew", brIMeshShapeNew, AT_POINTER, AT_STRING, AT_STRING, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "newCube", brICubeNew, AT_POINTER, AT_VECTOR, AT_DOUBLE, 0 );

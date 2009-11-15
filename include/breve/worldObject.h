@@ -17,6 +17,7 @@ class slTransform {
 
 		double 				_rotation[ 3 ][ 3 ];
 		slVector 			_location;
+		slVector 			_scale;
 
 		double 				_transform[ 4 ][ 4 ];
 		double 				_globalTransform[ 4 ][ 4 ];
@@ -74,6 +75,7 @@ class slWorldObject {
 
 		virtual void setRotation( double rotation[3][3] );
 		virtual void setLocation( slVector *location );
+		virtual void setScale( slVector *scale ) { _transform._scale = *scale; }
 
 		inline unsigned char getType() { return _type; }
 

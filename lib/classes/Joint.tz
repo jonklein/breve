@@ -23,6 +23,7 @@ Abstract : Joint (aka Joints) [version 2.3] {
 	+ variables:
 		parent, child (object).
 		plinkPoint, clinkPoint (vector).
+		nativePlinkPoint, nativeClinkPoint (vector).
 		relativeRotation (matrix).
 		jointPointer (pointer).
 		strengthLimit (float).
@@ -187,6 +188,19 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
   + section "Getting and Setting Joint Position & Orientation"
 
+	- to set-native-link-points:
+		pScale, cScale (vector).
+
+		if parent: {
+			pScale = ((parent get-shape) get-scale).
+			nativePlinkPoint = ( plinkPoint::x / pScale::x, plinkPoint::y / pScale::y, plinkPoint::z / pScale::z ).
+		}
+
+		if child: {
+			cScale = ((child  get-shape) get-scale).
+			nativeClinkPoint = ( clinkPoint::x / cScale::x, clinkPoint::y / cScale::y, clinkPoint::z / cScale::z ).
+		}
+
 	+ to get-child-link-point:
 		% Returns the child link point.
 		return clinkPoint.
@@ -335,11 +349,11 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		if !parent: return.
 
-		scale = ((parent get-shape) get-last-scale).
+		scale = ((parent get-shape) get-scale).
 	
-		plinkPoint::x *= scale::x.
-		plinkPoint::y *= scale::y.
-		plinkPoint::z *= scale::z.
+		plinkPoint::x = nativePlinkPoint::x * scale::x.
+		plinkPoint::y = nativePlinkPoint::y * scale::y.
+		plinkPoint::z = nativePlinkPoint::z * scale::z.
 
 		self set-parent-link-point to plinkPoint.
 
@@ -350,11 +364,11 @@ Abstract : Joint (aka Joints) [version 2.3] {
 
 		if !child: return.
 
-		scale = ((child get-shape) get-last-scale).
+		scale = ((child get-shape) get-scale).
 	
-		clinkPoint::x *= scale::x.
-		clinkPoint::y *= scale::y.
-		clinkPoint::z *= scale::z.
+		clinkPoint::x = nativeClinkPoint::x * scale::x.
+		clinkPoint::y = nativeClinkPoint::y * scale::y.
+		clinkPoint::z = nativeClinkPoint::z * scale::z.
 
 		self set-child-link-point to clinkPoint.
 
@@ -409,6 +423,7 @@ Joint : PrismaticJoint (aka PrismaticJoints) [version 2.3] {
 		parent = parentLink.
 		child = childLink.
 
+		self set-native-link-points.
 		self add-dependency on child.
 		self add-dependency on parent.
 
@@ -483,6 +498,7 @@ Joint : RevoluteJoint (aka RevoluteJoints) [version 2.3] {
 		parent = parentLink.
 		child = childLink.
 
+		self set-native-link-points.
 		self add-dependency on child.
 		self add-dependency on parent.
 
@@ -553,12 +569,14 @@ Joint : FixedJoint (aka FixedJoints) [version 2.3] {
 		jointPointer = jointLinkStatic(ppointer, cpointer, (0, 0, 0), parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = (1, 0, 0).
+
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.
 
 		parent = parentLink.
 		child = childLink.
 
+		self set-native-link-points.
 		self add-dependency on child.
 		self add-dependency on parent.
 
@@ -711,12 +729,14 @@ Joint : BallJoint (aka BallJoints) [version 2.3] {
 		jointPointer = jointLinkBall(ppointer, cpointer, normal, parentPoint, childPoint, relativeRotation, currentRotation).
 
 		normalVector = normal.
+
 		plinkPoint = parentPoint.
 		clinkPoint = childPoint.
 
 		parent = parentLink.
 		child = childLink.
 
+		self set-native-link-points.
 		self add-dependency on child.
 		self add-dependency on parent.
 

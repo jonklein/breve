@@ -326,6 +326,7 @@ DLLEXPORT void *brObjectGetUserData( brObject *inObject );
 DLLEXPORT int brMethodCall(brInstance *, brMethod *, const brEval **, brEval *);
 DLLEXPORT int brMethodCallByName(brInstance *, const char *, brEval *);
 DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, const char *, const brEval **, int, brEval *);
+DLLEXPORT int brMethodCallByNameWithArgs(brInstance *, const char *, const brEval **, int, brEval *);
 
 // functions related to adding and removing classes and instances to the breve engine
 

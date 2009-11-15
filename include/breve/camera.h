@@ -18,14 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include "slutil.h"
-#include "texture.h"
-#include "worldObject.h"
-
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-#define SPHERE_RESOLUTIONS	10
+#include "slutil.h"
+#include "texture.h"
 
 class slWorldObject;
 class slWorld;
@@ -58,7 +55,7 @@ class slSceneNode {
 	public:
 		
 	private:
-		slTransform 		_transform;
+		// slTransform 		_transform;
 };
 
 class slSceneObject : public slSceneNode {

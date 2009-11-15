@@ -60,12 +60,13 @@ slWorldObject::~slWorldObject() {
 
 void slWorldObject::draw( const slRenderGL& inRenderer ) {
 	if ( _displayShape ) {
+		const slVector *scale = _displayShape -> scale();
 	
 		inRenderer.PushMatrix( slMatrixGeometry );
 		inRenderer.Translate( slMatrixGeometry, _position.location.x, _position.location.y, _position.location.z );
 
 		inRenderer.MulMatrix( slMatrixGeometry, _position.rotation );
-		inRenderer.MulMatrix( slMatrixGeometry, _displayShape -> _transform );
+		inRenderer.Scale( slMatrixGeometry, scale -> x, scale -> y, scale -> z );
 
 		if( _texture ) {	
 			inRenderer.PushMatrix( slMatrixTexture );

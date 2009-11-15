@@ -104,16 +104,15 @@ int slMeshShape::createODEGeom() {
 }
 
 void slMeshShape::bounds( const slPosition *position, slVector *outMin, slVector *outMax ) const {
-	float scale = slMAX( _transform[ 0 ][ 0 ], slMAX( _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] ) );
-	float reach = _maxReach * scale;
+	float reach = _maxReach;
 
-	outMax->x = position->location.x + reach;
-	outMax->y = position->location.y + reach;
-	outMax->z = position->location.z + reach;
+	outMax -> x = position->location.x + reach;
+	outMax -> y = position->location.y + reach;
+	outMax -> z = position->location.z + reach;
 
-	outMin->x = position->location.x - reach;
-	outMin->y = position->location.y - reach;
-	outMin->z = position->location.z - reach;
+	outMin -> x = position->location.x - reach;
+	outMin -> y = position->location.y - reach;
+	outMin -> z = position->location.z - reach;
 }
 
 slMeshShape::~slMeshShape() {

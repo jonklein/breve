@@ -60,20 +60,24 @@ Abstract : Shape (aka Shapes) [version 2.0] {
 
   + section "Dynamically Changing the Size of a Shape"
 
-	+ to scale by scale (vector):
+	+ to set-scale to scale (vector):
 		% If the shape is <i>not</i> a sphere, scales the shape by the x, y 
 		% and z elements of scale.  If the shape <i>is</i> a sphere, scales 
 		% the shape by only the x element such that the shape always remains 
 		% spherical.
 		% <p>
-		% After the size has been changed, the instances announces a 
-		% "size-changed" notification.
+		% After the size has been changed, the instances announces a "size-changed" notification.
 
-		scaleShape(shapePointer, scale).
-
-		lastScale = scale.
-
+		shapeSetScale( shapePointer, scale ).
 		self announce message "size-changed".
+
+	+ to get-scale:
+		return shapeGetScale( shapePointer ).
+
+	- to scale by scale (vector):
+		current (vector).
+		current = (self get-scale).
+		self set-scale to ( scale::x * current::x, scale::y * current::y, scale::z * current::z ).
 
 	- to get-last-scale:
 		% Used internally...

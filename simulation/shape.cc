@@ -189,9 +189,9 @@ void slBox::finishShape( double inDensity ) {
 	if( _odeGeomID[ 1 ] ) 	
 		dGeomDestroy( _odeGeomID[ 1 ] );
 
-	float sx = _size.x * _transform[ 0 ][ 0 ];
-	float sy = _size.y * _transform[ 1 ][ 1 ];
-	float sz = _size.z * _transform[ 2 ][ 2 ];
+	float sx = _size.x * _scale.x;
+	float sy = _size.y * _scale.y;
+	float sz = _size.z * _scale.z;
 
 	_odeGeomID[ 0 ] = dCreateBox( 0, sx, sy, sz );
 	_odeGeomID[ 1 ] = dCreateBox( 0, sx, sy, sz );
@@ -958,15 +958,8 @@ int slShape::rayHitsShape( slVector *dir, slVector *target, slVector *point ) {
 	return -1;
 }
 
-void slSphere::scale( slVector *scale ) {
-	slMatrixMulScalar( _transform, scale -> x, _transform );
-	finishShape( this->_density );
-}
-
-void slShape::scale( slVector *scale ) {
-	_transform[ 0 ][ 0 ] *= scale -> x;
-	_transform[ 1 ][ 1 ] *= scale -> y;
-	_transform[ 2 ][ 2 ] *= scale -> z;
+void slShape::setScale( slVector *scale ) {
+	_scale = *scale;
 
 	// printf( "scale = %f %f, %f\n", scale -> x, scale -> y, scale -> y );
 	// printf( "total scale = %f %f, %f\n", _transform[ 0 ][ 0 ], _transform[ 1 ][ 1 ], _transform[ 2 ][ 2 ] );
@@ -1135,7 +1128,10 @@ void slShape::bounds( const slPosition *position, slVector *outMin, slVector *ou
 		slPoint *p = *pi;
 		slVector loc, tloc;
 
-		slVectorXform( _transform, &p->vertex, &tloc );
+		tloc.x = p -> vertex.x * _scale.x;
+		tloc.y = p -> vertex.y * _scale.y;
+		tloc.z = p -> vertex.z * _scale.z;
+		
 		slVectorXform( position->rotation, &tloc, &loc );
 
 		if ( loc.x > max.x ) max.x = loc.x;

@@ -169,6 +169,7 @@ class slShape {
 			_odeGeomID[ 1 ]					= 0;
 
 			slMatrixIdentity( _transform );
+			slVectorSet( &_scale, 1, 1, 1 );
 		}
 
 		int									findPointIndex( slVector *inVertex );
@@ -186,7 +187,9 @@ class slShape {
 		virtual int 						pointOnShape(slVector *dir, slVector *point);
 		virtual int 						rayHitsShape(slVector *dir, slVector *target, slVector *point);
 
-		virtual void 						scale(slVector *point);
+		void 								setScale( slVector *inSize );
+		const slVector* 					scale() const { return &_scale; };
+
 		virtual slSerializedShapeHeader* 	serialize(int *length);
 
 		static slShape* 					deserialize( slSerializedShapeHeader* inData );
@@ -203,7 +206,6 @@ class slShape {
 		double 								getMass();
 		double 								getDensity();
 
-		slMatrix							_transform;
 
 		double 								_inertia[3][3];
 		double 								_mass;
@@ -222,6 +224,9 @@ class slShape {
 		dGeomID								_odeGeomID[ 2 ];
 
 	protected:
+		slMatrix							_transform;
+		slVector							_scale;
+
 		virtual void 						fillVertexBuffer();
 
 		slVector 							_max, _min;
