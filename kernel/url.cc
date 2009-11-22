@@ -1,9 +1,9 @@
 
-
+#include "config.h"
+#include "slutil.h"
 #include "url.h"
 
 #ifdef HAVE_LIBCURL
-
 
 struct brURLWriteData {
 							brURLWriteData() {

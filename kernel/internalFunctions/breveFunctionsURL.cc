@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "kernel.h"
+#include "url.h"
 
 /*! \addtogroup InternalFunctions */
 /*@{*/
@@ -35,7 +36,7 @@ int brIURLGet( brEval args[], brEval *target, brInstance *i ) {
 	char *data;
 	int dataSize;
 
-	e -> _url.get( BRSTRING( &args[ 0 ] ), &data, &dataSize );
+	e -> _url -> get( BRSTRING( &args[ 0 ] ), &data, &dataSize );
 
 	if( data ) {
 		target -> set( data );
@@ -58,7 +59,7 @@ int brIURLPut( brEval args[], brEval *target, brInstance *i ) {
 
 	char *putData = BRSTRING( &args[ 1 ] );
 
-	e -> _url.put( BRSTRING( &args[ 0 ] ), putData, strlen( putData ), &data, &dataSize );
+	e -> _url -> put( BRSTRING( &args[ 0 ] ), putData, strlen( putData ), &data, &dataSize );
 
 	if( data ) {
 		target -> set( data );

@@ -309,20 +309,20 @@ int stLoadFiles( stSteveData *sdata, brEngine *engine, const char *code, const c
 	if ( n != 0 && path[0] == '/' ) {
 		/* absolute path */
 
-		brAddSearchPath( engine, path );
+		engine -> addSearchPath( path );
 	} else if ( n != 0 ) {
 		/* relative path */
 
 		char *fullpath = new char[strlen( enginePath ) + strlen( path ) + 2];
 		sprintf( fullpath, "%s/%s", enginePath, path );
 
-		brAddSearchPath( engine, fullpath );
+		engine -> addSearchPath( fullpath );
 
 		delete[] fullpath;
 	} else {
 		// no path--just a file in the current directory
 
-		brAddSearchPath( engine, enginePath );
+		engine -> addSearchPath( enginePath );
 	}
 
 	slFree( path );
@@ -544,7 +544,7 @@ int stPreprocess( stSteveData *s, brEngine *engine, const char *srcFile, const c
 			} else {
 				s->_paths[ current ].push_back( filename );
 
-				brAddSearchPath( engine, filename );
+				engine -> addSearchPath( filename );
 			}
 
 			delete[] filename;

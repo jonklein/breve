@@ -2,11 +2,12 @@
 #define _STEVE_FRONTEND_H
 
 #define ST_STACK_SIZE   0x4000
+#define STEVE_TYPE_SIGNATURE		0x73747665
 
 #include <vector>
 #include <map>
 
-#define STEVE_TYPE_SIGNATURE		0x73747665
+class stStackRecord;
 
 struct stSteveData {
 	stSteveData() {

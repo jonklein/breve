@@ -9,12 +9,13 @@ enum allocStatus {
 	AS_ACTIVE			// active object
 };
 
-typedef struct brObjectType brObjectType;
-typedef struct brMethod brMethod;
-typedef struct brCollisionHandler brCollisionHandler;
-
+class brObjectType;
+class brMethod;
+class brCollisionHandler;
 class brEngine;
 class brEval;
+class brMenuEntry;
+class brObserver;
 
 /** \addtogroup breveObjectAPI */
 /*@{*/

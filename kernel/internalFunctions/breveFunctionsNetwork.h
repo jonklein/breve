@@ -22,6 +22,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#if !MINGW
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#else
+#include <malloc.h>
+#include <wininet.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -29,6 +40,17 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/file.h>
+
+/**
+ * \brief Data about a network client, passed off to the function which
+ * handles the connection.
+ */
+struct brNetworkClientData {
+    brEngine *engine;
+    brNetworkServer *server;
+    int socket;
+    struct sockaddr_in addr;
+};
 
 void breveInitNetworkFuncs(brNamespace *);
 

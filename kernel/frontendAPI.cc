@@ -21,7 +21,7 @@ int brLoadFile( brEngine *engine, const char *code, const char *file ) {
 	// warning: dirname may modify contents -- jerks
 
 	char *dir = slDirname( file );
-	brAddSearchPath( engine, dir );
+	engine -> addSearchPath( dir );
 	slFree( dir );
 
 	for( unsigned int n = 0; n < engine->_objectTypes.size(); n++ ) {

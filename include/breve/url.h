@@ -2,8 +2,6 @@
 #ifndef _URL_H
 #define _URL_H
 
-#include "slutil.h"
-
 #ifdef HAVE_LIBCURL
 
 #include <curl/curl.h>

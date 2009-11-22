@@ -24,20 +24,24 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <gsl/gsl_rng.h>
-
 #include <vector>
 #include <map>
 #include <string>
 #include <algorithm>
 
 #include "timeval.h"
-#include "url.h"
-#include "sound.h"
-#include "render.h"
 
 class slCamera;
 class slWorld;
 class slRenderGL;
+class brInstance;
+class brDlPlugin;
+class brObject;
+class brEvent;
+class brURLFetcher;
+class brSoundMixer;
+class brNamespace;
+class brInternalFunction;
 class brInstance;
 
 // the maximum error size 
@@ -147,13 +151,7 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
-		brEngine();
-
-		brEngine( int inArgc, char **inArgv ) { 
-				_argc = inArgc; 
-				_argv = inArgv; 
-			}
-
+		brEngine( int inArgc = 0, const char **inArgv = NULL );
 		~brEngine();
 
 		std::vector< brObjectType* > 		_objectTypes;
@@ -176,18 +174,15 @@ class brEngine {
 		void 					pauseTimer();
 		void 					unpauseTimer();
 
-#ifdef HAVE_LIBCURL
-		brURLFetcher			_url;
-#endif
+		void addSearchPath( const char *inPath );
 
-#if HAVE_LIBPORTAUDIO && HAVE_LIBSNDFILE
-		brSoundMixer			_soundMixer;
-#endif
+		brURLFetcher*			_url;
+		brSoundMixer*			_soundMixer;
 
 		slWorld* 				world;
 		slCamera*				camera;
 
-		slRenderGL				_renderer;
+		slRenderGL*				_renderer;
 
 		gsl_rng*				RNG;
 
@@ -201,7 +196,6 @@ class brEngine {
 
 		FILE*					_logFile;
 
-private:
 		brInstance*				_controller;
 
 		std::map< std::string, brObject* > 	objectAliases;
@@ -237,14 +231,10 @@ public:
 		struct timeval 				accumulatedTime;
 
 		int 					_argc;
-		char**					_argv;
+		const char**				_argv;
 
 		int 					nThreads;
 		pthread_mutex_t 			lock;
-		pthread_mutex_t 			scheduleLock;
-		pthread_mutex_t 			conditionLock;
-		pthread_cond_t 				condition;
-
 		int 					lastScheduled;
 
 		std::vector<void*> 			windows;
@@ -327,17 +317,11 @@ const std::vector< std::string > &brEngineGetSearchPaths( brEngine * );
 
 std::vector< std::string > brEngineGetAllObjectNames( brEngine *e );
 
-brEngine *brEngineNew();
-brEngine *brEngineNewWithArguments( int inArgc, char **inArgv );
-
-void brEngineFree(brEngine *);
-
 void brAddToInstanceLists(brInstance *);
 void brRemoveFromInstanceLists(brInstance *);
 
 int brFileLogWrite(void *, const char *, int);
 
-void brAddSearchPath(brEngine *, const char *);
 char *brFindFile(brEngine *, const char *, struct stat *);
 void brFreeSearchPath(brEngine *);
 

@@ -21,9 +21,17 @@
 #ifndef _BREVEEVAL_H
 #define _BREVEEVAL_H
 
-#include "slutil.h"
 #include <string>
 #include <set>
+
+#include "slutil.h"
+
+class brEvalHash;
+class brEvalList;
+class brEvalListHead;
+class brInstance;
+class brData;
+class brObject;
 
 enum evaluationCodes {
 	EC_ERROR_HANDLED = -2,

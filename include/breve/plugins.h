@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _PLUGINS_H
+#define _PLUGINS_H
 #ifdef MINGW
 
 #include <windows.h>
@@ -49,3 +51,5 @@ void brEngineRemoveDlPlugins(brEngine *);
 void *brDlLoadPlugin(char *, char *, brNamespace *);
 
 DLLEXPORT char *brPluginFindFile(char *, void *);
+
+#endif

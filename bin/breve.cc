@@ -112,7 +112,7 @@ int brGLUTUnpause() {
 }
 
 
-int main( int argc, char **argv ) {
+int main( int argc, const char **argv ) {
 	char *text;
 	const char *simulationFile;
 
@@ -161,7 +161,7 @@ int main( int argc, char **argv ) {
 		exit( 0 );
 	}
 
-	gEngine = brEngineNewWithArguments( argc, argv );
+	gEngine = new brEngine( argc, argv );
 
 	char currentDir[ MAXPATHLEN ];
 	brEngineSetIOPath( gEngine, getcwd( currentDir, sizeof( currentDir ) ) );
@@ -343,7 +343,7 @@ void brQuit( brEngine *e ) {
 		printf( "%f simulated/real\n", age / diff );
 	}
 
-	brEngineFree( gEngine );
+	delete gEngine;
 
 	if( gOffscreenBuffer )
 		slFree( gOffscreenBuffer );
@@ -393,7 +393,7 @@ void brClick( int inX, int inY ) {
 	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 }
 
-int brParseArgs( int argc, char **argv ) {
+int brParseArgs( int argc, const char **argv ) {
 	int level, r;
 	int error = 0;
 

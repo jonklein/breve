@@ -21,41 +21,4 @@
 #ifndef _BREVETYPEDEFS_H
 #define _BREVETYPEDEFS_H
 
-typedef struct brEngine brEngine;
-typedef struct brVersionRequirement brVersionRequirement;
-typedef struct brVisualData brVisualData;
-typedef struct briTunesData briTunesData;
-typedef struct brMenuEntry brMenuEntry;
-typedef struct brEvent brEvent;
-typedef struct stStackRecord stStackRecord;
-typedef struct brErrorInfo brErrorInfo;
-typedef struct brEvalList brEvalList;
-typedef struct brEvalData brEvalData;
-typedef struct brEvalListHead brEvalListHead;
-typedef struct brObserver brObserver;
-typedef struct brEval brEval;
-typedef struct brNamespaceSymbol brNamespaceSymbol;
-typedef struct brNamespace brNamespace;
-
-typedef struct brInstance brInstance;
-typedef struct brObject brObject;
-
-typedef struct brInternalFunction brInternalFunction;
-
-typedef struct brData brData;
-
-typedef struct brEvalHash brEvalHash;
-typedef struct brSoundMixer brSoundMixer;
-typedef struct brSoundData brSoundData;
-typedef struct brSoundPlayer brSoundPlayer;
-
-typedef struct brDlPlugin brDlPlugin;
-
-typedef struct stThreadData stThreadData;
-
-typedef struct brNetworkClientData brNetworkClientData;
-typedef struct brNetworkServer brNetworkServer;
-typedef struct brNetworkRequest brNetworkRequest;
-typedef struct brStringHeader brStringHeader;
-
 #endif

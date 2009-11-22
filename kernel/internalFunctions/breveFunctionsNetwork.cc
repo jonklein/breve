@@ -36,19 +36,6 @@
 
 #define BRNETWORKSERVERPOINTER(p)	((brNetworkServer*)BRPOINTER(p))
 
-/*!
-	\brief Data about a network client, passed off to the function which
-	handles the connection.
-*/
-
-struct brNetworkClientData {
-	brEngine *engine;
-	brNetworkServer *server;
-	int socket;
-
-	struct sockaddr_in addr;
-};
-
 /*! \addtogroup InternalFunctions */
 /*@{*/
 

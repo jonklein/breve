@@ -22,6 +22,8 @@
 #define _NAMESPACE_H
 #include "slutil.h"
 
+class brNamespaceSymbol;
+
 enum symbolTypes {
     ST_METHODS = 1,
     ST_VAR
@@ -48,9 +50,10 @@ class brNamespace {
  * \brief A symbol in a brNamespace.
  */
 
-struct brNamespaceSymbol {
-    int type;
-    void *data;
+class brNamespaceSymbol {
+	public:
+ 		int type;
+ 		void *data;
 };
 
 brNamespace *brNamespaceNew(void);

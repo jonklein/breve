@@ -18,11 +18,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#include "config.h"
+
 #include "kernel.h"
 #include "world.h"
 #include "camera.h"
 #include "movie.h"
 #include "render.h"
+#include "url.h"
+#include "sound.h"
 
 #ifndef WINDOWS
 #include <dlfcn.h>
@@ -53,29 +57,14 @@ brEvent::~brEvent() {
 }
 
 /**
- * \brief Creates a brEngine structure with _argc and _argv values filled in.
- *
- * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
- */
-
-brEngine *brEngineNewWithArguments( int inArgc, char **inArgv ) {
-	brEngine *e = brEngineNew();
-
-	e->_argc = inArgc;
-	e->_argv = inArgv;
-
-	return e;
-}
-
-/**
  * \brief Creates a brEngine structure.
  *
  * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
  */
 
-brEngine::brEngine() {
-	_argc = 0;
-	_argv = NULL;
+brEngine::brEngine( int inArgc, const char **inArgv ) {
+	_argc = inArgc;
+	_argv = inArgv;
 
 	updateMenu = NULL;
 	getSavename = NULL;
@@ -90,20 +79,24 @@ brEngine::brEngine() {
 	freeWindowCallback = NULL;
 	renderWindowCallback = NULL;
 
+	_url = NULL;
+	_soundMixer = NULL;
 	_controller = NULL;
 
+	_renderer = new slRenderGL;
 
-	gettimeofday( &unpauseTime, NULL );
-	accumulatedTime.tv_sec = 0;
-	accumulatedTime.tv_usec = 0;
+	memset( keys, 0, sizeof( keys ) );
 
-}
+	// wxWindows change change the locale -- I'm not cool with that
+	setlocale( LC_ALL, "C" );
 
-brEngine *brEngineNew() {
-	brEngine *e;
-	char *envpath, *dir;
+#ifdef HAVE_LIBCURL
+	_url = new brURLFetcher;
+#endif
 
-	char wd[MAXPATHLEN];
+#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+	_soundMixer = new brSoundMixer;
+#endif
 
 #if WINDOWS
 	pthread_win32_process_attach_np();
@@ -111,29 +104,24 @@ brEngine *brEngineNew() {
 	WSAStartup( 0x0101, &wsaData );
 #endif
 
-	// wxWindows change change the locale -- I'm not cool with that
+	gettimeofday( &unpauseTime, NULL );
+	accumulatedTime.tv_sec = 0;
+	accumulatedTime.tv_usec = 0;
 
-	setlocale( LC_ALL, "C" );
-
-	e = new brEngine;
-
-	brClearError( e );
+	brClearError( this );
 
 #if HAVE_LIBAVCODEC && HAVE_LIBAVFORMAT && HAVE_LIBAVUTIL && HAVE_LIBSWSCALE
 	av_register_all();
 #endif
 
-#ifdef HAVE_LIBGSL
 	gsl_set_error_handler_off();
-#endif
+	RNG = gsl_rng_alloc( gsl_rng_mt19937 );
 
-	e->RNG = gsl_rng_alloc( gsl_rng_mt19937 );
+	_simulationWillStop = 0;
 
-	e->_simulationWillStop = 0;
+	camera = new slCamera( 400, 400 );
 
-	e->camera = new slCamera( 400, 400 );
-
-	e->nThreads = 1;
+	nThreads = 1;
 
 	// under OSX we'll connect a file handle to the output queue to allow
 	// file handle output to the message logs (useful to plugins).  Under
@@ -141,71 +129,42 @@ brEngine *brEngineNew() {
 	// can just use stderr.
 
 #if MACOSX
-	e->_logFile = funopen( e, NULL, brFileLogWrite, NULL, NULL );
+	_logFile = funopen( this, NULL, brFileLogWrite, NULL, NULL );
 #else
-	e->_logFile = stderr;
+	_logFile = stderr;
 #endif
 
-	e->drawEveryFrame = 1;
+	drawEveryFrame = 1;
 
 	char path[ MAXPATHLEN + 1 ];
 	getcwd( path, MAXPATHLEN );
-	e->_launchDirectory = path;
+	_launchDirectory = path;
+	brEngineSetIOPath( this, path );
 
-	e->world = new slWorld();
+	world = new slWorld();
 
-	e->world->setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
-	//  e->world->setNetworkHandler();
+	world -> setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
 
-	if ( pthread_mutex_init( &e->lock , NULL ) ) {
+	if ( pthread_mutex_init( &lock , NULL ) ) {
 		slMessage( 0, "warning: error creating lock for breve engine\n" );
 
-		if ( e->nThreads > 1 ) {
+		if ( nThreads > 1 ) {
 			slMessage( 0, "cannot start multi-threaded simulation without lock\n" );
-			return NULL;
+			return;
 		}
-	}
-
-	if ( pthread_mutex_init( &e->scheduleLock, NULL ) ) {
-		slMessage( 0, "warning: error creating lock for breve engine\n" );
-
-		if ( e->nThreads > 1 ) {
-			slMessage( 0, "cannot start multi-threaded simulation without lock\n" );
-			return NULL;
-		}
-	}
-
-	if ( pthread_mutex_init( &e->conditionLock, NULL ) ) {
-		slMessage( 0, "warning: error creating lock for breve engine\n" );
-
-		if ( e->nThreads > 1 ) {
-			slMessage( 0, "cannot start multi-threaded simulation without lock\n" );
-			return NULL;
-		}
-	}
-
-	if ( pthread_cond_init( &e->condition, NULL ) ) {
-		slMessage( 0, "warning: error creating pthread condition variable\n" );
 	}
 
 	// namespaces holding object names and method names
 
-	e->internalMethods = brNamespaceNew();
-
-	// set up the initial search paths
-
-	brEngineSetIOPath( e, getcwd( wd, MAXPATHLEN ) );
-
-	// load all of the internal breve functions
-
-	brLoadInternalFunctions( e );
+	internalMethods = brNamespaceNew();
+	brLoadInternalFunctions( this );
 
 	// add the default class path, and check the BREVE_CLASS_PATH
 	// environment variable to see if it adds any more
 
-	brAddSearchPath( e, "lib/classes" );
-	brAddSearchPath( e, "lib" );
-	brAddSearchPath( e, "." );
+	addSearchPath( "lib/classes" );
+	addSearchPath( "lib" );
+	addSearchPath( "." );
 
 #if WINDOWS
 	#define PATHSEP	";"
@@ -213,31 +172,27 @@ brEngine *brEngineNew() {
 	#define PATHSEP ":"
 #endif
 
+	char *envpath, *dir;
 	int n = 0;
 
 	if ( ( envpath = getenv( "BREVE_CLASS_PATH" ) ) ) {
-
 		while ( ( dir = slSplit( envpath, PATHSEP, n++ ) ) ) {
-			brAddSearchPath( e, dir );
+			addSearchPath( dir );
 			slMessage( DEBUG_INFO, "adding \"%s\" to class path\n", dir );
 			slFree( dir );
 		}
 	}
 
-	if (( envpath = getenv( "HOME" ) ) ) brAddSearchPath( e, envpath );
+	if ( ( envpath = getenv( "HOME" ) ) ) addSearchPath( envpath );
 
-	memset( e->keys, 0, sizeof( e->keys ) );
-
-	for ( int t = 1; t < e -> nThreads; t++ ) {
+	for ( int t = 1; t < nThreads; t++ ) {
 		stThreadData *data;
 
 		data = new stThreadData;
-		data->engine = e;
-		data->number = t;
+		data -> engine = this;
+		data -> number = t;
 		pthread_create( &data->thread, NULL, brIterationThread, data );
 	}
-
-	return e;
 }
 
 /**
@@ -280,6 +235,18 @@ void brEngineFree( brEngine *e ) {
 brEngine::~brEngine() {
 	std::vector<brInstance*>::iterator bi;
 	std::vector<void*>::iterator wi;
+
+	delete _renderer;
+
+#ifdef HAVE_LIBCURL
+	if( _url )
+		delete _url;
+#endif
+
+#if defined(HAVE_LIBPORTAUDIO) && defined(HAVE_LIBSNDFILE)
+	if( _soundMixer )
+		delete _soundMixer;
+#endif
 
 	gsl_rng_free( RNG );
 
@@ -346,8 +313,8 @@ int brEngine::setController( brInstance *instance ) {
  */
 
 void brEngineSetIOPath( brEngine *inEngine, const char *inPath ) {
-	inEngine->_outputPath = inPath;
-	brAddSearchPath( inEngine, inPath );
+	inEngine -> _outputPath = inPath;
+	inEngine -> addSearchPath( inPath );
 }
 
 /** 
@@ -575,12 +542,12 @@ void brReplaceSubstring( std::string *inStr, const char *sub, const char *repl )
 	}
  } 
 
-void brAddSearchPath( brEngine *e, const char *path ) {
-	std::string newPath( path );
+void brEngine::addSearchPath( const char *inPath ) {
+	std::string newPath( inPath );
 
 	brReplaceSubstring( &newPath, "\\", "\\\\" );
-	slMessage( DEBUG_INFO, "adding search path %s\n", path );
-	e->_searchPaths.push_back( newPath );
+	slMessage( DEBUG_INFO, "adding search path %s\n", inPath );
+	_searchPaths.push_back( newPath );
 }
 
 const std::vector< std::string > &brEngineGetSearchPaths( brEngine *e ) {
@@ -625,7 +592,7 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
  */
 
 void brEngine::draw() {
-	world -> draw( _renderer, camera );
+	world -> draw( *_renderer, camera );
 }
 
 /*@}*/
