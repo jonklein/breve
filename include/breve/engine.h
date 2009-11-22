@@ -38,6 +38,7 @@
 class slCamera;
 class slWorld;
 class slRenderGL;
+class brInstance;
 
 // the maximum error size 
 
@@ -203,7 +204,6 @@ class brEngine {
 private:
 		brInstance*				_controller;
 
-public:
 		std::map< std::string, brObject* > 	objectAliases;
 		std::map< std::string, brObject* > 	objects;
 		brNamespace*				internalMethods;
@@ -217,6 +217,7 @@ public:
 
 		std::vector< brEvent* > 		events;
 
+public:
 		// runtime error info 
 
 		brErrorInfo 				error;

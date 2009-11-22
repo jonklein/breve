@@ -21,8 +21,8 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-#include "slutil.h"
 #include "texture.h"
+#include "vector.h"
 
 class slWorldObject;
 class slWorld;
