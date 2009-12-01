@@ -212,6 +212,9 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 
 	drawObjects( inRenderer );
 
+	inCamera -> processBillboards( this );
+	inCamera -> renderBillboards( inRenderer );
+
 	if( inCamera -> _drawLights ) {
 		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
 			if( _lights[ n ]._type ) 
@@ -250,7 +253,7 @@ void slWorld::drawObjects( slRenderGL& inRenderer ) {
 	for ( unsigned int n = 0; n < _objects.size(); n++ ) {
 		slWorldObject *wo = _objects[ n ];
 		
-		if( wo )
+		if( wo && wo -> _textureMode == slBitmapNone )
 			wo -> draw( inRenderer );
 	}
 }

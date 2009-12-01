@@ -29,10 +29,10 @@ class slWorld;
 class slStationary;
 class slRenderGL;
 
-enum billboardType {
-	BBT_NONE = 0,
-	BBT_BITMAP,
-	BBT_LIGHTMAP
+enum slBillboardType {
+	slBitmapNone = 0,
+	slBitmap,
+	slLightmap
 };
 
 
@@ -121,7 +121,7 @@ class slCamera {
 		void getRotation(double *, double *);
 		void setRecompile();
 
-		void renderBillboards( int flags );
+		void renderBillboards( slRenderGL& inRenderer );
 		void processBillboards( slWorld *w );
 		void addBillboard( slWorldObject *object, float size, float z );
 		void sortBillboards();	

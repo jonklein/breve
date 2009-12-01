@@ -297,7 +297,7 @@ int brIRealSetTexture( brEval args[], brEval *target, brInstance *i ) {
 		slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> getTexture();
 
 		o -> setTexture( t );
-		o -> setTextureMode( BBT_NONE );
+		o -> setTextureMode( slBitmapNone );
 	} else {
 		o -> setTexture( NULL );
 	}
@@ -340,7 +340,7 @@ int brIRealSetBitmap( brEval args[], brEval *target, brInstance *i ) {
 	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> getTexture();
 
 	o->setTexture( t );
-	o->setTextureMode( BBT_BITMAP );
+	o->setTextureMode( slBitmap );
 
 	return EC_OK;
 }
@@ -425,7 +425,7 @@ int brIRealSetLightmap( brEval args[], brEval *target, brInstance *i ) {
 	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> getTexture();
 
 	o->setTexture( t );
-	o->setTextureMode( BBT_LIGHTMAP );
+	o->setTextureMode( slLightmap );
 
 	return EC_OK;
 }

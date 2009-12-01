@@ -669,92 +669,6 @@ void slCamera::setBlendMode( slRenderBlendMode inBlendMode ) {
 	}
 }
 
-/*!
-	\brief Renders preprocessed billboards.
-*/
-
-void slCamera::renderBillboards( int flags ) {
-	slVector normal;
-	slBillboardEntry *b;
-	unsigned int n;
-	slTexture2D *lastTexture = NULL;
-
-	if( _billboardCount == 0 )
-		return;
-
-	slVectorCopy( &_location, &normal );
-	slVectorNormalize( &normal );
-
-	if ( !( flags & DO_NO_TEXTURE ) ) {
-		glPushAttrib( GL_LIGHTING_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT );
-		glEnable( GL_TEXTURE_2D );
-		glDisable( GL_LIGHTING );
-	}
-
-	glPushAttrib( GL_TRANSFORM_BIT );
-
-	glMatrixMode( GL_TEXTURE );
-	glLoadIdentity();
-	glPopAttrib();
-
-	// we do want to have a depth test against other objects in the world.
-	// but we do our own back-to-front billboard sort and we do not want
-	// them fighting in the depth buffer.  so we'll disable depth-buffer
-	// writing so that no new info goes there.
-
-	slVertexBufferGL buffer;
-
-	glDepthMask( GL_FALSE );
-	
-	_billboardBuffer.bind();
-
-	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
-
-	for ( n = 0; n < _billboardCount; n++ ) {
-		slWorldObject *object;
-		int bound;
-
-		glPushMatrix();
-
-		b = _billboards[ n ];
-
-		object = b->object;
-
-		bound = ( object->_drawMode & DM_BOUND );
-
-		if ( !( flags & DO_NO_COLOR ) )
-			glColor4f( object->_color.x, object->_color.y, object->_color.z, object->_alpha );
-
-		if ( lastTexture != object->_texture )
-			object-> _texture -> bind();
-			
-		if ( object->_textureMode == BBT_LIGHTMAP )
-			setBlendMode( SR_LIGHTBLEND );
-		else
-			setBlendMode( SR_ALPHABLEND );
-
-		lastTexture = object->_texture;
-
-		glTranslated( object->_position.location.x, object->_position.location.y, object->_position.location.z );
-		glRotatef( object->_billboardRotation, normal.x, normal.y, normal.z );
-		glScalef( b -> size, b -> size, b -> size );
-		
-		_billboardBuffer.draw( VB_TRIANGLE_STRIP );
-
-		if ( bound && !( flags & DO_NO_BOUND ) ) {
-			slMessage( DEBUG_ALL, "Somebody should fix this" );
-		}
-
-		glPopMatrix();
-	}
-
-	_billboardBuffer.unbind();
-
-	glDepthMask( GL_TRUE );
-
-	if ( !( flags & DO_NO_TEXTURE ) ) glPopAttrib();
-}
-
 void slStrokeText( double x, double y, const char *string, double scale, void *font ) {
 	int c;
 
@@ -782,8 +696,8 @@ void slText( double x, double y, const char *string, void *font ) {
 }
 	
 /*!
-	\brief Renders a stationary object.
-*/
+ * \brief Renders a stationary object.
+ */
 
 void slCamera::processBillboards( slWorld *inWorld ) {
 	GLfloat matrix[ 16 ];

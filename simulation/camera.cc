@@ -353,12 +353,106 @@ void slCamera::setShadowCatcher( slStationary *s, slVector *normal ) {
 	_shadowCatcher = s;
 }
 
-/*!
-	\brief Adds an entry for a billboard.
 
-	This is used dynamically while rendering billboards in order to correctly render
-	them from back to front.
-*/
+
+
+/**
+ * \brief The sort function used to sort billboards from back to front.
+ */
+
+bool slBillboardCompare( const slBillboardEntry *a, const slBillboardEntry *b ) {
+	return a -> z < b -> z;
+}
+
+/*!
+ * \brief Renders a stationary object.
+ */
+
+void slCamera::processBillboards( slWorld *inWorld ) {
+	GLfloat matrix[ 16 ];
+	std::vector<slWorldObject*>::iterator wi;
+
+	glGetFloatv( GL_MODELVIEW_MATRIX, matrix );
+
+	_billboardCount = 0;
+
+	for ( wi = inWorld->_objects.begin(); wi != inWorld->_objects.end(); wi++ ) {
+		slWorldObject *wo = *wi;
+
+		if ( wo && wo -> _textureMode != slBitmapNone && wo->_displayShape && wo->_displayShape->_type == ST_SPHERE ) {
+			double z = 0;
+
+			slSphere *ss = static_cast< slSphere* >( wo->_displayShape );
+
+			z = matrix[2] * wo->_position.location.x + matrix[6] * wo->_position.location.y + matrix[10] * wo->_position.location.z;
+
+			addBillboard( wo, ss -> radius(), z );
+		}
+	}
+
+	if( _billboardCount == 0 ) 
+		return;
+
+	std::sort( _billboards, _billboards + _billboardCount, slBillboardCompare );
+
+	_billboardX.x = matrix[0];
+	_billboardX.y = matrix[4];
+	_billboardX.z = matrix[8];
+
+	_billboardY.x = matrix[1];
+	_billboardY.y = matrix[5];
+	_billboardY.z = matrix[9];
+
+	_billboardZ.x = matrix[2];
+	_billboardZ.y = matrix[6];
+	_billboardZ.z = matrix[10];
+	
+	float *v;
+	
+	v = _billboardBuffer.texcoord( 0 );
+	v[ 0 ] = 1.0;
+	v[ 1 ] = 1.0;
+
+	v = _billboardBuffer.texcoord( 1 );
+	v[ 0 ] = 0.0;	
+	v[ 1 ] = 1.0;
+	
+	v = _billboardBuffer.texcoord( 2 );
+	v[ 0 ] = 1.0;
+	v[ 1 ] = 0.0;
+	
+	v = _billboardBuffer.texcoord( 3 );
+	v[ 0 ] = 0.0;
+	v[ 1 ] = 0.0;
+
+	v = _billboardBuffer.vertex( 0 );
+	v[ 0 ] =  _billboardX.x + _billboardY.x;  
+	v[ 1 ] =  _billboardX.y + _billboardY.y;
+	v[ 2 ] =  _billboardX.z + _billboardY.z;
+
+	v = _billboardBuffer.vertex( 1 );
+	v[ 0 ] = -_billboardX.x + _billboardY.x;
+	v[ 1 ] = -_billboardX.y + _billboardY.y;
+	v[ 2 ] = -_billboardX.z + _billboardY.z;
+
+	v = _billboardBuffer.vertex( 2 );
+	v[ 0 ] =  _billboardX.x - _billboardY.x;
+	v[ 1 ] =  _billboardX.y - _billboardY.y;
+	v[ 2 ] =  _billboardX.z - _billboardY.z;
+
+	v = _billboardBuffer.vertex( 3 );
+	v[ 0 ] = -_billboardX.x - _billboardY.x;
+	v[ 1 ] = -_billboardX.y - _billboardY.y;
+	v[ 2 ] = -_billboardX.z - _billboardY.z;
+
+}
+
+/**
+ * \brief Adds an entry for a billboard.
+ *
+ * This is used dynamically while rendering billboards in order to correctly render
+ * them from back to front.
+ */
 
 void slCamera::addBillboard( slWorldObject *object, float size, float z ) {
 	unsigned int n, last;
@@ -379,9 +473,72 @@ void slCamera::addBillboard( slWorldObject *object, float size, float z ) {
 	_billboardCount++;
 }
 
-/*!
-	\brief Sets the size of the camera window.
-*/
+/**
+ *	\brief Renders preprocessed billboards.
+ */
+
+void slCamera::renderBillboards( slRenderGL& inRenderer ) {
+	slVector normal;
+	slBillboardEntry *b;
+	unsigned int n;
+	slTexture2D *lastTexture = NULL;
+
+	if( _billboardCount == 0 )
+		return;
+
+	slVectorCopy( &_location, &normal );
+	slVectorNormalize( &normal );
+
+	// we do want to have a depth test against other objects in the world.
+	// but we do our own back-to-front billboard sort and we do not want
+	// them fighting in the depth buffer.  so we'll disable depth-buffer
+	// writing so that no new info goes there.
+	
+	_billboardBuffer.bind();
+
+	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
+
+	for ( n = 0; n < _billboardCount; n++ ) {
+		slWorldObject *object;
+		int bound;
+		
+		inRenderer.PushMatrix( slMatrixGeometry );
+
+		b = _billboards[ n ];
+		object = b->object;
+
+		unsigned char color[ 4 ] = { object->_color.x, object->_color.y, object->_color.z, object->_alpha };
+		//inRenderer.SetBlendColor( color );
+
+		if ( lastTexture != object -> _texture ) {
+			object -> _texture -> bind();
+			lastTexture = object->_texture;
+		}
+
+		inRenderer.SetBlendMode( object -> _textureMode == slLightmap ? slBlendLight : slBlendAlpha );
+		
+		inRenderer.Translate( slMatrixGeometry, object->_position.location.x, object->_position.location.y, object->_position.location.z );
+		inRenderer.Rotate( slMatrixGeometry, object->_billboardRotation, normal.x, normal.y, normal.z );
+		inRenderer.Scale( slMatrixGeometry, b -> size, b -> size, b -> size );
+		
+		_billboardBuffer.draw( VB_TRIANGLE_STRIP );
+
+		inRenderer.PopMatrix( slMatrixGeometry );
+	}
+	
+	lastTexture -> unbind();
+
+	_billboardBuffer.unbind();
+}
+
+
+
+
+
+
+/**
+ * \brief Sets the size of the camera window.
+ */
 
 void slCamera::setBounds( unsigned int nx, unsigned int ny ) {
 	_width = nx;
@@ -389,18 +546,18 @@ void slCamera::setBounds( unsigned int nx, unsigned int ny ) {
 	_fov = ( double )_width / ( double )_height;
 }
 
-/*!
-	\brief Gets the size of the camera window.
-*/
+/**
+ * \brief Gets the size of the camera window.
+ */
 
 void slCamera::getBounds( unsigned int *nx, unsigned int *ny ) {
 	*nx = _width;
 	*ny = _height;
 }
 
-/*!
-	\brief Gets the camera's x and y rotation.
-*/
+/**
+ * \brief Gets the camera's x and y rotation.
+ */
 
 void slCamera::getRotation( double *x, double *y ) {
 	*x = _rx;
@@ -418,23 +575,6 @@ void slCamera::setRecompile() {
 
 void slCamera::setActivateContextCallback( int( *f )() ) {
 	_activateContextCallback = f;
-}
-
-
-/*!
-	\brief The sort function used to sort billboards from back to front.
-*/
-
-bool slBillboardCompare( const slBillboardEntry *a, const slBillboardEntry *b ) {
-	return a->z < b->z;
-}
-
-/*!
-	\brief Sorts the billboards from back to front.
-*/
-
-void slCamera::sortBillboards() {
-	std::sort( _billboards, _billboards + _billboardCount, slBillboardCompare );
 }
 
 /*!

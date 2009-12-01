@@ -250,24 +250,26 @@ class slBox : public slShape {
 class slSphere : public slShape {
 	public:
 		/** \brief Creates a new sphere of a given radius and density. */
-		slSphere(double radius, double density);
+							slSphere(double radius, double density);
 
-		void 						bounds( const slPosition *position, slVector *min, slVector *max ) const;
-		int 						pointOnShape(slVector *dir, slVector *point);
-		int 						rayHitsShape(slVector *dir, slVector *target, slVector *point);
-		void 						scale(slVector *point);
+		void 					bounds( const slPosition *position, slVector *min, slVector *max ) const;
+		int 					pointOnShape(slVector *dir, slVector *point);
+		int 					rayHitsShape(slVector *dir, slVector *target, slVector *point);
+		void 					scale(slVector *point);
 
-		virtual 					void setDensity(double density);
+		virtual 				void setDensity(double density);
 
-		slSerializedShapeHeader 	*serialize(int *length);
+		slSerializedShapeHeader*		serialize(int *length);
 
-		void 						drawShadowVolume(slCamera *camera, slPosition *position);
+		void 					drawShadowVolume(slCamera *camera, slPosition *position);
+
+		float					radius() const { return _radius; } 
 
 	protected:
 		virtual void 				fillVertexBuffer();
 
-		int 						addTriangles( GLfloat *inX, GLfloat *inY, GLfloat *inZ, int inDiv, float inR, int inIndex );
-		double 						_radius;
+		int 				addTriangles( GLfloat *inX, GLfloat *inY, GLfloat *inZ, int inDiv, float inR, int inIndex );
+		float				_radius;
 };
 
 /*!

@@ -1231,6 +1231,4 @@ void slSphere::fillVertexBuffer() {
 
     for( int i = 0; i < 20; i++ )
         vertices = addTriangles( sphereVertexData[ sphereIndices[ i ][ 0 ] ], sphereVertexData[ sphereIndices[ i ][ 1 ] ], sphereVertexData[ sphereIndices[ i ][ 2 ] ], divisions, _radius, vertices );
-		
-	printf( "%d vertices added (%d)\n", vertices, 20 * 3 * (int)pow( 4, ( divisions ) ) );
 }
