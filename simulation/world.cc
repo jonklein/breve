@@ -212,16 +212,15 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 
 	drawObjects( inRenderer );
 
-	inCamera -> processBillboards( this );
-	inCamera -> renderBillboards( inRenderer );
-
 	if( inCamera -> _drawLights ) {
 		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
 			if( _lights[ n ]._type ) 
 				inRenderer.PopLight();
 		}
 	}
-	
+
+	inCamera -> processBillboards( this );
+	inCamera -> renderBillboards( inRenderer );	
 	
 	if( inCamera -> _drawShadow && inCamera -> _shadowCatcher ) {
 

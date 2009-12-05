@@ -370,7 +370,7 @@ bool slBillboardCompare( const slBillboardEntry *a, const slBillboardEntry *b ) 
 
 void slCamera::processBillboards( slWorld *inWorld ) {
 	GLfloat matrix[ 16 ];
-	std::vector<slWorldObject*>::iterator wi;
+	std::vector< slWorldObject* >::iterator wi;
 
 	glGetFloatv( GL_MODELVIEW_MATRIX, matrix );
 
@@ -496,8 +496,6 @@ void slCamera::renderBillboards( slRenderGL& inRenderer ) {
 	
 	_billboardBuffer.bind();
 
-	glNormal3f( _billboardZ.x, _billboardZ.y, _billboardZ.z );
-
 	for ( n = 0; n < _billboardCount; n++ ) {
 		slWorldObject *object;
 		int bound;
@@ -507,8 +505,8 @@ void slCamera::renderBillboards( slRenderGL& inRenderer ) {
 		b = _billboards[ n ];
 		object = b->object;
 
-		unsigned char color[ 4 ] = { object->_color.x, object->_color.y, object->_color.z, object->_alpha };
-		//inRenderer.SetBlendColor( color );
+		unsigned char color[ 4 ] = { object->_color.x * 255.0f, object->_color.y * 255.0f, object->_color.z * 255.0f, object->_alpha * 255.0f };
+		inRenderer.SetBlendColor( color );
 
 		if ( lastTexture != object -> _texture ) {
 			object -> _texture -> bind();
