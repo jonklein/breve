@@ -15,6 +15,8 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		cameraPointer (pointer).
 		shared (int).
 
+		watchObject (object).
+
 	- to set-camera-pointer to p (pointer):
 		% Used internally.
 
@@ -29,6 +31,10 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		cameraPointer = cameraNew().
 		self set-size with-height 100 with-width 100.
 		self set-position with-x 0 with-y 0.
+
+	+ to iterate:
+		if watchObject: self look at (watchObject get-location) from (cameraGetPosition(cameraPointer)).
+		super iterate.
 
   + section "Enabling and Disabling the Camera"
 
@@ -55,6 +61,13 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		cameraTextSetEnabled(cameraPointer, 0).
 
   + section "Changing the Size, Position and Perspective of the Viewing Window"
+
+	+ to watch item theObject (object):
+		% Points the camera at the OBJECT(Mobile) object theObject.  If 
+		% theObject is passed in as 0, then the camera will stop watching
+		% a previously watched object.
+
+		watchObject = theObject.
 
 	+ to get-width:
 		% Returns the current camera width.
@@ -97,6 +110,11 @@ Abstract : Camera (aka Cameras) [version 2.4] {
 		% simulation to not be drawn because they are too far away.
 
 		cameraSetZClip(cameraPointer, distance).
+
+	+ to get-position:
+		% Returns a vector containing the position of the camera
+		% return cameraGetPosition(cameraPointer)
+		return cameraGetPosition(cameraPointer).
 
 	+ to get-rotation:
 		% Returns a vector containing the rotation of the camera about the X- 

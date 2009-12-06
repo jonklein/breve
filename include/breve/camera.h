@@ -119,6 +119,7 @@ class slCamera {
 		void setBounds(unsigned int, unsigned int);
 		void getBounds(unsigned int *, unsigned int *);
 		void getRotation(double *, double *);
+		void getPosition(double *, double *, double *);
 		void setRecompile();
 
 		void renderBillboards( slRenderGL& inRenderer );

@@ -283,6 +283,25 @@ int brICameraGetRotation( brEval args[], brEval *target, brInstance *i ) {
 	return EC_OK;
 }
 
+/*!
+	\brief Gets the position for a camera
+
+	void cameraGetPosition(slCamera pointer, int).
+*/
+
+int brICameraGetPosition( brEval args[], brEval *target, brInstance *i ) {
+	slCamera *camera = BRCAMERAPOINTER( &args[0] );
+	slVector v;
+
+	v.x = camera->_location.x;
+	v.y = camera->_location.y;
+	v.z = camera->_location.z;
+
+	target->set( v );
+
+	return EC_OK;
+}
+
 /**
  * Enables or disables a camera's text display.
  * void cameraTextSetEnabled(slCamera pointer, int).
@@ -318,6 +337,7 @@ void breveInitCameraFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "cameraResizeDisplay", brICameraResizeDisplay, AT_NULL, AT_POINTER, AT_INT, AT_INT, 0 );
 	brNewBreveCall( n, "cameraSetRotation", brICameraSetRotation, AT_NULL, AT_POINTER, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "cameraGetRotation", brICameraGetRotation, AT_VECTOR, AT_POINTER, 0 );
+	brNewBreveCall( n, "cameraGetPosition", brICameraGetPosition, AT_VECTOR, AT_POINTER, 0 );	
 	brNewBreveCall( n, "cameraNew", brICameraNew, AT_POINTER, 0 );
 	brNewBreveCall( n, "cameraSetBlur", brICameraSetBlur, AT_NULL, AT_POINTER, AT_INT, 0 );
 	brNewBreveCall( n, "cameraClear", brICameraClear, AT_NULL, AT_POINTER, 0 );

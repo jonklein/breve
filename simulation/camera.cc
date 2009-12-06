@@ -562,6 +562,16 @@ void slCamera::getRotation( double *x, double *y ) {
 	*y = _ry;
 }
 
+/**
+ * \brief Gets the camera's x,y,z position
+ */
+
+void slCamera::getPosition( double *x, double *y, double *z ) {
+	*x = _location.x;
+	*y = _location.y;
+	*z = _location.z;
+}
+
 /*!
 	\brief Sets the recompile flag for this camera, indicating that drawlists
 	need to be recompiled.
