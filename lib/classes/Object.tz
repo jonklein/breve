@@ -121,7 +121,6 @@ NULL : Object (aka Objects) [version 2.1] {
 	+ to unschedule method-call theMethod="" (string) at-time theTime=0 (float):
 	     	% Unschedules a call to theMethod when the simulation time equals
 		% theTime.  Both theMethod and theTime are optional.
-		print "unschedule event $theMethod at $theTime".
 		removeEvent(theMethod, theTime).
 
 	- to schedule-repeating method-call theMethod (string) with-interval theInterval (double): 
