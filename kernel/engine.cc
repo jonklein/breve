@@ -412,6 +412,35 @@ brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double 
 	return event;
 }
 
+/*!
+	\brief Removes a call to a method for an instance at a given time.
+*/
+
+int brEngineRemoveEvent( brEngine *e, brInstance *i, char *methodName, double time ) {
+        std::vector<brEvent*>::iterator ei, nei;
+
+	ei = e->events.end() - 1;
+
+	if ( e->events.size() == 0 ) {
+		return EC_OK;
+	}
+
+	while ( ei != e->events.begin() && (time >= e->world->getAge( ) || time == 0) ) {
+	  if( ( *ei )->_instance == i && (( ( *ei )->_time >= e->world->getAge( ) && ( *ei )->_time == time && strcmp(( *ei )->_name,methodName)==0) ||
+					  ( time == 0 && strcmp(( *ei )->_name,methodName)==0 ) ||
+					  ( strcmp("",methodName)==0 ))) {
+	    
+	    nei = ei - 1;
+	    e->events.erase(ei);
+	    ei = nei;
+	  } else {
+	    ei--;
+	  }
+	}
+
+	return EC_OK;
+}
+
 /**
  * Iterates the breve engine.
  * Iterates an engine by:

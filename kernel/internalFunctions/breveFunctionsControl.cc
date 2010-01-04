@@ -197,6 +197,29 @@ int brIAddEvent( brEval args[], brEval *target, brInstance *i ) {
 }
 
 /*!
+	\brief Remove an event to the breve engine to be executed at a certain time.
+
+	The method will be executed for the calling object.
+
+	void removeEvent(double time, string methodName).
+*/
+
+int brIRemoveEvent( brEval args[], brEval *target, brInstance *i ) {
+        if ( BRDOUBLE( &args[1] ) <= i->engine->world->getAge( ) && BRDOUBLE( &args[1] ) != 0) {
+		slMessage( DEBUG_ALL, "warning: attempt to remove event from the past\n" );
+		return EC_OK;
+	}
+
+	if ( !brEngineRemoveEvent( i->engine, i, BRSTRING( &args[0] ), BRDOUBLE( &args[1] ) ) ) {
+		slMessage( DEBUG_ALL, "unable to remove event from engine: brEngineRemoveEvent() failed\n" );
+		return EC_ERROR;
+	}
+
+	return EC_OK;
+}
+
+
+/*!
 	\brief Set the starting and ending distances for fog.
 
 	void setFogDistances(double start, double end).
@@ -535,6 +558,7 @@ void breveInitControlFunctions( brNamespace *n ) {
 	brNewBreveCall( n, "unpauseSimulation", brIUnpause, AT_NULL, 0 );
 
 	brNewBreveCall( n, "addEvent", brIAddEvent, AT_NULL, AT_STRING, AT_DOUBLE, AT_DOUBLE, 0 );
+	brNewBreveCall( n, "removeEvent", brIRemoveEvent, AT_NULL, AT_STRING, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "setFogDistances", brISetFogDistances, AT_NULL, AT_DOUBLE, AT_DOUBLE, 0 );
 	brNewBreveCall( n, "setDrawLights", brISetDrawLights, AT_NULL, AT_INT, 0 );
 	brNewBreveCall( n, "setDrawShadow", brISetDrawShadow, AT_NULL, AT_INT, 0 );

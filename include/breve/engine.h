@@ -308,6 +308,7 @@ enum versionRequiermentOperators {
 };
 
 brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
+int brEngineRemoveEvent(brEngine *, brInstance *, char *, double);
 void brEventFree(brEvent *);
 
 void brEngineSetIOPath(brEngine *, const char *);
