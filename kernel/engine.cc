@@ -426,19 +426,21 @@ int brEngineRemoveEvent( brEngine *e, brInstance *i, char *methodName, double ti
 	}
 
 	// Loop through the list as long as the time of the event to remove is after NOW or we want to remove all events with this name (time==0)
-	while ( ei != e->events.end() && (time >= e->world->getAge( ) || time == 0) ) {
+	while ( ei != e->events.end()-1 && (time >= e->world->getAge( ) || time == 0) ) {
+
 	  // Find the right instance with time >= NOW
 	  if( ( *ei )->_instance == i && ( *ei )->_time >= e->world->getAge( ) ) {
+
 	    // Cases: matching time & matching name, matching name for all time, or method to remove is empty
 	    if(( ( *ei )->_time == time && 
 		 strcmp(( *ei )->_name,methodName)==0) ||
 	       ( time == 0 && strcmp(( *ei )->_name,methodName)==0 ) ||
 	       ( strcmp("",methodName)==0 )) {
 
-	      nei = ei + 1;
-	      e->events.erase(ei);
-	      ei = nei;
+	      nei = e->events.erase(ei);
 
+	    } else {
+	      ei++;
 	    }
 	  } else {
 	    ei++;

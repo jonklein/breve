@@ -237,7 +237,7 @@ PhysicalControl : WalkerSim {
 		time = (self get-time) + 20.0.
 
 		self schedule method-call "change-drivers" at-time time.
-
+		self unschedule method-call "change-drivers".# at-time time.
 		self display-current-driver.
 
 		state save.
