@@ -344,6 +344,7 @@ Object : GeneticAlgorithm {
 
 				# migration...
 				if transferIn: {
+				        print "Immigrants coming in.".
 					if (transferIn get-individual number i):
 						ind = (transferIn get-individual number i).
 					else:
@@ -365,12 +366,15 @@ Object : GeneticAlgorithm {
 		
 
 		if | migrationHosts | != 0: {
+		        if !transferOut:
+		          transferOut = new GAIndividualTransporter. 
 			transferOut clear.
+
 
 			for n=0, n<populationSize * (migrationPercent / 100.0), n++:
 				transferOut add individual (self tournament-select for-index n).
 
-			#print "Migrating individuals...".
+			print "Migrating individuals...".
 			recipientHost = migrationHosts{ random[ | migrationHosts | - 1 ] }.
 			transferOut send-over-network to recipientHost on GENETIC_ALGORITHM_SERVER_PORT.
 		}

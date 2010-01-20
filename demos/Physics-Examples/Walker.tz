@@ -199,6 +199,7 @@ PhysicalControl : WalkerSim {
 	+ to change-drivers:
 		newDist (double).
 		newOffset (vector).
+		time (double).
 
 		# if they have locked the current driver, do nothing.
 
@@ -233,7 +234,10 @@ PhysicalControl : WalkerSim {
 
 		# schedule a new driver change in 20 seconds.
 
-		self schedule method-call "change-drivers" at-time (self get-time) + 20.0.
+		time = (self get-time) + 20.0.
+
+		self schedule method-call "change-drivers" at-time time.
+
 		self display-current-driver.
 
 		state save.

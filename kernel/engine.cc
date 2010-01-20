@@ -419,18 +419,19 @@ brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double 
 int brEngineRemoveEvent( brEngine *e, brInstance *i, char *methodName, double time ) {
         std::vector<brEvent*>::iterator ei, nei;
 
-	ei = e->events.end() - 1;
+	ei = e->events.begin();
 
 	if ( e->events.size() == 0 ) {
 		return EC_OK;
 	}
 
-	while ( ei != e->events.begin() && (time >= e->world->getAge( ) || time == 0) ) {
+	// Loop through the list as long as the time of the event to remove is after NOW or we want to remove all events with this name (time==0)
+	while ( ei != e->events.end() && (time >= e->world->getAge( ) || time == 0) ) {
+
 	  if( ( *ei )->_instance == i && (( ( *ei )->_time >= e->world->getAge( ) && ( *ei )->_time == time && strcmp(( *ei )->_name,methodName)==0) ||
 					  ( time == 0 && strcmp(( *ei )->_name,methodName)==0 ) ||
 					  ( strcmp("",methodName)==0 ))) {
-	    
-	    nei = ei - 1;
+	    nei = ei + 1;
 	    e->events.erase(ei);
 	    ei = nei;
 	  } else {
