@@ -327,8 +327,8 @@ void brQuit( brEngine *e ) {
 
 	if ( !gPaused && !gEngine->drawEveryFrame ) {
 		gThreadShouldExit = 1;
-		brEngineLock( gEngine );
-		brEngineUnlock( gEngine );
+		gEngine -> lock();
+		gEngine -> unlock();
 	}
 
 	e -> pauseTimer();
@@ -573,10 +573,7 @@ void slDemoReshape( int x, int y ) {
 }
 
 void slDemoDisplay() {
-	brEngineLock( gEngine );
 	gEngine -> draw();
-	brEngineUnlock( gEngine );
-
 	glutSwapBuffers();
 }
 

@@ -14,8 +14,8 @@ class brqtEngine : public QObject {
 		~brqtEngine();
 
 		void timerEvent( QTimerEvent* ) {
-			brEngineIterate( _engine );
-			_glwidget->updateGL();
+			_engine -> iterate();
+			_glwidget -> updateGL();
 		}
 
 		brEngine 		*_engine;

@@ -37,12 +37,12 @@ char *interfaceID;
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
 
-void brEngineLock( brEngine *e ) {
-	( pthread_mutex_lock( &( e )->lock ) );
+void brEngine::lock() {
+	pthread_mutex_lock( &_engineLock );
 }
 
-void brEngineUnlock( brEngine *e ) {
-	( pthread_mutex_unlock( &( e )->lock ) );
+void brEngine::unlock() {
+	pthread_mutex_unlock( &_engineLock );
 }
 
 brEvent::brEvent( char *n, double t, double interval, brInstance *i ) {
@@ -145,7 +145,7 @@ brEngine::brEngine( int inArgc, const char **inArgv ) {
 
 	world -> setCollisionCallbacks( brCheckCollisionCallback, brCollisionCallback );
 
-	if ( pthread_mutex_init( &lock , NULL ) ) {
+	if ( pthread_mutex_init( &_engineLock , NULL ) ) {
 		slMessage( 0, "warning: error creating lock for breve engine\n" );
 
 		if ( nThreads > 1 ) {
@@ -457,7 +457,7 @@ int brEngine::iterate() {
 
 	brInstance *i;
 
-	brEngineLock( this );
+	lock();
 
 	lastScheduled = -1;
 
@@ -488,9 +488,7 @@ int brEngine::iterate() {
 
 		if ( i->status == AS_ACTIVE ) {
 			if ( brMethodCall( i, i->iterate, NULL, &result ) != EC_OK ) {
-
-				pthread_mutex_unlock( &lock );
-
+				unlock();
 				return EC_ERROR;
 			}
 		}
@@ -501,9 +499,7 @@ int brEngine::iterate() {
 
 		if ( i->status == AS_ACTIVE ) {
 			if ( brMethodCall( i, i->postIterate, NULL, &result ) != EC_OK ) {
-
-				pthread_mutex_unlock( &lock );
-
+				unlock();
 				return EC_ERROR;
 			}
 		}
@@ -522,9 +518,7 @@ int brEngine::iterate() {
 			world->setAge( oldAge );
 
 			if ( rcode != EC_OK ) {
-
-				pthread_mutex_unlock( &lock );
-
+				unlock();
 				return rcode;
 			}
 
@@ -539,7 +533,7 @@ int brEngine::iterate() {
 		events.pop_back();
 	}
 
-	brEngineUnlock( this );
+	unlock();
 
 	fflush( _logFile );
 
@@ -621,7 +615,9 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
  */
 
 void brEngine::draw() {
+	lock();
 	world -> draw( *_renderer, camera );
+	unlock();
 }
 
 /*@}*/

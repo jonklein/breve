@@ -13,7 +13,7 @@ brqtEngine::brqtEngine( const char *inSimulationText, const char *inSimulationNa
 
 	_timerDelay = 0;
 
-	_engine = brEngineNew();
+	_engine = new brEngine();
 	_glwidget -> setEngine( _engine );
 
 	brEngineSetUpdateMenuCallback( _engine, updateSimulationMenuCallback );
@@ -26,14 +26,14 @@ brqtEngine::brqtEngine( const char *inSimulationText, const char *inSimulationNa
         
 	classPath = QApplication::applicationDirPath() + "/../Resources/classes";
         
-        #else
+	#else
         
 	classPath = QApplication::applicationDirPath() + "../lib/classes";
         
 	#endif
 
 
-	brAddSearchPath( _engine, classPath.toAscii().constData() );
+	_engine -> addSearchPath( classPath.toAscii().constData() );
 
 	brInitFrontendLanguages( _engine );
 
@@ -50,12 +50,12 @@ brqtEngine::~brqtEngine() {
 	_stop = 1;
 
 	if( _glwidget )
-		_glwidget->setEngine( NULL );
+		_glwidget -> setEngine( NULL );
 
 	if( _timerID != -1 )
 		killTimer( _timerID );
 
-	brEngineFree( _engine );
+	delete _engine;
 
 	_currentEngine = NULL;
 }
@@ -63,7 +63,7 @@ brqtEngine::~brqtEngine() {
 void brqtEngine::updateSimulationMenu( brInstance *inInstance ) {
 	_simulationMenu -> clear();
 
-	for( int n = 0; n < inInstance -> _menus.size(); n++ ) {
+	for( unsigned int n = 0; n < inInstance -> _menus.size(); n++ ) {
 		brMenuEntry *entry = inInstance -> _menus[ n ];
 		_simulationMenu -> addAction( entry -> title );
 	}

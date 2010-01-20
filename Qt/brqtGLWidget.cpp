@@ -14,9 +14,7 @@ brqtGLWidget::~brqtGLWidget() {
 
 void brqtGLWidget::paintGL() {
 	if (_engine) {
-		brEngineLock( _engine );
-		brEngineRenderWorld( _engine, 0 );
-		brEngineUnlock( _engine );
+		_engine -> draw();
 	} else {
 		glClearColor( 0, 0, 0, 1 );
 		glClear( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
@@ -25,7 +23,7 @@ void brqtGLWidget::paintGL() {
 
 void brqtGLWidget::resizeGL( int w, int h ) {
 	if( _engine ) 
-		_engine->camera->setBounds( w, h );
+		_engine-> camera -> setBounds( w, h );
 }
 
 void brqtGLWidget::mousePressEvent ( QMouseEvent *e) {

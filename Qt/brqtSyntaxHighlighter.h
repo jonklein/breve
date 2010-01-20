@@ -2,7 +2,7 @@
 #include <vector>
 
 struct brqtSyntaxFeature {
-	brqtSyntaxFeature( char *inRegex, const QColor& inColor ) {
+	brqtSyntaxFeature( const char *inRegex, const QColor& inColor ) {
 		_regex.setPattern( inRegex );	
 		_color = inColor;
 	}

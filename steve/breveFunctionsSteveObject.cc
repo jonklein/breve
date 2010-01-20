@@ -292,7 +292,7 @@ int stNSendXMLObject( brEval *args, brEval *target, brInstance *i ) {
 
 	buffer = slCloseStringStream( xmlBuffer );
 
-	brEngineUnlock( i->engine );
+	i -> engine -> unlock();
 
 	if ( stSendXMLString( addr, port, buffer, target, i ) ) {
 		// Something went wrong, we are not happy, but returning EC_ERROR
@@ -300,7 +300,7 @@ int stNSendXMLObject( brEval *args, brEval *target, brInstance *i ) {
 		slMessage( DEBUG_ALL, "warning: network send of object %p failed\n", i );
 	}
 
-	brEngineLock( i->engine );
+	i -> engine -> lock();
 
 	slFree( buffer );
 

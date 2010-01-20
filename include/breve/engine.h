@@ -158,7 +158,10 @@ class brEngine {
 		std::vector< brInstance* > 		_freedInstances;
 
 		int 					iterate();
+
 		void					draw();
+		void					lock();
+		void					unlock();
 
 		brInstance*				getController() const { return _controller; }
 		int						setController( brInstance *inController );
@@ -234,7 +237,7 @@ public:
 		const char**				_argv;
 
 		int 					nThreads;
-		pthread_mutex_t 			lock;
+		pthread_mutex_t 			_engineLock;
 		int 					lastScheduled;
 
 		std::vector<void*> 			windows;

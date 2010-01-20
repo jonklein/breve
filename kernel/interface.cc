@@ -86,11 +86,9 @@ int brMenuCallback( brEngine *e, brInstance *i, unsigned int n ) {
 
 	if ( !strcmp( menu->method, "" ) ) return EC_OK;
 
-	brEngineLock( e );
-
+	e -> lock();
 	int result = brMethodCallByName( i, menu->method, &eval );
-
-	brEngineUnlock( e );
+	e -> unlock();
 
 	return result;
 }
@@ -125,9 +123,9 @@ brInstance *brClickCallback( brEngine *inEngine, brInstance *inClickedObject ) {
 
 	argPtr[ 0 ] = &theArg;
 
-	brEngineLock( inEngine );
+	inEngine -> lock();
 	brMethodCall( inEngine -> getController() , method, argPtr, &eval );
-	brEngineUnlock( inEngine );
+	inEngine -> unlock();
 
 	brMethodFree( method );
 
@@ -170,7 +168,7 @@ int brDragCallback( brEngine *e, int x, int y ) {
 	unsigned char types[] = { AT_VECTOR };
 	slVector v;
 
-	pthread_mutex_lock( &e->lock );
+        e -> lock();
 
 	method = brMethodFind( e-> getController() ->object, "get-drag-object", NULL, 0 );
 
@@ -181,18 +179,14 @@ int brDragCallback( brEngine *e, int x, int y ) {
 	brMethodFree( method );
 
 	if ( n != EC_OK ) {
-
-		pthread_mutex_unlock( &e->lock );
-
+        	e -> unlock();
 		return n;
 	}
 
 	i = BRINSTANCE( &eval );
 
 	if ( !i ) {
-
-		pthread_mutex_unlock( &e->lock );
-
+        	e -> unlock();
 		return EC_OK;
 	}
 
@@ -205,22 +199,18 @@ int brDragCallback( brEngine *e, int x, int y ) {
 	brMethodFree( method );
 
 	if ( n != EC_OK ) {
-
-		pthread_mutex_unlock( &e->lock );
-
+        	e -> unlock();
 		return n;
 	}
 
-	e-> camera -> vectorForDrag( e->world, &BRVECTOR( &eval ), x, y, &v );
+	e -> camera -> vectorForDrag( e->world, &BRVECTOR( &eval ), x, y, &v );
 
 	theArg.set( v );
 
 	method = brMethodFind( i->object, "move", types, 1 );
 
 	if ( !method ) {
-
-		pthread_mutex_unlock( &e->lock );
-
+		e -> unlock();
 		return EC_ERROR;
 	}
 
@@ -230,8 +220,7 @@ int brDragCallback( brEngine *e, int x, int y ) {
 
 	brMethodFree( method );
 
-	pthread_mutex_unlock( &e->lock );
-
+	e -> unlock();
 	return EC_OK;
 }
 

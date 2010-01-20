@@ -19,11 +19,6 @@ brqtMainWindow::brqtMainWindow() : QMainWindow( NULL, Qt::WindowTitleHint ) {
 
 	_palette.show();
 
-	char *argv[] = { "none" };
-	int argc = 1;
-
-	// glutInit( &argc, argv );
-
 
 	// connect( _ui.editButton, SIGNAL( pressed() ), this, SLOT( toggleEditing() ) );
 	connect( _ui.actionOpen, SIGNAL( triggered() ), this, SLOT( openDocument() ) );
@@ -251,8 +246,6 @@ void brqtMainWindow::toggleSimulation() {
 		const QString paramtext = window -> getXMLParameters ();
 		char *params = slStrdup( paramtext.toAscii().constData() );
 
-		printf( "%s\n", params );
-
 		_engine = new brqtEngine( str, window -> windowTitle().toAscii().constData(), _ui.glWidget, _ui.menuSimulation );
 
 		slFree( str );
@@ -266,7 +259,7 @@ void brqtMainWindow::toggleSimulation() {
 
 QMenu *brqtMainWindow::buildMenuFromDirectory( const QString& inDirectory, QMenu *inParent, QStringList *inFilters, const char *inSlot ) {
 	QDir dir( inDirectory );
-	QFileInfoList files = dir.entryInfoList( *inFilters, QDir::Files | QDir::AllDirs, QDir::Name );
+	QFileInfoList files = dir.entryInfoList( *inFilters, QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name );
 
 	for ( int i = 0; i < files.size(); i++ ) {
 		const QFileInfo &file = files.at( i );
@@ -296,7 +289,7 @@ void brqtMainWindow::updateSimulationPopup() {
 	_ui.simulationPopup -> clear();
 
 	for( int n = 0; n < _documents.size(); n++ ) 
-		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( _documents[ n ] ) );
+		_ui.simulationPopup -> addItem( _documents[ n ] -> windowTitle(), QVariant( (const char*)_documents[ n ] ) );
 
 	_ui.simulationPopup -> setCurrentIndex( _documents.size() - 1 );
 }

@@ -226,11 +226,11 @@ void *brListenOnSocket( void *data ) {
 			// fcntl(clientData.socket, F_SETFL, O_NONBLOCK);
 			printf( "about to lock\n" );
 
-			brEngineLock( clientData.engine );
+			clientData.engine -> lock();
 
 			brHandleConnection( &clientData );
 
-			brEngineUnlock( clientData.engine );
+			clientData.engine -> unlock();
 
 #if WINDOWS
 			closesocket( clientData.socket );

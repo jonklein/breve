@@ -6,7 +6,6 @@
 
 #include "kernel.h"
 #include "camera.h"
-#include "gldraw.h"
 
 class brqtGLWidget : public QGLWidget {
 	Q_OBJECT
