@@ -46,7 +46,7 @@ PhysicalControl : VirtualCreatures {
 
 
 	+ to init:
-		startTexture = (new Image load from "images/star.png").
+		startTexture = (new Image load from "images/star_start.png").
 
 		flag = new Mobile.
 		flag disable-physics.
@@ -60,7 +60,7 @@ PhysicalControl : VirtualCreatures {
 		blockTexture = ( new Image load from "images/noise.png" ).
 
 		floor = new Floor.
-		floor set-texture-image to ( new Image load from "images/ground.png" ).
+		floor set-texture-image to ( new Image load from "images/ground.jpg" ).
 		floor set-color to ( .8, .8, .8 ).
 
 		self enable-fast-physics.
@@ -69,7 +69,7 @@ PhysicalControl : VirtualCreatures {
 
 		parser = new MorphologyParser.
 
-		ga = (controller dearchive-xml file "breveCreatures275.xml").	
+		ga = (controller dearchive-xml file "breveCreatures.xml").	
 
 		if !ga: {
 			print "Making new GA".
@@ -207,7 +207,7 @@ GeneticAlgorithm : SimsGA {
 		if isnan((o get-fitness)): o set-fitness to 0.
 		print "fitness of $o: ", (o get-fitness).
 
-		self archive-as-xml file "breveCreatures275.xml".
+		self archive-as-xml file "breveCreatures.xml".
 }
 
 GeneticAlgorithmIndividual : SimsGAIndividual {
@@ -240,8 +240,8 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 		free genome.
 }
 
-@define MAXDEPTH 6.
-@define MAXLINKS 20.
+@define MAXDEPTH 3.
+@define MAXLINKS 12.
 
 Object : MorphologyParser {
 	+ variables:
@@ -259,7 +259,7 @@ Object : MorphologyParser {
 		rootNode = (self create-node from root with-level 1).
 
 		(self parse from root with-level 1 with-link rootNode).
-		# (self parse from root with-level 1 with-link rootNode flip 1).
+		(self parse from root with-level 1 with-link rootNode flip 1).
 
 		return rootNode.
 
@@ -268,12 +268,13 @@ Object : MorphologyParser {
 		child, childNode, joint (object).
 		cpoint, ppoint, point, size, norm (vector).
 		jointRange (float).
+		face (int).
 
 		connections = (root get-connections).
 
 		nodeParams = (root get-parameters).
 		
-		size = 3.0 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
+		size = 1.5 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
 
 		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
 
@@ -292,24 +293,34 @@ Object : MorphologyParser {
 			
 			if childNode: {
 				connectionParams = (child get-parameters).
+				
+				face = connectionParams{0} * 6.
+				
+				if( face < -2 ): {
+					point = (1,0,0).
+					norm = (0,.6,1).
+				} else if( face < -1 ): {
+					point = (-1,0,0).
+					norm = (0,.6,-1).
+				} else if( face < 0 ): {
+					point = (0,1,0).
+					norm = (.6,0,1).
+				} else if( face < 1 ): {
+					point = (0,-1,0).
+					norm = (.6,0,-1).
+				} else if( face < 2 ): {
+					point = (0,0,1).
+					norm = (1,.6,0).
+				} else {
+					point = (0,0,-1).
+					norm = (-1,.6,0).
+				}
 
-				point = (connectionParams{0}, connectionParams{1}, connectionParams{2}).
-
-				if f:
-					point::x *= -1.
-
-				point::x *= size::x.
-				point::y *= size::y.
-				point::z *= size::z.
-		 
 				cpoint = (childNode get-shape) get-point-on-shape on-vector point.
 				ppoint = (rootNode get-shape) get-point-on-shape on-vector -point.
-
-				norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
 				norm /= | norm |.
 
-				if f:
-					norm::x *= -1.
+			
 
 				joint = new SineJoint.
 
@@ -321,13 +332,13 @@ Object : MorphologyParser {
 					to-child childNode 
 					parent rootNode.
 
-				joint set-phaseshift to n * 3.14 * connectionParams{7}.
-				joint set-frequency to .1 + connectionParams{8}.
+				joint set-phaseshift to 2 * 3.14 * connectionParams{7}.
+				joint set-frequency to .1 + 2.0 * connectionParams{8}.
 
-				jointRange = 0.5 + 1 * | connectionParams{ 9 } |.
+				jointRange = 0.8 + 1.5 * | connectionParams{ 9 } |.
 
-				joint set-double-spring with-max jointRange with-min -jointRange with-strength 1.
-				joint set-strength-limit to 1000.
+				joint set-double-spring with-max jointRange with-min -jointRange with-strength 20.
+				joint set-strength-limit to 1300.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
 				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
@@ -352,10 +363,10 @@ Object : MorphologyParser {
 		scaleFactor = ( ( MAXDEPTH + 1 ) - ( ( .5 + .45 * |nodeParams{10}| ) * n ) ) / ( MAXDEPTH + 1 ).
 		
 		rootNode = new CreaturesLink.	
-		rootNode move to (0, 15, 0).
+		rootNode move to (0, 8, 0).
 		rootNode set-color to scaleFactor * (1, 1, 1).
 
-		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
+		size = 6 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
 
 		rootNode set-color to (|nodeParams{3}|, |nodeParams{4}|, |nodeParams{5}|).
 
@@ -372,7 +383,7 @@ Link : CreaturesLink (aka CreaturesLinks) {
 		_startLocation (vector).
 
 	+ to init:
-		self set-mu to 3.0.
+		self set-mu to 300.0.
                 
 	+ to set-start-location:
 		_startLocation = ( self get-location ).
@@ -397,8 +408,12 @@ RevoluteJoint : SineJoint (aka SineJoints) {
 		frequency = f.
 
 	+ to iterate:
+	    value (double).
+    
+	    value = sin( (controller get-time) * frequency + phaseshift ).
+
 		if active: {
-			self set-joint-velocity to sin( (controller get-time) * frequency + phaseshift ).
+                    self set-joint-velocity to value.
 		}
 
 	+ to activate:

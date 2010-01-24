@@ -23,14 +23,13 @@
 @implementation slBreveSaver
 
 - (void)initGL {
-	char *simFile, *simName, *text;
+	char *simFile, *text;
+
+	const char *simName;
 	int result;
 		
 	glInited = YES;
 
-	if( viewEngine ) 
-		brEngineGetCamera( viewEngine ) -> initGL();
-	
 	simName = [self getSimName];
 
 	if(*simName != '/') {
@@ -140,17 +139,17 @@
 
 	path = [NSString stringWithFormat: @"%@/classes", inputDirectory];
 
-	brAddSearchPath( viewEngine, slStrdup((char*)[path cString]) ); 
+	viewEngine -> addSearchPath( slStrdup([path UTF8String]) ); 
 
 	/* set the output path to the resource dir, and add it to the search path */
 
-	brAddSearchPath( viewEngine, slStrdup((char*)[inputDirectory cString]) ); 
+	viewEngine -> addSearchPath( slStrdup([inputDirectory UTF8String]) ); 
 	
 	paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 
 	if([paths count] > 0) { 
 		outputDirectory = [[[paths objectAtIndex: 0] stringByAppendingString: @"/Preferences/"] retain];
-		brEngineSetIOPath( viewEngine, (char*)[outputDirectory cString] );
+		brEngineSetIOPath( viewEngine, [outputDirectory UTF8String] );
 	}
 		
 	if( [defaults boolForKey: @"initialized"] != YES) 
@@ -167,7 +166,7 @@
 }
 
 - (int)initEngineWithFrame:(NSRect)frame {
-	viewEngine = brEngineNew();
+	viewEngine = new brEngine();
 	brInitFrontendLanguages( viewEngine );
 	
 	if( !viewEngine ) return -1;
@@ -283,7 +282,7 @@
 } 
 
 - (void)animateOneFrame {
-	 brEngineIterate( viewEngine );
+	viewEngine -> iterate();
 
 	[[theView openGLContext] makeCurrentContext];
 
@@ -298,7 +297,7 @@
 
 	}
 	
-	brEngineRenderWorld( viewEngine, 0 );
+	viewEngine -> draw();
 	
 	glFlush();
 }
@@ -312,13 +311,13 @@
 	
 	if( !viewEngine ) return;
 	
-	brInstance *controller = brEngineGetController( viewEngine );
+	brInstance *controller = viewEngine -> getController();
 
-	if(controller) brMethodCallByName(controller, (char*)[method cString], &r);
+	if(controller) brMethodCallByName(controller, [method UTF8String], &r);
 }
 
 - (void)dealloc {
-	brEngineFree( viewEngine );
+	delete viewEngine;
 
 	[outputDirectory release];
 	[inputDirectory release];
@@ -328,11 +327,11 @@
 
 /* this should be overriden by subclasses */
 
-- (char*)getSimName {
+- (const char*)getSimName {
 	return "Simulation.tz";
 }
 
-- (char*)getDefaultsName {
+- (const char*)getDefaultsName {
 	return "Simulation";
 }
 

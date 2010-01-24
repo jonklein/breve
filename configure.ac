@@ -319,7 +319,6 @@ AC_CHECK_LIB([expat], [XML_ParserCreate],,AC_MSG_FAILURE([Missing expat library 
 
 if test "x$engine_only" = "x"; then
 	AC_CHECK_LIB([enet], [enet_initialize])
-	AC_CHECK_LIB([jpeg], [jpeg_read_header])
 	AC_CHECK_LIB([tiff], [TIFFOpen])
 	AC_CHECK_LIB([OSMesa], [OSMesaCreateContext])
 	AC_CHECK_LIB([assimp], [aiImportFile])
@@ -355,9 +354,7 @@ if test "x$engine_only" = "x"; then
 	# look for main in the C++ only libraries, since the function names are mangled.
 
 	AC_CHECK_LIB([qgame++], [main])
-
 	AC_CHECK_LIB([curl], [curl_easy_init])
-
 fi
 
 if test "x$custom_cblas" = x; then
@@ -365,6 +362,7 @@ if test "x$custom_cblas" = x; then
 fi
 
 AC_CHECK_LIB([png], [png_create_write_struct])
+AC_CHECK_LIB([jpeg], [jpeg_read_header])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))

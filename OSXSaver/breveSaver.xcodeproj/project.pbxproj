@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -523,23 +523,13 @@
 		489B5EFC0AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
-				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-bundle",
-					"-read_only_relocs",
-					suppress,
-					"-multiply_defined",
-					suppress,
-				);
+				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = breveCreatures;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -548,33 +538,20 @@
 					"-Wno-unknown-pragmas",
 				);
 				WRAPPER_EXTENSION = saver;
-				ZERO_LINK = YES;
 			};
 			name = Development;
 		};
 		489B5EFD0AB79D2500244255 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 4;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
-				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-bundle",
-					"-read_only_relocs",
-					suppress,
-					"-multiply_defined",
-					suppress,
-				);
+				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = breveCreatures;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -583,7 +560,6 @@
 					"-Wno-unknown-pragmas",
 				);
 				WRAPPER_EXTENSION = saver;
-				ZERO_LINK = NO;
 			};
 			name = Deployment;
 		};
@@ -709,12 +685,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
-					i386,
+					x86_64,
+					"$(ARCHS_STANDARD_32_BIT)",
 				);
+				GCC_ENABLE_OBJC_GC = unsupported;
+				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = ../lib;
-				USER_HEADER_SEARCH_PATHS = ../include/breve;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				USER_HEADER_SEARCH_PATHS = "/usr/local/include ../include/breve";
 			};
 			name = Development;
 		};
@@ -722,12 +701,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
-					i386,
+					x86_64,
+					"$(ARCHS_STANDARD_32_BIT)",
 				);
+				GCC_ENABLE_OBJC_GC = unsupported;
+				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;
 				LIBRARY_SEARCH_PATHS = ../lib;
-				USER_HEADER_SEARCH_PATHS = ../include/breve;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				USER_HEADER_SEARCH_PATHS = "/usr/local/include ../include/breve";
 			};
 			name = Deployment;
 		};

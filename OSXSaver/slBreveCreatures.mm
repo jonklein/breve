@@ -26,45 +26,15 @@
 - (void)loadSettings {
 	brEval result;
 	
-	if(!viewEngine) return;
-	
-	brInstance *controller = brEngineGetController(viewEngine);
-	
-	/*
-	
-	arg.type = AT_VECTOR;
-	BRVECTOR(&arg).x = [defaults floatForKey: @"cloudRed"];
-	BRVECTOR(&arg).y = [defaults floatForKey: @"cloudGreen"];
-	BRVECTOR(&arg).z = [defaults floatForKey: @"cloudBlue"];
-
-	brMethodCallByNameWithArgs(controller, "set-background-color", &ap, 1, &result);
-
-	arg.type = AT_VECTOR;
-	BRVECTOR(&arg).x = [defaults floatForKey: @"skyRed"];
-	BRVECTOR(&arg).y = [defaults floatForKey: @"skyGreen"];
-	BRVECTOR(&arg).z = [defaults floatForKey: @"skyBlue"];
-	
-	brMethodCallByNameWithArgs(controller, "set-background-color", &ap, 1, &result);
-
-	disableFX = [defaults integerForKey: @"disableEffects"];
-
-	if(disableFX) {
-		brMethodCallByName(controller, "disable-shadows", &result);
-		brMethodCallByName(controller, "disable-reflections", &result);
-	} else {
-		brMethodCallByName(controller, "enable-shadows", &result);
-		brMethodCallByName(controller, "enable-reflections", &result);	
-	}
-	 
-	*/
-	 
+	if(!viewEngine) 
+		return;
 }
 
-- (char*)getSimName {
+- (const char*)getSimName {
     return "Creatures.tz";
 }   
 
-- (char*)getDefaultsName {
+- (const char*)getDefaultsName {
 	return "breveCreatures";
 }
 
