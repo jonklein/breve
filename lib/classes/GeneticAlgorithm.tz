@@ -297,7 +297,7 @@ Object : GeneticAlgorithm {
 
 		self start-fitness-test of populations{ currentPopulation }{ currentIndividual }.
 
-		self unschedule method-call "switch-individual".
+		# self unschedule method-call "switch-individual".
 		self schedule method-call "switch-individual" at-time (controller get-time) + testDuration.
 
 	- to reproduce:

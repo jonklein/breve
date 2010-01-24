@@ -241,7 +241,7 @@ GeneticAlgorithmIndividual : SimsGAIndividual {
 }
 
 @define MAXDEPTH 3.
-@define MAXLINKS 6.
+@define MAXLINKS 12.
 
 Object : MorphologyParser {
 	+ variables:
@@ -259,7 +259,7 @@ Object : MorphologyParser {
 		rootNode = (self create-node from root with-level 1).
 
 		(self parse from root with-level 1 with-link rootNode).
-		# (self parse from root with-level 1 with-link rootNode flip 1).
+		(self parse from root with-level 1 with-link rootNode flip 1).
 
 		return rootNode.
 
@@ -274,7 +274,7 @@ Object : MorphologyParser {
 
 		nodeParams = (root get-parameters).
 		
-		size = 3.0 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .5, .5, .5 ).
+		size = 1.5 * (|nodeParams{0}|, |nodeParams{1}|, |nodeParams{2}|) + ( .3, .3, .3 ).
 
 		# Don't recurse more than 3 levels deep, and don't recurse if the node-parameter doesn't tell us to.
 
@@ -294,53 +294,26 @@ Object : MorphologyParser {
 			if childNode: {
 				connectionParams = (child get-parameters).
 				
-				
-					if(connectionParams{0} > 0.5):
-						point::x = 1.
-					else 
-						point::x = 0.
-
-					if(connectionParams{1} > 0.5):
-						point::y = 1.
-					else 
-						point::y = 0.
-
-					if(connectionParams{2} > 0.5):
-						point::z = 1.
-					else 
-						point::z = 0.
-
-					if f:
-						point::x *= -1.
-
-				#	point::x *= size::x.
-				#	point::y *= size::y.
-				#	point::z *= size::z.
-				norm = (connectionParams{4}, connectionParams{5}, connectionParams{6}).
-
-				if f:
-					norm::x *= -1.
-			
-		face = connectionParams{0} * 6.
+				face = connectionParams{0} * 6.
 				
 				if( face < -2 ): {
 					point = (1,0,0).
-					norm = (0,0,1).
+					norm = (0,.6,1).
 				} else if( face < -1 ): {
 					point = (-1,0,0).
-					norm = (0,0,-1).
+					norm = (0,.6,-1).
 				} else if( face < 0 ): {
 					point = (0,1,0).
-					norm = (.3,0,1).
+					norm = (.6,0,1).
 				} else if( face < 1 ): {
 					point = (0,-1,0).
-					norm = (.3,0,-1).
+					norm = (.6,0,-1).
 				} else if( face < 2 ): {
 					point = (0,0,1).
-					norm = (1,.3,0).
+					norm = (1,.6,0).
 				} else {
 					point = (0,0,-1).
-					norm = (-1,.3,0).
+					norm = (-1,.6,0).
 				}
 
 				cpoint = (childNode get-shape) get-point-on-shape on-vector point.
@@ -362,10 +335,10 @@ Object : MorphologyParser {
 				joint set-phaseshift to 2 * 3.14 * connectionParams{7}.
 				joint set-frequency to .1 + 2.0 * connectionParams{8}.
 
-				jointRange = 0.5 + 1 * | connectionParams{ 9 } |.
+				jointRange = 0.8 + 1.5 * | connectionParams{ 9 } |.
 
 				joint set-double-spring with-max jointRange with-min -jointRange with-strength 20.
-				joint set-strength-limit to 650.
+				joint set-strength-limit to 1300.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
 				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.
@@ -440,10 +413,7 @@ RevoluteJoint : SineJoint (aka SineJoints) {
 	    value = sin( (controller get-time) * frequency + phaseshift ).
 
 		if active: {
-           # if value < 0:
-           #    value *= .7.
-               
-            self set-joint-velocity to value.
+                    self set-joint-velocity to value.
 		}
 
 	+ to activate:

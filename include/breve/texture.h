@@ -59,10 +59,13 @@ class slTexture2D : public slTexture {
 		bool		isLoaded() { return _textureID != 0; }
 
 		void 		loadPixels( const unsigned char *pixels, int inWidth, int inHeight, int inChannels = 4, bool inRepeat = true );
-		void 		resize( int inWidth, int inHeight, bool inHasAlpha = true );
+		void 		resize( int inWidth, int inHeight, bool inHasAlpha = true, bool inLinearInterp = true );
 
 		float		_unitX;
 		float		_unitY;
+
+		int		X() const { return _sizeX; }
+		int		Y() const { return _sizeY; }
 
 	protected:
 		void		createTextureID();

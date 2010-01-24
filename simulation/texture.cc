@@ -100,11 +100,19 @@ void slTexture2D::loadPixels( const unsigned char *pixels, int inWidth, int inHe
 	unbind();
 }
 
-void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
+void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha, bool inLinearInterp ) {
 	if( inWidth == _texX && inHeight == _texY ) 
 		return;
 
+	if( _textureID == 0 )
+		createTextureID();
+
 	bind();
+
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, inLinearInterp ? GL_LINEAR : GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, inLinearInterp ? GL_LINEAR : GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
 	_texX = inWidth;
 	_texY = inHeight;
@@ -114,8 +122,8 @@ void slTexture2D::resize( int inWidth, int inHeight, bool inHasAlpha ) {
 
 	_sizeX = _sizeY = slMAX( _sizeX, _sizeY );
 
-	_unitX = ( inWidth - 0.5f )  / (float)_sizeX;
-	_unitY = ( inHeight - 0.5f ) / (float)_sizeY;
+	_unitX = ( inWidth )  / (float)_sizeX;
+	_unitY = ( inHeight ) / (float)_sizeY;
 
 	GLenum format = inHasAlpha ? GL_RGBA : GL_RGB;
 

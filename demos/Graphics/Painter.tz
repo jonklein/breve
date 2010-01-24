@@ -25,6 +25,8 @@ Control : myController {
 	+ to init:
 		brush (object).
 
+		self set-background-texture-image to (new Image load from "images/clouds.png").
+
 		self disable-text.
 
 		vel = 1.0 + random[9].
@@ -33,12 +35,10 @@ Control : myController {
 
 		if (self get-argument-count) == 2: {
 			file = (self get-argument at-index 1).
-		} else file = "images/jon.png".
+		} else file = "images/jon.jpg".
 
 		image = (new Image load from file).
 
-		blur = .992.
-		if blur > .992: blur = .992.
 		blur = 1.0.
 
 		self set-background-color to (0, 0, 0).

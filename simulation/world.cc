@@ -195,9 +195,29 @@ slWorld::~slWorld() {
 void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 	float c[] = { backgroundColor.x, backgroundColor.y, backgroundColor.z, 1.0 };
 	inRenderer.Clear( c );
+	inRenderer.SetBlendMode( slBlendAlpha );
+
+
+	if( inCamera -> _drawBlur ) {
+		slVector center, a1, a2; 
+		center.set( 0, 0, 0 ); 
+		a1.set( 1, 0, 0 ); 
+		a2.set( 0, 1, 0 );
+		
+		glDisable( GL_CULL_FACE );
+		
+		float c[4] = { 1, 1, 1, 1 };
+		inRenderer.SetBlendColor( c );
+
+		inRenderer.SetDepthWriteEnabled( false );
+		inRenderer.SetIdentity( slMatrixProjection );
+		inRenderer.SetIdentity( slMatrixGeometry );
+		inRenderer.SetIdentity( slMatrixTexture );
+		inRenderer.DrawQuad( *inCamera -> readbackTexture(), center, a1, a2 );
+		inRenderer.SetDepthWriteEnabled( true );
+	}
 	
 	inRenderer.ApplyCamera( inCamera );
-	inRenderer.SetBlendMode( slBlendAlpha );
 
 	_skybox.draw( inRenderer, inCamera );
 	
@@ -234,8 +254,10 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 		}
 		
 		inRenderer.EndFlatShadows();
-		
 	}
+
+	if( inCamera -> _drawBlur ) 
+		inRenderer.ReadToTexture( *inCamera );
 }
 
 

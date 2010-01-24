@@ -59,9 +59,9 @@ class slRenderGL {
 	
 		void				PushMatrix( slMatrixMode inMode ) const;
 		void				PopMatrix( slMatrixMode inMode ) const;
+		void				SetIdentity( slMatrixMode inMode ) const;
 		void 				MulMatrix( slMatrixMode inMode, double inMatrix[ 3 ][ 3 ] ) const;
 		void 				MulMatrix4( slMatrixMode inMode, float inMatrix[ 16 ] ) const;
-
 
 		void 				Scale( slMatrixMode inMode, float inX, float inY, float inZ ) const;
 		void 				Translate( slMatrixMode inMode, float inX, float inY, float inZ ) const;
@@ -77,6 +77,8 @@ class slRenderGL {
 
 		void				PushLight( const slLight *inLight, bool inAmbientOnly = false );
 		void				PopLight();
+
+		void				SetDepthWriteEnabled( bool inEnabled = true );
 	
 		void 				DrawQuad( const slTexture2D& inTexture, const slVector &inCenterPoint, const slVector &inAxis1, const slVector &inAxis2 );
 
@@ -85,6 +87,8 @@ class slRenderGL {
 		
 		void				BindMaterial( const slMaterial& inMaterial ) const;
 		void				UnbindMaterial( const slMaterial& inMaterial ) const;
+
+		void				ReadToTexture( slCamera& inCamera );
 
 	protected:
 		

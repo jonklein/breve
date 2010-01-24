@@ -452,9 +452,9 @@ Abstract : Control (aka Controls) [version 2.3] {
 		% METHOD(set-skybox-images) for information on setting custom skyboxes.
 
 		self set-skybox-images to {
-			"images/MountainBoxFront.png", "images/MountainBoxBack.png",
-			"images/MountainBoxLeft.png", "images/MountainBoxRight.png",
-			"images/MountainBoxTop.png", "images/MountainBoxBottom.png" }.
+			"images/MountainBoxFront.jpg", "images/MountainBoxBack.jpg",
+			"images/MountainBoxLeft.jpg", "images/MountainBoxRight.jpg",
+			"images/MountainBoxTop.jpg", "images/MountainBoxBottom.jpg" }.
 
 	+ to set-background-scroll-rate x xValue (float) y yValue (float):
 		% Sets the rate of the background image scrolling.  Purely cosmetic.

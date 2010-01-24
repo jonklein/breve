@@ -229,7 +229,7 @@ class slWorld {
 		slSkybox				_skybox;
 		slLight					_lights[ 8 ];
 		
-		slTexture2D*			backgroundTexture;
+		slTexture2D*				backgroundTexture;
 
 		void 					updateNeighbors();
 

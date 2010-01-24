@@ -87,6 +87,28 @@ void slRenderGL::UnbindMaterial( const slMaterial& inMaterial ) const {
 }
 
 
+void slRenderGL::ReadToTexture( slCamera& inCamera ) {
+	// During a live-resize drag, the texture is going to be continually resized and 
+	// will be degraded as a result.  Therefore, we'll only do the resize if we
+	// get the same size request twice in a row indicating that the redraw is 
+	// not occurring during a window resize.
+
+	if( inCamera._width != inCamera._readbackX || inCamera._height != inCamera._readbackY ) {
+		inCamera._readbackX = inCamera._width;
+		inCamera._readbackY = inCamera._height;
+		return;
+	}
+
+	// slgl( glFlush() );
+
+	inCamera.readbackTexture() -> resize( inCamera._width, inCamera._height, false );
+	inCamera.readbackTexture() -> bind();
+	slgl( glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, inCamera._width, inCamera._height ) );
+	inCamera.readbackTexture() -> unbind();
+}
+
+
+
 void slRenderGL::DrawQuad( const slTexture2D& inTexture, const slVector &inCenterPoint, const slVector &inAxis1, const slVector &inAxis2 ) {
 	slVector v1, v2, v3, v4;
 		
@@ -138,16 +160,17 @@ void slRenderGL::DrawQuad( const slTexture2D& inTexture, const slVector &inCente
 	v[ 2 ] = v4.z;
 	t[ 0 ] = inTexture._unitX;
 	t[ 1 ] = inTexture._unitY;
-
-	inTexture.bind();
-	_quad.bind();
-	_quad.draw( VB_TRIANGLE_STRIP );
-	_quad.unbind();
-	inTexture.unbind();
+	
+	if( inTexture.isLoaded() ) {
+		inTexture.bind();
+		_quad.bind();
+		_quad.draw( VB_TRIANGLE_STRIP );
+		_quad.unbind();
+		inTexture.unbind();
+	}
 }
 
 void slRenderGL::ApplyCamera( slCamera *inCamera ) const {
-
 	slgl( glViewport( inCamera -> _originx, inCamera -> _originy, inCamera -> _width, inCamera -> _height ) );
 
 	SetMatrixMode( slMatrixProjection );	
@@ -174,7 +197,7 @@ void slRenderGL::ApplyCamera( slCamera *inCamera ) const {
 	// gluLookAt( position.x, position.y, position.z, inCamera -> _target.x, inCamera -> _target.y, inCamera -> _target.z, 0.0, 1.0, 0.0 );
 
 	SetMatrixMode( slMatrixGeometry );	
-	glLoadIdentity();
+	slgl( glLoadIdentity() );
 	
 	slVector position, s, u, f, up;
 
@@ -253,6 +276,12 @@ void slRenderGL::PopMatrix( slMatrixMode inMode ) const {
 	SetMatrixMode( inMode );
 	slgl( glPopMatrix() );
 }
+
+void slRenderGL::SetIdentity( slMatrixMode inMode ) const {
+	SetMatrixMode( inMode );
+	slgl( glLoadIdentity() );
+}
+
 
 void slRenderGL::MulMatrix( slMatrixMode inMode, double m[3][3] ) const {
 	SetMatrixMode( inMode );
@@ -372,6 +401,10 @@ void slRenderGL::PopLight() {
 	
 	if( _lightCount == 0 )
 		glDisable( GL_LIGHTING );
+}
+
+void slRenderGL::SetDepthWriteEnabled( bool inEnabled ) {
+	glDepthMask( inEnabled ? GL_TRUE : GL_FALSE );	
 }
 
 void slRenderGL::BeginFlatShadows( slCamera *inCamera, slVector *inLight, float inAlpha ) {

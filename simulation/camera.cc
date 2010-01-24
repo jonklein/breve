@@ -98,23 +98,6 @@ slCamera::slCamera( int x, int y ) {
 	_billboardBuffer.resize( 4, VB_XYZ | VB_UV );
 }
 
-void slCamera::readbackToTexture() {
-	// During a live-resize drag, the texture is going to be continually resized and 
-	// will be degraded as a result.  Therefore, we'll only do the resize if we
-	// get the same size request twice in a row indicating that the redraw is 
-	// not occurring during a window resize.
-
-	if( _width != _readbackX || _height != _readbackY ) {
-		_readbackX = _width;
-		_readbackY = _height;
-		return;
-	}
-
-	_readbackTexture -> resize( _width, _height, false );
-	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, _width, _height );
-	_readbackTexture -> unbind();
-}
-
 void slCamera::updateFrustum() {
 	slVector loc;
 	float proj[16], frust[16], modl[16];
@@ -498,7 +481,6 @@ void slCamera::renderBillboards( slRenderGL& inRenderer ) {
 
 	for ( n = 0; n < _billboardCount; n++ ) {
 		slWorldObject *object;
-		int bound;
 		
 		inRenderer.PushMatrix( slMatrixGeometry );
 

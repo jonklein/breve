@@ -100,6 +100,7 @@ struct slBillboardEntry {
 #include <vector>
 
 class slCamera {
+	friend class slRenderGL;
 	public:
 		slCamera( int width = 200, int height = 200 );
 		~slCamera();
@@ -185,7 +186,7 @@ class slCamera {
 		bool						_drawText;
 		bool						_drawBlur;
 
-		double						_blurFactor;
+		float						_blurFactor;
 	
 		slVector					_fogColor;
 	
@@ -234,15 +235,15 @@ class slCamera {
 
 		void						setTextColor( slVector *inColor ) { slVectorCopy( inColor, &_textColor ); }
 
-		void						readbackToTexture();
+		slTexture2D*					readbackTexture() const { return _readbackTexture; }
 
 		void						initGL();
 
 	private:
 
-		slTexture2D*				_readbackTexture;
-		int							_readbackX;
-		int							_readbackY;
+		slTexture2D*					_readbackTexture;
+		int						_readbackX;
+		int						_readbackY;
 
 		void 						stencilFloor( slWorld *w );
 		void 						reflectionPass( slWorld *w, bool inWillDoVolumeShadow );

@@ -160,6 +160,7 @@ class brEngine {
 		int 					iterate();
 
 		void					draw();
+		void					clear();
 		void					lock();
 		void					unlock();
 
@@ -292,12 +293,12 @@ public:
 class brEvent {
 	public:
 		brEvent(char *name, double time, double interval, brInstance *i);
-		~brEvent();
+		~brEvent() {};
 
-		char *_name;
-		double _time;
-		double _interval;
-		brInstance *_instance;
+		std::string 	_name;
+		double 		_time;
+		double 		_interval;
+		brInstance*	_instance;
 };
 #endif
 

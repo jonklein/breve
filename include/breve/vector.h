@@ -30,6 +30,8 @@
  */
 class slVector {
     public:
+        void set( double inX = 0, double inY = 0, double inZ = 0 ) { x = inX; y = inY; z = inZ; }
+
         double x;
         double y;
         double z;

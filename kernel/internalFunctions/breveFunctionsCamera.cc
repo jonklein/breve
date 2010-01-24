@@ -50,7 +50,8 @@ int brICameraClear( brEval args[], brEval *target, brInstance *i ) {
 	if ( camera->_activateContextCallback ) 
 		camera -> _activateContextCallback();
 
-    slMessage( DEBUG_ALL, "cameraClear not implemented\n" );
+
+	i -> engine -> clear();
 
 	return EC_OK;
 }

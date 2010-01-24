@@ -47,13 +47,9 @@ void brEngine::unlock() {
 
 brEvent::brEvent( char *n, double t, double interval, brInstance *i ) {
 	_instance = i;
-	_name = slStrdup( n );
+	_name = n;
 	_time = t;
 	_interval = interval;
-}
-
-brEvent::~brEvent() {
-	slFree( _name );
 }
 
 /**
@@ -386,28 +382,19 @@ double brEngine::runningTime() {
 	\brief Adds a call to a method for an instance at a given time.
 */
 
-brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double time, double interval ) {
+bool brEventCompare( const brEvent *a, const brEvent *b ) {
+        return a -> _time > b -> _time;
+}
+
+
+brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double inTime, double interval ) {
 	brEvent *event;
 	std::vector<brEvent*>::iterator ei;
 
-	event = new brEvent( methodName, time, interval, i );
+	event = new brEvent( methodName, inTime, interval, i );
+	e->events.push_back( event );
 
-	// insert the event where it belongs according to the time it will be called
-
-	ei = e->events.end() - 1;
-
-	if ( e->events.size() == 0 ) {
-		e->events.push_back( event );
-		return event;
-	}
-
-	while ( ei != e->events.begin() && ( *ei )->_time < time ) ei--;
-
-	// we want to insert AFTER the current event...
-
-	if ((( *ei )->_time ) > time ) ei++;
-
-	e->events.insert( ei, event );
+	std::sort( e -> events.begin(), e -> events.end(), brEventCompare );
 
 	return event;
 }
@@ -425,23 +412,14 @@ int brEngineRemoveEvent( brEngine *e, brInstance *i, char *methodName, double ti
 		return EC_OK;
 	}
 
-	// Loop through the list as long as the time of the event to remove is after NOW or we want to remove all events with this name (time==0)
-	while ( ei != e->events.end()-1 && (time >= e->world->getAge( ) || time == 0) ) {
-
-	  // Find the right instance with time >= NOW
-	  if( ( *ei )->_instance == i && ( *ei )->_time >= e->world->getAge( ) ) {
-
-	    // Cases: matching time & matching name, matching name for all time, or method to remove is empty
-	    if(( ( *ei )->_time == time && 
-		 strcmp(( *ei )->_name,methodName)==0) ||
-	       ( time == 0 && strcmp(( *ei )->_name,methodName)==0 ) ||
-	       ( strcmp("",methodName)==0 )) {
-
-	      nei = e->events.erase(ei);
-
-	    } else {
-	      ei++;
-	    }
+	while ( ei != e->events.begin() && (time >= e->world->getAge( ) || time == 0) ) {
+	  if( ( *ei )->_instance == i && (( ( *ei )->_time >= e->world->getAge( ) && ( *ei )->_time == time && strcmp(( *ei )->_name.c_str(),methodName)==0) ||
+					  ( time == 0 && strcmp(( *ei )->_name.c_str(),methodName)==0 ) ||
+					  ( strcmp("",methodName)==0 ))) {
+	    
+	    nei = ei - 1;
+	    e->events.erase(ei);
+	    ei = nei;
 	  } else {
 	    ei++;
 	  }
@@ -522,7 +500,7 @@ int brEngine::iterate() {
 		if ( event->_instance->status == AS_ACTIVE ) {
 			world -> setAge( event->_time );
 
-			int rcode = brMethodCallByName( event->_instance, event->_name, &result );
+			int rcode = brMethodCallByName( event->_instance, event->_name.c_str(), &result );
 
 			world->setAge( oldAge );
 
@@ -533,9 +511,8 @@ int brEngine::iterate() {
 
 		}
 
-		if ( event->_interval != 0.0 ) {
-			brEngineAddEvent( this, event->_instance, event->_name, event->_time + event->_interval, event->_interval );
-		}
+		if ( event->_interval != 0.0 )
+			brEngineAddEvent( this, event->_instance, event -> _name.c_str(), event->_time + event->_interval, event->_interval );
 
 		delete event;
 
@@ -560,7 +537,7 @@ int brEngine::iterate() {
 */
 
 void brReplaceSubstring( std::string *inStr, const char *sub, const char *repl ) { 
-	unsigned int pos = 0;
+	int pos = 0;
 
 	while( 1 ) {
     		pos = inStr->find( sub, pos ); 
@@ -622,10 +599,15 @@ char *brFindFile( brEngine *e, const char *file, struct stat *st ) {
  * \brief Render the current simulation world to an active OpenGL context.
  * Requires that a valid OpenGL context is active.
  */
-
 void brEngine::draw() {
 	lock();
 	world -> draw( *_renderer, camera );
+	unlock();
+}
+
+void brEngine::clear() {
+	lock();
+	_renderer -> Clear();
 	unlock();
 }
 
