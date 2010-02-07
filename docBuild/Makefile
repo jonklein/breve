@@ -3,9 +3,11 @@
 # DOCBOOK=http://docbook.sourceforge.net/release/xsl/1.73.2
 # DOCBOOK=/usr/share/xml/docbook/stylesheet/nwalsh
 # DOCBOOK=/usr/local/lib/docbook-xsl-1.73.2
-DOCBOOK=/usr/local/lib/docbook-xsl-1.71.1
+# DOCBOOK=/usr/local/lib/docbook-xsl-1.71.1
+DOCBOOK=/opt/local/share/xsl/docbook-xsl/
 
-all: html pdf
+#all: html pdf
+all: pdf
 
 clean: pdf-clean html-clean
 

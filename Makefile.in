@@ -44,6 +44,7 @@ include steve/Makefile
 include python/Makefile
 # include perl/Makefile
 include lisp/Makefile
+include scheme/Makefile
 include util/Makefile
 include WinSaver/Makefile
 

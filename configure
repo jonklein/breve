@@ -610,6 +610,7 @@ PLATFORM
 EXE_SUFFIX
 ARCHIVE_SUFFIX
 ARCHIVER
+GUILE_CONFIG
 ECL_CONFIG
 XSUBPP
 X_EXTRA_LIBS
@@ -690,6 +691,7 @@ enable_option_checking
 enable_engineonly
 enable_static
 enable_lisp
+enable_scheme
 enable_python
 enable_osxcompat104
 with_wx
@@ -1333,6 +1335,7 @@ Optional Features:
 --enable-engineonly	Eliminate as many optional libraries from build as possible
 --enable-static		Link staticly for as many libraries as possible
 --enable-lisp		Link against ECL Lisp library (for development only)
+--enable-scheme	Link against Guile library (for development only)
 --enable-python		Build without support for Python
 --enable-osxcompat104	Build on Mac OS X 10.5 to produce 10.4 compatible build
 
@@ -2502,6 +2505,11 @@ fi
 # Check whether --enable-lisp was given.
 if test "${enable_lisp+set}" = set; then :
   enableval=$enable_lisp; lisp="$enableval"
+fi
+
+# Check whether --enable-scheme was given.
+if test "${enable_scheme+set}" = set; then :
+  enableval=$enable_scheme; scheme="$enableval"
 fi
 
 # Check whether --enable-python was given.
@@ -5849,6 +5857,111 @@ fi
 fi
 
 #
+# Guile Support (currently for development only)
+#
+
+for ac_prog in guile-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_GUILE_CONFIG+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$GUILE_CONFIG"; then
+  ac_cv_prog_GUILE_CONFIG="$GUILE_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$PATH:/usr/local/bin:/usr/bin "
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_GUILE_CONFIG="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+GUILE_CONFIG=$ac_cv_prog_GUILE_CONFIG
+if test -n "$GUILE_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $GUILE_CONFIG" >&5
+$as_echo "$GUILE_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$GUILE_CONFIG" && break
+done
+
+
+if test "x$engine_only" = "x" && test "x$scheme" != "x"; then
+	if test "$GUILE_CONFIG" != ""; then
+		LDGUILE=`$GUILE_CONFIG link`
+		CPPGUILE=`GUILE_CONFIG compile`
+
+		LIBS="$LIBS $LDGUILE"
+		CPPFLAGS="$CPPFLAGS $CPPGUILE"
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gh_eval_string in -lguile" >&5
+$as_echo_n "checking for gh_eval_string in -lguile... " >&6; }
+if test "${ac_cv_lib_guile_gh_eval_string+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lguile  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gh_eval_string ();
+int
+main ()
+{
+return gh_eval_string ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_guile_gh_eval_string=yes
+else
+  ac_cv_lib_guile_gh_eval_string=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_guile_gh_eval_string" >&5
+$as_echo "$ac_cv_lib_guile_gh_eval_string" >&6; }
+if test "x$ac_cv_lib_guile_gh_eval_string" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGUILE 1
+_ACEOF
+
+  LIBS="-lguile $LIBS"
+
+fi
+
+	fi
+fi
+
+
+#
 # These required system libraries are assumed to require dynamic linking even
 # when static linking is requested.  Other (optional) libraries may be linked
 # statically if present and if requested with --enable-static
@@ -9161,6 +9274,51 @@ else
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error "Missing ODE library -- see http://opende.sourceforge.net
 See \`config.log' for more details." "$LINENO" 5; }
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gh_eval_str in -lguile" >&5
+$as_echo_n "checking for gh_eval_str in -lguile... " >&6; }
+if test "${ac_cv_lib_guile_gh_eval_str+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lguile  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gh_eval_str ();
+int
+main ()
+{
+return gh_eval_str ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_guile_gh_eval_str=yes
+else
+  ac_cv_lib_guile_gh_eval_str=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_guile_gh_eval_str" >&5
+$as_echo "$ac_cv_lib_guile_gh_eval_str" >&6; }
+if test "x$ac_cv_lib_guile_gh_eval_str" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGUILE 1
+_ACEOF
+
+  LIBS="-lguile $LIBS"
+
 fi
 
 

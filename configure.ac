@@ -15,6 +15,8 @@ AC_ARG_ENABLE([static],
 		[--enable-static		Link staticly for as many libraries as possible], static="$enableval")
 AC_ARG_ENABLE([lisp], 	
 		[--enable-lisp		Link against ECL Lisp library (for development only)], lisp="$enableval")
+AC_ARG_ENABLE([scheme],
+		[--enable-scheme	Link against Guile library (for development only)], scheme="$enableval")
 AC_ARG_ENABLE([python], 	
 		[--enable-python		Build without support for Python], python="$enableval")
 AC_ARG_ENABLE([osxcompat104], 
@@ -211,6 +213,25 @@ if test "x$engine_only" = "x" && test "x$lisp" != "x"; then
 fi
 
 #
+# Guile Support (currently for development only)
+#
+
+AC_CHECK_PROGS(GUILE_CONFIG, [guile-config], [], $PATH:/usr/local/bin:/usr/bin )
+
+if test "x$engine_only" = "x" && test "x$scheme" != "x"; then
+	if test "$GUILE_CONFIG" != ""; then
+		LDGUILE=`$GUILE_CONFIG link`
+		CPPGUILE=`GUILE_CONFIG compile`        
+
+		LIBS="$LIBS $LDGUILE"
+		CPPFLAGS="$CPPFLAGS $CPPGUILE"
+
+		AC_CHECK_LIB([guile], [gh_eval_string])
+	fi    
+fi
+
+
+#
 # These required system libraries are assumed to require dynamic linking even 
 # when static linking is requested.  Other (optional) libraries may be linked
 # statically if present and if requested with --enable-static
@@ -366,6 +387,7 @@ AC_CHECK_LIB([jpeg], [jpeg_read_header])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
 AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
+AC_CHECK_LIB([guile], [gh_eval_str])
 
 AC_CHECK_FUNCS([getopt_long gettimeofday iswspace mkstemp strdup vasprintf])
 
