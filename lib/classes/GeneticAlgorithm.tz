@@ -24,6 +24,7 @@ Object : GeneticAlgorithm {
 		individualClass (string).
 		currentPopulation (int).
 		currentIndividual (int).
+		elitismPercent (int).
 		crossoverPercent (int).
 		mutationPercent (int).
 		randomizePercent (int).
@@ -53,6 +54,7 @@ Object : GeneticAlgorithm {
 		testDuration = 20.
 		populationSize = 30.
 		currentIndividual = 0.
+		elitismPercent = 0.
 		mutationPercent = 75.
 		migrationPercent = 0.
 		crossoverPercent = 0.
@@ -102,6 +104,16 @@ Object : GeneticAlgorithm {
 		% Returns the size of the population.  The default value is 30, and
 		% can be set with METHOD(set-population-size).
 		return populationSize.
+
+	+ to set-elitism-percent to percent (int):
+	     	% Sets the number of highest scoring individuals that are retained.
+		% The default value is 0%
+		elitismPercent = percent.
+
+	+ to get-elitism-percent:
+		% Returns the percent of highest scoring indivuals that are retained
+		% The default value is 0%
+		return elitismPercent.	 
 
 	+ to set-mutation-percent to percent (int): 
 		% Sets the probability of mutation to percent%.  This specifies the 
@@ -300,8 +312,14 @@ Object : GeneticAlgorithm {
 		# self unschedule method-call "switch-individual".
 		self schedule method-call "switch-individual" at-time (controller get-time) + testDuration.
 
+	+ to compare-individuals ind-a a (object) int-b b (object):
+	     	% Used to sort the population. We sort in descending order.
+		if (a get-fitness) > (b get-fitness): return -1.
+		else if (a get-fitness) < (b get-fitness): return 1.
+		else: return 0.
+
 	- to reproduce:
-		r, i, best, n (int).
+		r, i, best, n, elite (int).
 		totalFitness, fitness (double).
 		ind (object).
 		recipientHost (string).
@@ -312,6 +330,8 @@ Object : GeneticAlgorithm {
 		}
 
 		best = 0.
+
+		sort populations{ currentPopulation } with compare-individuals.
 
 		for i = 0, i < | populations{ currentPopulation } |, i++: {
 			fitness = (populations{ currentPopulation }{ i } get-fitness).
@@ -329,7 +349,11 @@ Object : GeneticAlgorithm {
 			with-best-individual populations{ currentPopulation }{ best }
 			with-average-fitness totalFitness.
 
-		for i = 0, i < populationSize, i++: {
+		elite = min(populationSize * (elitismPercent/100.0), populationSize).
+
+		# Crossover should use fitness proportional roulette.
+
+		for i = elite, i < populationSize, i++: {
 			r = random[100].
 
 			if r < mutationPercent: {
