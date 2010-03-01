@@ -331,7 +331,7 @@ Object : GeneticAlgorithm {
 
 		best = 0.
 
-		sort populations{ currentPopulation } with compare-individuals.
+		if elitismPercent != 0: sort populations{ currentPopulation } with compare-individuals.
 
 		for i = 0, i < | populations{ currentPopulation } |, i++: {
 			fitness = (populations{ currentPopulation }{ i } get-fitness).
