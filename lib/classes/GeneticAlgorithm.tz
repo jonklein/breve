@@ -9,7 +9,7 @@ Object : GeneticAlgorithm {
 	% <P>
 	% To run a genetic algorithm, you will need to a create custom subclass
 	% of this object, GeneticAlgorithm, and of its companion object 
-	% OBJECT(GeneticProgrammingIndividual).
+	% OBJECT(GeneticAlgorithmIndividual).
 	% <P>
 	% Your subclass of GeneticAlgorithm must implement two important methods:	
 	% METHOD(start-fitness-test) and METHOD(end-fitness-test).  These methods
