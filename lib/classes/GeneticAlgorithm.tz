@@ -176,9 +176,9 @@ Object : GeneticAlgorithm {
 		return migrationPercent.
 		
 	+ to set-migration-hosts to hosts (list):
-		% Sets a list of migration hosts for this object.  This should be a list of strings 
-		% containing hostnames of other machines running a genetic algorithm with the same
-		% simulation.
+		% Sets a list of migration hosts for this object.  This should be a list of lists 
+		% where sub-lists are (string, integer) for hostname, hostport for other machines
+		% running a genetic algorithm with the same simulation.
 
 		migrationHosts = copylist hosts.
 			
@@ -323,6 +323,7 @@ Object : GeneticAlgorithm {
 		totalFitness, fitness (double).
 		ind (object).
 		recipientHost (string).
+		recipientPort (int).
 
 		if | populations{ !currentPopulation } | != populationSize: {
 			free populations{ !currentPopulation }.
@@ -399,8 +400,9 @@ Object : GeneticAlgorithm {
 				transferOut add individual (self tournament-select for-index n).
 
 			print "Migrating individuals...".
-			recipientHost = migrationHosts{ random[ | migrationHosts | - 1 ] }.
-			transferOut send-over-network to recipientHost on GENETIC_ALGORITHM_SERVER_PORT.
+			recipientHost = migrationHosts{ random[ | migrationHosts | - 1 ] }{0}.
+			recipientPort = migrationHosts{ random[ | migrationHosts | - 1 ] }{1}.
+			transferOut send-over-network to recipientHost on recipientPort.
 		}
 		
 		currentPopulation = !currentPopulation.
