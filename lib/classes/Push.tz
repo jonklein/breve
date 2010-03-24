@@ -298,7 +298,7 @@ Object : PushInterpreter (aka PushInterpreters) {
 	+ to pop-boolean-stack:
 		% Pops the boolean stack.  If the boolean stack is empty, this
 		% method has no effect.
-		pushFloatStackPop(pushInterpreterPointer).
+		pushBoolStackPop(pushInterpreterPointer).
 
 	+ to pop-integer-stack:
 		% Pops the integer stack.  If the integer stack is empty, this 
