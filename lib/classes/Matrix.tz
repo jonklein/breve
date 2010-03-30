@@ -282,6 +282,9 @@ Matrix : Matrix2D (aka Matrices2D) {
 		}
 
 		return (super dearchive).
+
+	+ to get-max-value:
+	     return matrix2DGetMax(matrixPointer).
 }
 
 Matrix : Matrix3D (aka Matrices3D) {
@@ -551,14 +554,18 @@ Image : MatrixImage {
 		red (object).
 		green (object).
 		blue (object).
-		scale (float).
+		red_scale (float).
+		green_scale (float).
+		blue_scale (float).
 		
 	+ to init-with the-matrix theMatrix (object) scale theScale = 1.0 (float):
 		% Initializes the MatrixImage with sizes taken from theMatrix.
 	
 		super init-with width (theMatrix get-x-dimension)
 						height (theMatrix get-y-dimension).
-		scale = theScale.
+		red_scale = theScale.
+		green_scale = theScale.
+		blue_scale = theScale.
 
 		return self.
 		
@@ -576,12 +583,38 @@ Image : MatrixImage {
 
 	+ to set-scale-to-max-value of theMatrix (object):
 		% Sets the scale of this matrix image object to the maximum value in the specified matrix.
-		scale = (theMatrix get-max-value).
+		red_scale = 1.0 / (theMatrix get-max-value).
+		green_scale = 1.0 / (theMatrix get-max-value).
+		blue_scale = 1.0 / (theMatrix get-max-value).
+
+	+ to set-red-scale-to-max-value:
+		max (float).
+
+		max = (red get-max-value).
+
+		if max: red_scale = 1.0 / max.
+		else:	red_scale = 1.0.
+
+	+ to set-green-scale-to-max-value:
+		max (float).
+
+		max = (green get-max-value).
+
+		if max: green_scale = 1.0 / max.
+		else:	green_scale = 1.0.
+
+	+ to set-blue-scale-to-max-value:
+		max (float).
+
+		max = (blue get-max-value).
+
+		if max: blue_scale = 1.0 / max.
+		else:	blue_scale = 1.0.
 		
 	+ to iterate:
-		if red: red copy-to-red-channel of-image self with-scale scale.
-		if green: green copy-to-green-channel of-image self with-scale scale.
-		if blue: blue copy-to-blue-channel of-image self with-scale scale.
+		if red: red copy-to-red-channel of-image self with-scale red_scale.
+		if green: green copy-to-green-channel of-image self with-scale green_scale.
+		if blue: blue copy-to-blue-channel of-image self with-scale blue_scale.
 
 		super iterate.
 		
