@@ -20,6 +20,7 @@
 
 
 #include "simulation.h"
+#include "glIncludes.h"
 #include "image.h"
 #include "camera.h"
 

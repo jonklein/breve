@@ -168,9 +168,10 @@ int brIImageReadPixels( brEval args[], brEval *result, brInstance *i ) {
 
 /*! 
   \brief Reads Depth buffer information from the screen.
-
 */ 
 int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
+	return EC_ERROR;
+
 #ifndef OPENGLES
 	brImageData *dm = BRIMAGEDATAPOINTER( &args[0] );
 	int x = BRINT( &args[1] );
@@ -203,7 +204,7 @@ int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
           for (int y_counter = y; y_counter < dm -> _height; y_counter ++){
             for (int x_counter = 0; x_counter < dm -> _width; x_counter ++)
               {
-                gluUnProject((double)x_counter, (double)y_counter, (double)(((unsigned short *) dm ->_data)[y_counter*(dm -> _width)+x_counter])/65535.0, model, proj, view, &objX, &objY, &objZ);
+                // gluUnProject((double)x_counter, (double)y_counter, (double)(((unsigned short *) dm ->_data)[y_counter*(dm -> _width)+x_counter])/65535.0, model, proj, view, &objX, &objY, &objZ);
 
                                         // Compute the actual distance
                                         double d = sqrt(objX*objX + objY*objY + objZ*objZ);
@@ -220,7 +221,6 @@ int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
 
 	}
 	return EC_OK;
-
 #endif
 }
 

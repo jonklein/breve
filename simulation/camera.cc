@@ -94,8 +94,9 @@ slCamera::slCamera( int x, int y ) {
 
 	for ( n = 0; n < _maxBillboards; n++ ) 
 		_billboards[n] = new slBillboardEntry;
-
-	_billboardBuffer.resize( 4, VB_XYZ | VB_UV );
+		
+	_billboardBuffer = new slVertexBufferGL;
+	_billboardBuffer -> resize( 4, VB_XYZ | VB_UV );
 }
 
 void slCamera::updateFrustum() {
@@ -392,38 +393,38 @@ void slCamera::processBillboards( slWorld *inWorld ) {
 	
 	float *v;
 	
-	v = _billboardBuffer.texcoord( 0 );
+	v = _billboardBuffer -> texcoord( 0 );
 	v[ 0 ] = 1.0;
 	v[ 1 ] = 1.0;
 
-	v = _billboardBuffer.texcoord( 1 );
+	v = _billboardBuffer -> texcoord( 1 );
 	v[ 0 ] = 0.0;	
 	v[ 1 ] = 1.0;
 	
-	v = _billboardBuffer.texcoord( 2 );
+	v = _billboardBuffer -> texcoord( 2 );
 	v[ 0 ] = 1.0;
 	v[ 1 ] = 0.0;
 	
-	v = _billboardBuffer.texcoord( 3 );
+	v = _billboardBuffer -> texcoord( 3 );
 	v[ 0 ] = 0.0;
 	v[ 1 ] = 0.0;
 
-	v = _billboardBuffer.vertex( 0 );
+	v = _billboardBuffer -> vertex( 0 );
 	v[ 0 ] =  _billboardX.x + _billboardY.x;  
 	v[ 1 ] =  _billboardX.y + _billboardY.y;
 	v[ 2 ] =  _billboardX.z + _billboardY.z;
 
-	v = _billboardBuffer.vertex( 1 );
+	v = _billboardBuffer -> vertex( 1 );
 	v[ 0 ] = -_billboardX.x + _billboardY.x;
 	v[ 1 ] = -_billboardX.y + _billboardY.y;
 	v[ 2 ] = -_billboardX.z + _billboardY.z;
 
-	v = _billboardBuffer.vertex( 2 );
+	v = _billboardBuffer -> vertex( 2 );
 	v[ 0 ] =  _billboardX.x - _billboardY.x;
 	v[ 1 ] =  _billboardX.y - _billboardY.y;
 	v[ 2 ] =  _billboardX.z - _billboardY.z;
 
-	v = _billboardBuffer.vertex( 3 );
+	v = _billboardBuffer -> vertex( 3 );
 	v[ 0 ] = -_billboardX.x - _billboardY.x;
 	v[ 1 ] = -_billboardX.y - _billboardY.y;
 	v[ 2 ] = -_billboardX.z - _billboardY.z;
@@ -477,7 +478,7 @@ void slCamera::renderBillboards( slRenderGL& inRenderer ) {
 	// them fighting in the depth buffer.  so we'll disable depth-buffer
 	// writing so that no new info goes there.
 	
-	_billboardBuffer.bind();
+	_billboardBuffer -> bind();
 
 	for ( n = 0; n < _billboardCount; n++ ) {
 		slWorldObject *object;
@@ -501,14 +502,14 @@ void slCamera::renderBillboards( slRenderGL& inRenderer ) {
 		inRenderer.Rotate( slMatrixGeometry, object->_billboardRotation, normal.x, normal.y, normal.z );
 		inRenderer.Scale( slMatrixGeometry, b -> size, b -> size, b -> size );
 		
-		_billboardBuffer.draw( VB_TRIANGLE_STRIP );
+		_billboardBuffer -> draw( VB_TRIANGLE_STRIP );
 
 		inRenderer.PopMatrix( slMatrixGeometry );
 	}
 	
 	lastTexture -> unbind();
 
-	_billboardBuffer.unbind();
+	_billboardBuffer -> unbind();
 }
 
 

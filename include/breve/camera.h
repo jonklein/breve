@@ -21,13 +21,16 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-#include "texture.h"
+#include <string>
+#include <vector>
 #include "vector.h"
 
 class slWorldObject;
 class slWorld;
 class slStationary;
 class slRenderGL;
+class slTexture2D;
+class slVertexBufferGL;
 
 enum slBillboardType {
 	slBitmapNone = 0,
@@ -108,8 +111,7 @@ class slCamera {
 		void renderWorld( slWorld *w, int crosshair, int scissor );
 		void renderScene( slWorld *w, int crosshair );
 
-
-		void detectLightExposure( slWorld *w, int size, GLubyte *buffer );
+		void detectLightExposure( slWorld *w, int size, unsigned char *buffer );
 
 		void updateFrustum();
 
@@ -139,8 +141,8 @@ class slCamera {
 		void setActivateContextCallback( int (*f)() );
 		void setCameraText( int n, char *string, float x, float y, slVector *v );
 	
-		slWorldObject *select( slWorld *inWorld, int inScreenX, int inScreenY ) const { slMessage( DEBUG_ALL, "Selection not implemented." ); return NULL; }
-		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) const { slMessage( DEBUG_ALL, "Vector for drag not implemented." ); return 0; }
+		slWorldObject *select( slWorld *inWorld, int inScreenX, int inScreenY ) const { fprintf( stderr, "Selection not implemented." ); return NULL; }
+		int vectorForDrag( slWorld *w, slVector *dragVertex, int x, int y, slVector *dragVector ) const { fprintf( stderr, "Vector for drag not implemented." ); return 0; }
 
 		void renderShadowVolume( slWorld *w );
 		void renderObjectShadowVolumes( slWorld *w );
@@ -255,7 +257,7 @@ class slCamera {
 		void 						drawBackground( slWorld *w );
 		void 						drawFog();
 
-		slVertexBufferGL			_billboardBuffer;
+		slVertexBufferGL*			_billboardBuffer;
 };
 
 #endif /* _CAMERA_H */

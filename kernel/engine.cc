@@ -34,6 +34,23 @@
 
 char *interfaceID;
 
+
+brErrorInfo::~brErrorInfo() {
+	if( file )
+		slFree( file );
+}
+
+void brErrorInfo::clear() {
+	if( file ) 
+		slFree( file );
+
+	type = 0;
+	line = 0;
+	file = slStrdup( "<unknown>" ); 
+	sprintf( message, "An unknown error occurred (see the breve log for more information)\n" );
+}
+
+
 /** \defgroup breveEngineAPI The breve engine API: using a breve simulation from another program or application frontend */
 /*@{*/
 

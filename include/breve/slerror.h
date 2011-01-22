@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
+#ifndef _SLERROR_H
+#define _SLERROR_H
+
 #include <string>
 
 /*!
@@ -101,3 +104,4 @@ void slStdoutMessageCallback( const char * );
 
 void slSetMessageCallbackFunction( void (*)( const char *) );
 void slSetMessageCallbackFunctions( void (*)( const char *), void (*)( const char *) );
+#endif

@@ -58,20 +58,9 @@ struct brErrorInfo {
 		clear();
 	}
 
-	~brErrorInfo() {
-		if( file )
-			slFree( file );
-	}
+	~brErrorInfo();
 
-	void clear() {
-		if( file ) 
-			slFree( file );
-
-		type = 0;
-		line = 0;
-		file = slStrdup( "<unknown>" ); 
-		sprintf( message, "An unknown error occurred (see the breve log for more information)\n" );
-	}
+	void clear();
 
 	char *file;
 	int line;
