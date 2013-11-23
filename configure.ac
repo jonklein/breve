@@ -385,7 +385,7 @@ fi
 AC_CHECK_LIB([png], [png_create_write_struct])
 AC_CHECK_LIB([jpeg], [jpeg_read_header])
 AC_CHECK_LIB([gsl], [gsl_rng_alloc],,AC_MSG_FAILURE([Missing GSL library -- see http://www.gnu.org/software/gsl/]))
-AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
+# AC_CHECK_LIB([GIMPACT], [main],,AC_MSG_FAILURE([Missing GIMPACT library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([ode], [dWorldStep],,AC_MSG_FAILURE([Missing ODE library -- see http://opende.sourceforge.net]))
 AC_CHECK_LIB([guile], [gh_eval_str])
 

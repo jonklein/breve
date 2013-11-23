@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 
-class stStackRecord;
+struct stStackRecord;
 
 struct stSteveData {
 	stSteveData() {

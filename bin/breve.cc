@@ -85,7 +85,7 @@ static std::string gSlaveHost;
 
 static std::map<int, void*> gWindowMap;
 
-int slLoadOSMesaPlugin( char *execPath );
+int slLoadOSMesaPlugin( const char *execPath );
 
 int brGLUTNoContextActivate() {
 	return -1;
@@ -112,7 +112,7 @@ int brGLUTUnpause() {
 }
 
 
-int main( int argc, const char **argv ) {
+int main( int argc, char *argv[] ) {
 	char *text;
 	const char *simulationFile;
 
@@ -130,7 +130,7 @@ int main( int argc, const char **argv ) {
 
 	int index = brParseArgs( argc, argv );
 
-	char *execpath = argv[ 0 ];
+	const char *execpath = argv[ 0 ];
 
 	// offset argc and argv to account for the options parsed out
 
@@ -393,7 +393,7 @@ void brClick( int inX, int inY ) {
 	glutAttachMenu( GLUT_MIDDLE_BUTTON );
 }
 
-int brParseArgs( int argc, const char **argv ) {
+int brParseArgs( int argc,  char *argv[] ) {
 	int level, r;
 	int error = 0;
 
@@ -844,7 +844,7 @@ void renderContext( slWorld *inWorld, slCamera *inCamera ) {
 	gEngine -> draw();
 }
 
-int slLoadOSMesaPlugin( char *execPath ) {
+int slLoadOSMesaPlugin( const char *execPath ) {
 #ifdef MINGW
 	// I'm not even going to try.
 	return -1;
@@ -853,7 +853,9 @@ int slLoadOSMesaPlugin( char *execPath ) {
 	void( *create )( unsigned char *, int, int );
 	int( *activate )();
 
-	std::string path = dirname( execPath );
+  char *p = strdup(execPath);
+	std::string path = dirname( p );
+  free(p);
 	
 
 	path += "/osmesaloader.o";

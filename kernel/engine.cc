@@ -32,6 +32,8 @@
 #include <dlfcn.h>
 #endif
 
+#include <locale.h>
+
 char *interfaceID;
 
 
@@ -62,7 +64,7 @@ void brEngine::unlock() {
 	pthread_mutex_unlock( &_engineLock );
 }
 
-brEvent::brEvent( char *n, double t, double interval, brInstance *i ) {
+brEvent::brEvent( const char *n, double t, double interval, brInstance *i ) {
 	_instance = i;
 	_name = n;
 	_time = t;
@@ -75,7 +77,7 @@ brEvent::brEvent( char *n, double t, double interval, brInstance *i ) {
  * Creates and initializes the bloated brEngine structure.  This is the first step in starting a breve simulation.
  */
 
-brEngine::brEngine( int inArgc, const char **inArgv ) {
+brEngine::brEngine( int inArgc, char *inArgv[] ) {
 	_argc = inArgc;
 	_argv = inArgv;
 
@@ -404,7 +406,7 @@ bool brEventCompare( const brEvent *a, const brEvent *b ) {
 }
 
 
-brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double inTime, double interval ) {
+brEvent *brEngineAddEvent( brEngine *e, brInstance *i, const char *methodName, double inTime, double interval ) {
 	brEvent *event;
 	std::vector<brEvent*>::iterator ei;
 
@@ -420,7 +422,7 @@ brEvent *brEngineAddEvent( brEngine *e, brInstance *i, char *methodName, double 
 	\brief Removes a call to a method for an instance at a given time.
 */
 
-int brEngineRemoveEvent( brEngine *e, brInstance *i, char *methodName, double time ) {
+int brEngineRemoveEvent( brEngine *e, brInstance *i, const char *methodName, double time ) {
         std::vector<brEvent*>::iterator ei, nei;
 
 	ei = e->events.begin();

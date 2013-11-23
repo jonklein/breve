@@ -27,11 +27,11 @@
 #include "shape.h"
 
 void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
+#if 0
 	std::vector< slEdge* >::iterator ei;
 	slVector light;
 	slVector lNormal;
 
-#if 0
 	slVectorCopy( &c->_lights[ 0 ]._location, &light );
 	slVectorCopy( &light, &lNormal );
 	slVectorNormalize( &lNormal );

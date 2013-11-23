@@ -68,7 +68,7 @@ const struct option gCLIOptions[] = {
         { "python",		no_argument 	 , 0, 'Y' } 
 };
 
-int brParseArgs(int, const char **);
+int brParseArgs(int, char *args[]);
 
 __dead void brPrintUsage(const char *);
 __dead void brQuit(brEngine *);

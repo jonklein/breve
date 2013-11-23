@@ -494,32 +494,25 @@ slBigMatrix2DGSL& slBigMatrix2DGSL::vectorMultiplyInto( const slVectorViewGSL& s
 }
 
 float slBigMatrix2DGSL::getRowMagnitude( const unsigned int x ) {
-	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
-	return gsl_blas_snrm2( row );
+	gsl_vector_float_view row = gsl_matrix_float_row( _matrix, x );
+	return gsl_blas_snrm2( &row.vector );
 }
 
 slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceRowMultiply( const unsigned int x, const float scalar ) {
-
-	gsl_vector_float *row = &gsl_matrix_float_row( _matrix, x ).vector;
-	gsl_blas_sscal( scalar, row );
+	gsl_vector_float_view row = gsl_matrix_float_row( _matrix, x );
+	gsl_blas_sscal( scalar, &row.vector );
 	return *this;
 }
 
-/*
-slBigVectorGSL& slBigMatrix2DGSL::getColumnVector(const unsigned int y)
-{
-    return new slBigVectorGSL(&gsl_matrix_float_column(_matrix, y));
-}
-*/
 float slBigMatrix2DGSL::getColumnMagnitude( const unsigned int y ) {
-	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
-	return gsl_blas_snrm2( column );
+	gsl_vector_float_view column = gsl_matrix_float_column( _matrix, y );
+	return gsl_blas_snrm2( &column.vector );
 }
 
 slBigMatrix2DGSL& slBigMatrix2DGSL::inPlaceColumnMultiply( const unsigned int y, const float scalar ) {
 
-	gsl_vector_float *column = &gsl_matrix_float_column( _matrix, y ).vector;
-	gsl_blas_sscal( scalar, column );
+	gsl_vector_float_view column = gsl_matrix_float_column( _matrix, y );
+	gsl_blas_sscal( scalar, &column.vector );
 	return *this;
 
 }

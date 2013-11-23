@@ -20,12 +20,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#define YY_NO_UNPUT
-
 #include <string.h>
 
 #include "steve.h"
-
 #include "steveparse.tab.h"
 
 void stParseAddDocumentingComment( const char *comment );
@@ -60,6 +57,9 @@ WHITESPACE	[\ \t]+
 
 %x BLOCKCOMMENT
 %x COMMENT
+
+%option nounput
+
 
 %%
 

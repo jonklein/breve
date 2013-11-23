@@ -56,7 +56,7 @@ class slTexture2D : public slTexture {
 						glDisable( GL_TEXTURE_2D );
 					}
 
-		bool		isLoaded() { return _textureID != 0; }
+		bool		isLoaded() const { return _textureID != 0; }
 
 		void 		loadPixels( const unsigned char *pixels, int inWidth, int inHeight, int inChannels = 4, bool inRepeat = true );
 		void 		resize( int inWidth, int inHeight, bool inHasAlpha = true, bool inLinearInterp = true );

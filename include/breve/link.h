@@ -65,7 +65,7 @@ class slLink: public slWorldObject {
 
 		~slLink();
 
-		void draw() {
+		void draw( const slRenderGL& inRenderer ) {
 		}
 
 		void setLocation(slVector *rotation);

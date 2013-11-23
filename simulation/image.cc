@@ -224,10 +224,10 @@ unsigned char *slReadPNGImage( const char *name, int *width, int *height, int *c
 	png_read_info( png_ptr, info );
 
 	*components = 4;
-	*width = info->width;
-	*height = info->height;
+	*width = png_get_image_width(png_ptr, info);
+	*height = png_get_image_height(png_ptr, info);
 
-	if ( !( info->color_type & PNG_COLOR_MASK_COLOR ) ) {
+	if ( !( png_get_color_type(png_ptr, info) & PNG_COLOR_MASK_COLOR ) ) {
 		slMessage( DEBUG_ALL, "error opening image file \"%s\": PNG files must be RGB or RGBA\n", name );
 		fclose( f );
 		return NULL;
@@ -243,31 +243,31 @@ unsigned char *slReadPNGImage( const char *name, int *width, int *height, int *c
 		return NULL;
 	}
 
-	rows = ( png_bytep* ) malloc( sizeof( png_bytep ) * info->height );
+	rows = ( png_bytep* ) malloc( sizeof( png_bytep ) * *height );
 
-	for ( y = 0;y < info->height;y++ ) rows[y] = ( png_byte* ) malloc( info->rowbytes );
+	for ( y = 0;y < *height;y++ ) rows[y] = ( png_byte* ) malloc( png_get_rowbytes(png_ptr, info) );
 
 	png_read_image( png_ptr, rows );
 
-	image = new unsigned char[  4 * info->height * info->width ];
+	image = new unsigned char[  4 * *height * *width ];
 
-	for ( x = 0;x < info->height;x++ ) {
+	for ( x = 0;x < *height;x++ ) {
 		int rowOffset = 0;
 
-		for ( y = 0;y < info->width;y++ ) {
-			image[x *( info->width * 4 ) + ( y * 4 ) + 0] = rows[( info->height - 1 ) - x][rowOffset++];
-			image[x *( info->width * 4 ) + ( y * 4 ) + 1] = rows[( info->height - 1 ) - x][rowOffset++];
-			image[x *( info->width * 4 ) + ( y * 4 ) + 2] = rows[( info->height - 1 ) - x][rowOffset++];
+		for ( y = 0;y < *width;y++ ) {
+			image[x *( *width * 4 ) + ( y * 4 ) + 0] = rows[( *height - 1 ) - x][rowOffset++];
+			image[x *( *width * 4 ) + ( y * 4 ) + 1] = rows[( *height - 1 ) - x][rowOffset++];
+			image[x *( *width * 4 ) + ( y * 4 ) + 2] = rows[( *height - 1 ) - x][rowOffset++];
 
-			if ( info->color_type & PNG_COLOR_MASK_ALPHA ) {
-				image[x *( info->width * 4 ) + ( y * 4 ) + 3] = rows[( info->height - 1 ) - x][rowOffset++];
+			if ( png_get_color_type(png_ptr, info) & PNG_COLOR_MASK_ALPHA ) {
+				image[x *( *width * 4 ) + ( y * 4 ) + 3] = rows[( *height - 1 ) - x][rowOffset++];
 			} else {
-				image[x *( info->width * 4 ) + ( y * 4 ) + 3] = 0xff;
+				image[x *( *width * 4 ) + ( y * 4 ) + 3] = 0xff;
 			}
 		}
 	}
 
-	for ( y = 0;y < info->height;y++ ) free( rows[y] );
+	for ( y = 0;y < *height;y++ ) free( rows[y] );
 
 	free( rows );
 
@@ -330,50 +330,36 @@ int slPNGWrite( const char *name, int width, int height, unsigned char *buffer, 
 			rowPtrs[height - ( n + 1 )] = &buffer[n * ( width * channels * bit_depth/8)];
 
 	png_init_io( png_ptr, fp );
-
-	info_ptr->width = width;
-
-	info_ptr->height = height;
-
-	info_ptr->bit_depth = bit_depth;
-
-
-	// printf("Bit depth: %d\n", bit_depth); 
+	
+  int color_type = 0;
 
 	switch ( channels ) {
-
 		case 1:
-			info_ptr->color_type = PNG_COLOR_TYPE_GRAY;
-
+			color_type = PNG_COLOR_TYPE_GRAY;
 			break;
 
 		case 2:
-			info_ptr->color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
-
+			color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
 			break;
 
 		case 3:
-			info_ptr->color_type = PNG_COLOR_TYPE_RGB;
-
+			color_type = PNG_COLOR_TYPE_RGB;
 			break;
 
 		case 4:
-			info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
-
+			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 			break;
 	}
 
+  png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE, 3, PNG_NO_FILTERS);
 	png_set_rows( png_ptr, info_ptr, rowPtrs );
 
 	if(bit_depth > 8 ){
-	
 	  png_write_png( png_ptr, info_ptr, PNG_TRANSFORM_SWAP_ENDIAN, NULL );
-
-	}
-
-	else {
+	} else {
 	  png_write_png( png_ptr, info_ptr, 0, NULL );
 	}
+	
 	png_destroy_write_struct( &png_ptr, &info_ptr );
 
 	delete[] rowPtrs;

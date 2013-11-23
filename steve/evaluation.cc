@@ -1213,7 +1213,7 @@ RTC_INLINE int stEvalMethodCall( stMethodExp *mexp, stRunInstance *i, brEval *t 
 }
 
 int stEvalForeignMethodCall( stMethodExp *mexp, brInstance *caller, stRunInstance *i, brEval *t ) {
-	brEval args[ mexp->arguments.size() ];
+	brEval *args = new brEval[ mexp->arguments.size() ];
 	const brEval *argps[ mexp->arguments.size() ];
 	unsigned int n;
 	int resultCode;
@@ -1233,7 +1233,8 @@ int stEvalForeignMethodCall( stMethodExp *mexp, brInstance *caller, stRunInstanc
 		stEvalError( i->instance, EE_UNKNOWN_METHOD, "Error calling method \"%s\" for foreign object %p\n", mexp->methodName.c_str(), caller );
 		return EC_ERROR;
 	}
-
+	
+  delete[] args;
 	return EC_OK;
 }
 
@@ -1351,7 +1352,7 @@ inline int stRealEvalMethodCall( stMethodExp *mexp, stRunInstance *target, stRun
 	// we don't want to reuse the same argps in the case of a 
 	// recursive function so we create some local storage for them.
 
-	brEval args[ cachedata -> _method -> keywords.size() ];
+	brEval *args = new brEval[ cachedata -> _method -> keywords.size() ];
 
 	const brEval *argps[ cachedata -> _method -> keywords.size() ];
 
@@ -1902,10 +1903,8 @@ RTC_INLINE int stEvalIndexAssign( stListIndexAssignExp *l, stRunInstance *i, brE
 
 	} else if ( expression.type() == AT_STRING ) {
 		char **stringptr, *newstring, *oldstring, *substring;
-		unsigned int n;
+		int n = BRINT( &index );
 		int type;
-
-		n = BRINT( &index );
 
 		resultCode = stPointerForExp( l->listExp, i, ( void ** ) & stringptr, &type );
 
@@ -2105,7 +2104,7 @@ RTC_INLINE int stEvalVectorElementAssignExp( stVectorElementAssignExp *s, stRunI
 */
 
 RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result ) {
-	brEval evals[ c->_function->_argCount ];
+	brEval *evals = new brEval[ c->_function->_argCount ];
 
 	int n, resultCode;
 
@@ -2171,6 +2170,7 @@ RTC_INLINE int stEvalCallFunc( stCCallExp *c, stRunInstance *i, brEval *result )
 	}
 
 cleanup:
+  delete[] evals;
 	return resultCode;
 }
 

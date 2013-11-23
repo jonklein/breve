@@ -29,9 +29,10 @@
 class brEvalHash;
 class brEvalList;
 class brEvalListHead;
-class brInstance;
 class brData;
-class brObject;
+
+struct brObject;
+struct brInstance;
 
 enum evaluationCodes {
 	EC_ERROR_HANDLED = -2,

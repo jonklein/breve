@@ -9,13 +9,14 @@ enum allocStatus {
 	AS_ACTIVE			// active object
 };
 
-class brObjectType;
-class brMethod;
-class brCollisionHandler;
+struct brObjectType;
 class brEngine;
 class brEval;
-class brMenuEntry;
-class brObserver;
+
+struct brCollisionHandler;
+struct brObserver;
+struct brMenuEntry;
+struct brMethod;
 
 /** \addtogroup breveObjectAPI */
 /*@{*/

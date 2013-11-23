@@ -189,7 +189,7 @@ int brIImageReadDepthBuffer( brEval args[], brEval *result, brInstance *i ) {
 	  double objX, objY, objZ;
           double proj[16];
           GLint view[4];
-          double model[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+          // double model[] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
           // We need to recover the projection matrix so that we can call gluUnProject
 	  glMatrixMode( GL_PROJECTION );
 	  glPushMatrix(); 

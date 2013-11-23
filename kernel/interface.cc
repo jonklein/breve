@@ -75,7 +75,7 @@ int brMenuCallback( brEngine *e, brInstance *i, unsigned int n ) {
 
 	if ( i->status != AS_ACTIVE ) return EC_OK;
 
-	if ( n >= i->_menus.size() || n < 0 ) {
+	if ( n >= i->_menus.size() ) {
 		brEvalError( e, EE_INTERNAL, "Menu callback #%d out of bounds for instance %x", n, i );
 		return EC_ERROR;
 	}

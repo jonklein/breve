@@ -81,10 +81,10 @@ int stGetTypeForString( char* );
     char *string;
 
     void *data;
-	struct stExp *exp;
-	struct brEval *eval;
-	struct stVarType *type;
-	struct stVar *variable;
+	class stExp *exp;
+	class brEval *eval;
+	class stVarType *type;
+	class stVar *variable;
 	struct stVersionRequirement *requirement;
 	struct stKeywordEntry *keyword;
 

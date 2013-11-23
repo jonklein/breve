@@ -263,5 +263,5 @@ unsigned int slHashPointer( void *p, unsigned int n ) {
 */
 
 unsigned int slCompPointer( void *a, void *b ) {
-	return ( unsigned int )a - ( unsigned int )b;
+	return ( unsigned long )a - ( unsigned long )b;
 }

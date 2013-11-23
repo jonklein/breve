@@ -4,7 +4,7 @@
 #include "texture.h"
 
 class slCamera;
-class slLight;
+struct slLight;
 
 enum slMatrixMode {
 	slMatrixProjection = 1,

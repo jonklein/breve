@@ -408,7 +408,7 @@ double Sensor::evaluate(){
 			result = maxValue;
 			result = factor* maxValue;
 			
-			if((i ==columns/2)&&(j ==rows/2)||rows==1) { 
+			if((i == columns/2 && j ==rows/2)||rows==1) { 
 				frontDistance = rayValues[i][j].distance;
 			}else{
 				frontDistance = sqrt(pow(rayValues[i][j].distance, 2)-pow(sin(rayValues[i][j].azimut)*rayValues[i][j].distance, 2) );
@@ -608,14 +608,12 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 				if(isTarget){
 					if(dist < targetDist){targetDist = dist;}
 					if(targetDist > shortestDist + 0.1){
-//				printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
 						return false;
 					}
 					//if(targetDist + 0.1 > shortestDist){continue;} use this if you want konvex shapes
 				}else{
-					if((shortestDist != 999999)&&(targetDist !=999999)){
+					if( shortestDist != 999999 && targetDist !=999999 ){
 						if(targetDist > shortestDist + 0.1){
-//				printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
 							return false;
 						}
 					}
@@ -632,12 +630,9 @@ bool Sensor::freePath(vector<slWorldObject*>* neighbors, slPosition* sensorPos, 
 		}//shapes
 	}//neighbours
 
-	if((targetDist ==999999)){
-//		printf("missed the target!\n");
-//		printf("shortestDist: %f targetDist: %f\n",shortestDist, targetDist);
-		// that happens if the shape is at the very border of the sensor
+	if( targetDist ==999999 )
 		return false;
-	}
+
 	return true;
 }
 

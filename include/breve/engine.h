@@ -34,15 +34,16 @@
 class slCamera;
 class slWorld;
 class slRenderGL;
-class brInstance;
-class brDlPlugin;
-class brObject;
 class brEvent;
 class brURLFetcher;
 class brSoundMixer;
 class brNamespace;
-class brInternalFunction;
-class brInstance;
+
+struct brInstance;
+struct brInternalFunction;
+struct brDlPlugin;
+struct brInstance;
+struct brObject;
 
 // the maximum error size 
 
@@ -140,7 +141,7 @@ typedef struct brObjectType brObjectType;
 
 class brEngine {
 	public:
-		brEngine( int inArgc = 0, const char **inArgv = NULL );
+		brEngine( int inArgc = 0, char *inArgv[] = NULL);
 		~brEngine();
 
 		std::vector< brObjectType* > 		_objectTypes;
@@ -224,7 +225,7 @@ public:
 		struct timeval 				accumulatedTime;
 
 		int 					_argc;
-		const char**				_argv;
+		char**					_argv;
 
 		int 					nThreads;
 		pthread_mutex_t 			_engineLock;
@@ -281,7 +282,7 @@ public:
 
 class brEvent {
 	public:
-		brEvent(char *name, double time, double interval, brInstance *i);
+		brEvent(const char *name, double time, double interval, brInstance *i);
 		~brEvent() {};
 
 		std::string 	_name;
@@ -300,8 +301,8 @@ enum versionRequiermentOperators {
 	VR_NE
 };
 
-brEvent *brEngineAddEvent(brEngine *, brInstance *, char *, double, double);
-int brEngineRemoveEvent(brEngine *, brInstance *, char *, double);
+brEvent *brEngineAddEvent(brEngine *, brInstance *, const char *, double, double);
+int brEngineRemoveEvent(brEngine *, brInstance *, const char *, double);
 void brEventFree(brEvent *);
 
 void brEngineSetIOPath(brEngine *, const char *);
