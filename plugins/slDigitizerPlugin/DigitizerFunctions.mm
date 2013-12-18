@@ -21,21 +21,120 @@
 #include "slBrevePluginAPI.h"
 #include "DigitizerFunctions.h"
 
+@implementation breveAVCaptureDelegate 
+
+- (id)initWithData:(brDigitizer*)inData {
+  if(self = [super init]) {
+    data = inData;    
+    data -> pixels = NULL;
+  }
+  
+  return self;
+}
+
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)source fromConnection:(AVCaptureConnection *)connection {
+  CVImageBufferRef buffer = CMSampleBufferGetImageBuffer(source);
+  CVPixelBufferLockBaseAddress(buffer,0);
+
+  data -> rowBytes = CVPixelBufferGetBytesPerRow(buffer);
+  
+  unsigned char *pixels = (unsigned char*)CVPixelBufferGetBaseAddress(buffer);
+  
+  if(!data -> pixels) 
+    data -> pixels = new unsigned char[data -> height * data -> rowBytes];
+    
+  memcpy(data -> pixels, pixels, data -> height * data -> rowBytes);
+  
+  
+  CVPixelBufferUnlockBaseAddress(buffer, 0);
+}
+
+@end
+
+
+
+AVCaptureSession* ccOpenCamera(brDigitizer *data, int width, int height) {
+  NSError *error = nil;
+  AVCaptureSession *session = [[AVCaptureSession alloc] init];
+	
+  AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType: AVMediaTypeVideo];
+
+  AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice: device error:&error];
+	[session addInput: input];
+
+  AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init];
+  [output setAlwaysDiscardsLateVideoFrames:YES];
+
+  [output setVideoSettings:[NSDictionary dictionaryWithObjectsAndKeys:
+    [NSNumber numberWithFloat: width], (id)kCVPixelBufferWidthKey,
+    [NSNumber numberWithFloat: height], (id)kCVPixelBufferHeightKey,
+    [NSNumber numberWithInt:kCVPixelFormatType_32ARGB],(id)kCVPixelBufferPixelFormatTypeKey, nil]];
+    
+  breveAVCaptureDelegate *delegate = [[breveAVCaptureDelegate alloc] initWithData: data];
+  [output setSampleBufferDelegate: delegate queue: dispatch_get_main_queue()];
+  [session addOutput: output];
+	  
+  data -> pixels = NULL;
+  data -> instance = session;
+  data -> delegate = delegate;
+  data -> width = width;
+  data -> height = height;
+	data -> map = ccNewIntensityMap(20);
+
+	[session startRunning];
+	
+	return session;
+}
+
+void ccGetPixels(brDigitizer *b, unsigned char *dst) {
+  unsigned char *pixels = b->pixels;
+  
+  if(!pixels)
+    return;
+  
+	int drowBytes = b->width * 4;
+	int h, w, dindex = 0;
+	int hh;
+
+	for(h=0;h<b->height;h++) {
+		dindex = ((b->height - h) * drowBytes) - 1;
+		for(w=0;w<b->width;w++) {
+			hh = b->flip ? b->height - (h + 1) : h;
+
+			dst[dindex--] = pixels[hh*b->rowBytes + w*4 + 0];
+			dst[dindex--] = pixels[hh*b->rowBytes + w*4 + 3];
+			dst[dindex--] = pixels[hh*b->rowBytes + w*4 + 2];
+			dst[dindex--] = pixels[hh*b->rowBytes + w*4 + 1];
+		}
+	}
+}
+
+void ccCloseCamera(AVCaptureSession* session) {
+	[session stopRunning];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 int brDigitizerOpenCamera(brEval args[], brEval *target, void *i) {
 	brDigitizer *data = new brDigitizer;
 
-	data->instance = ccOpenCamera(data, BRINT(&args[0]), BRINT(&args[1]));
+	ccOpenCamera(data, BRINT(&args[0]), BRINT(&args[1]));
 
 	if(!data->instance) {
 		slFree(data);
 		slMessage(0, "Error opening camera driver\n");
 		return EC_ERROR;
 	}
-
-	data->width = BRINT(&args[0]);
-	data->height = BRINT(&args[1]);
-
-	data->map = ccNewIntensityMap(20);
 
 	target->set( data );
 
@@ -61,7 +160,7 @@ int brDigitizerUpdateFrame(brEval args[], brEval *target, void *i) {
 
 	if(!b) return EC_ERROR;
 
-	value = SGIdle(b->instance);
+	// value = SGIdle(b->instance);
 
 	ccGetPixels( b, output );
 
@@ -160,95 +259,8 @@ DLLEXPORT int slInitDigitizerFuncs(void *n) {
 	brNewBreveCall(n, "digitizerDeltaMapValue", brDigitizerDeltaMapValue, AT_INT, AT_POINTER, AT_INT, AT_INT, 0);
 	brNewBreveCall(n, "digitizerHighestDeltaLocation", brDigitizerHighestDeltaLocation, AT_VECTOR, AT_POINTER, 0);
 	brNewBreveCall(n, "digitizerCloseCamera", brDigitizerCloseCamera, AT_NULL, AT_POINTER, 0);
-}
-
-ComponentInstance ccOpenCamera(brDigitizer *data, int width, int height) {
-	OSErr err;
-	ComponentInstance co;
-	SGChannel videoChannel;
-	Rect theBounds;
-	GWorldPtr pixelWorld;
 	
-	SetRect(&theBounds, 0, 0, width, height);
-	
-	NewGWorld( &pixelWorld, 32, &theBounds, NULL, NULL, 0 );
-	
-	data->rowBytes = (*GetGWorldPixMap(pixelWorld))->rowBytes & 0x3FFF;
-	data->pixels = (unsigned char*)GetPixBaseAddr(GetGWorldPixMap(pixelWorld));
-	
-	co = OpenDefaultComponent('barg', 0);
-	
-	if(!co) {
-		fprintf(stderr, "Error opening QuickTime component!\n");
-		return NULL;
-	}
-	
-	err = SGInitialize(co);
-	
-	if(err) {
-		fprintf(stderr, "Error initializing QuickTime sequence grabber: %d\n", err);
-		return NULL;
-	}
-	
-	err = SGSetGWorld(co, pixelWorld, NULL);
-	
-	if(err) {
-		fprintf(stderr, "Error configuring QuickTime sequence grabber: %d\n", err);
-		return NULL;
-	}
-	
-	err = SGNewChannel(co, VideoMediaType, &videoChannel);
-
-	if(err) {
-		fprintf(stderr, "Error creating QuickTime sequence grabber video channel: %d\n", err);
-		return NULL;
-	}
-	
-	err = SGSetChannelUsage(videoChannel, seqGrabPreview);
-
-	if(err) {
-		fprintf(stderr, "Error initializing QuickTime sequence grabber video channel: %d\n", err);
-		return NULL;
-	}
-	
-	err = SGSetChannelBounds(videoChannel, &theBounds);
-
-	if(err) {
-		fprintf(stderr, "Error configuring QuickTime sequence grabber video channel: %d\n", err);
-		return NULL;
-	}
-	
-	
-	SGStartPreview(co);
-	
-	return co;
-}
-
-void ccGetPixels(brDigitizer *b, unsigned char *dst) {
-	int srowBytes = b->width * 4;
-	int drowBytes = b->width * 4;
-	int h, w, dindex = 0;
-	int hh;
-
-	for(h=0;h<b->height;h++) {
-		dindex = ((b->height - h) * drowBytes) - 1;
-		for(w=0;w<b->width;w++) {
-			if(b->flip) hh = b->height - (h + 1);
-			else hh = h;
-
-			// input = ARGB
-			// output = RGBA
-
-			dst[dindex--] = b->pixels[hh*b->rowBytes + w*4 + 0];
-			dst[dindex--] = b->pixels[hh*b->rowBytes + w*4 + 3];
-			dst[dindex--] = b->pixels[hh*b->rowBytes + w*4 + 2];
-			dst[dindex--] = b->pixels[hh*b->rowBytes + w*4 + 1];
-		}
-	}
-}
-
-void ccCloseCamera(ComponentInstance co) {
-	CloseComponent(co);
+	return 0;
 }
 
 unsigned char ccAveragePixels(unsigned char *buffer, int size, int sampleSize) {
@@ -343,12 +355,16 @@ ccIntensityMap *ccNewIntensityMap(int size) {
 }
 
 void ccIntensityMapDeltaARGB(brDigitizer *b) {
+  unsigned char *pixels = b->pixels;
+  
+  if(!pixels)
+    return;
+
 	int n;
 	int highestValue = 0;
 	int x = b->width;
 	int y = b->height;
 	ccIntensityMap *map = b->map;
-	unsigned char *source = b->pixels;
 	int a = 0;
 
 	map->average = 0;
@@ -371,6 +387,11 @@ void ccIntensityMapDeltaARGB(brDigitizer *b) {
 }
 
 void ccIntensityMapARGB(brDigitizer *b, int active) {
+  unsigned char *pixels = b -> pixels;
+  
+  if(!pixels)
+    return;
+
 	int rowBytes;
 	int xscale;
 	int yscale;
@@ -380,7 +401,6 @@ void ccIntensityMapARGB(brDigitizer *b, int active) {
 	int total;
 	unsigned char *start;
 	ccIntensityMap *map = b->map;
-	unsigned char *source = b->pixels;
 	
 	xscale = (b->width * 4) / map->size;
 	yscale = b->height / map->size;
@@ -390,7 +410,7 @@ void ccIntensityMapARGB(brDigitizer *b, int active) {
 	for(mapX=0;mapX<map->size;mapX++) {
 		for(mapY=0;mapY<map->size;mapY++) {
 			total = 0;
-			start = &source[mapY * yscale * b->rowBytes + (xscale * mapX)];
+			start = &pixels[mapY * yscale * b->rowBytes + (xscale * mapX)];
 
 			for(m=0;m<yscale;m++) {
 				for(n=0;n<xscale;n++) {
@@ -399,22 +419,6 @@ void ccIntensityMapARGB(brDigitizer *b, int active) {
 			}
 
 			map->map[active][(mapY * map->size) + mapX] = total / (pixelCount / 3);
-		}
-	}
-}
-
-void ccColorRectRGBA(unsigned char *source, int x, int y, int rx, int ry, int rw, int rh, int color, unsigned char value) {
-	int rowBytes = x * 3;
-	int n;
-	int m;
-
-	unsigned char *start;
-
-	start = &source[ry * rowBytes + (rx * 4)];
-
-	for(n=0;n<rw;n++) {
-		for(m=0;m<rh;m++) {
-			start[m * rowBytes + (n * 4) + color] = value;
 		}
 	}
 }

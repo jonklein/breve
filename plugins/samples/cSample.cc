@@ -44,10 +44,10 @@ int cSampleListTest( brEval *args, brEval *result, void *i ) {
 	printf( "Total number of elements in list = %d.\n", numNodes );
 
 	input1 = BRDOUBLE( brEvalListIndexLookup( myListHead, 0 ) );
-	printf( "First Input = %d.\n", input1 );
+	printf( "First Input = %f.\n", input1 );
 
 	input2 = BRDOUBLE( brEvalListIndexLookup( myListHead, 1 ) );
-	printf( "Second Input = %d.\n", input2 );
+	printf( "Second Input = %f.\n", input2 );
 
 	return EC_OK;
 }

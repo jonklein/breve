@@ -80,21 +80,21 @@ typedef struct brInstance brInstance;
 // These entries appear in the brEval type field. 
 
 enum atomicTypes {
-    AT_INVALID = 0,
-    AT_NULL,
-    AT_INT,
-    AT_DOUBLE,
-    AT_STRING,
-    AT_INSTANCE,
-    AT_POINTER,
-    AT_VECTOR,
-    AT_MATRIX,
-    AT_LIST,
-    AT_ARRAY,
-    AT_DATA,
-    AT_HASH,
-    AT_TYPE,
-    AT_UNDEFINED
+	AT_INVALID = 0,
+	AT_UNDEFINED,
+	AT_NULL,
+	AT_INT,
+	AT_POINTER,
+	AT_TYPE,
+	AT_DOUBLE,
+	AT_VECTOR,
+	AT_MATRIX,
+	AT_ARRAY,
+	AT_STRING,
+	AT_INSTANCE,
+	AT_LIST,
+	AT_DATA,
+	AT_HASH
 };
 
 struct slVector {
@@ -227,8 +227,7 @@ void brDataFree(brData *data);
 #define EC_ERROR -1
 #define EC_OK 1
 
-int brNewBreveCall(void *n, char *name, int (*call)(brEval argumentArray[],
-	brEval *returnValue, void *callingInstance), int rtype, ...);
+extern "C" int brNewBreveCall(void *n, const char *name, int (*call)(brEval argumentArray[], brEval *returnValue, void *callingInstance), int rtype, ...);
 
 	/*
 	 * The brMethodCallByNameWithArgs() function calls the breve method

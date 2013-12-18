@@ -18,10 +18,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
  *****************************************************************************/
 
-#include <QuickTime/QuickTime.h>
+#include <AVFoundation/AVFoundation.h>
+#include <Foundation/Foundation.h>
+
+
 
 typedef struct brDigitizer brDigitizer;
 typedef struct ccIntensityMap ccIntensityMap;
+
+@interface breveAVCaptureDelegate : NSObject<AVCaptureVideoDataOutputSampleBufferDelegate> {
+  brDigitizer *data;
+}
+
+@end
+
+
 
 struct ccIntensityMap {
 	int size;
@@ -34,7 +45,8 @@ struct ccIntensityMap {
 };
 
 struct brDigitizer {
-    ComponentInstance instance;
+    AVCaptureSession* instance;
+    breveAVCaptureDelegate *delegate;
     unsigned char *pixels;
 
     ccIntensityMap *map;
@@ -46,12 +58,6 @@ struct brDigitizer {
     int average;
 	int flip;
 };
-
-ComponentInstance ccOpenCamera(brDigitizer *data, int width, int height);
-unsigned char *ccGrabFrame(ComponentInstance co, long *size);
-unsigned char *ccGrabFrameAsync(ComponentInstance co, long *size);
-
-void ccCloseCamera(ComponentInstance co);
 
 unsigned char ccAveragePixels(unsigned char *buffer, int size, int sampleSize);
 

@@ -1,5 +1,3 @@
-# include some frequently used classes and specify common classpaths
-
 @path "classes"
 @path "lib/classes"
 
@@ -11,11 +9,11 @@
 
 # tell the engine the name of the controller
 
-Controller myController.
+Controller LivePainter.
 
 # implment the controller object
 
-Control : myController {
+Control : LivePainter {
     + variables:
         image, light (object).
         patches (object).
@@ -29,13 +27,12 @@ Control : myController {
         average, lastAverage, stability, initialized (int).
         
     + to init:
-        brush (int).
+        brush (object).
 
-        brush = (self load-image from "images/brush.png").
+        brush = ((new Image) load from "images/brush.png").
 
         vel = 15.0 + random[9].
         acc = random[1000].
-        radius = 3.7 + random[1.0].
 
         self enable-blur.
         self set-blur-factor to 1.0.
@@ -53,10 +50,10 @@ Control : myController {
         light = new Mobile.
         light move to (-(image get-width)/2.0, -(image get-height)/2.0, -5) + (10, 10, 0).
         
-        shape = new Sphere init-with radius radius.
+        shape = new Sphere init-with radius 1.8 + random[1.0].
 
         painters = 200 new Painters.
-        painters set-bitmap to brush.
+        painters set-bitmap-image to brush.
 
         self offset-camera by (0, 0, -(image get-width) - 10).
         self set-z-clip to (image get-width) + 100.
@@ -80,8 +77,7 @@ Control : myController {
         if (stability == 25 && (average < 50 || !initialized)): {
             image update-intensity-reference-map.
             initialized = 1.
-
-            print "** initialization complete. **".
+            print "initialization complete".
         } 
 
         if !initialized: light set-color to (1, 1, 0).
@@ -135,11 +131,6 @@ Patch : PainterPatch {
         level += (image get-delta-map-value at-x (19 - xIndex) at-y (19 - yIndex)) / 256.0.
         neighbors spread level (level / |neighbors|).
         level = 0.
-
-        # if level > 1.5: {
-        #    p = (controller get-random-painter).
-        #    p move to (self get-location) + random[(20, 20, 0)].
-        # }
 
     + to post-iterate:
         level = newlevel.
