@@ -19,3 +19,7 @@ OSX/ConfigureLibraryList
 configure
 include/breve/config.h
 Qt/breve.pro
+**/xcuserdata
+**/project.xcworkspace
+**/.DS_Store
+DerivedData
