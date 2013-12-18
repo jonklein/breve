@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,21 +20,27 @@
 		4842D87507F9A72700140407 /* libbreve.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D87207F9A72700140407 /* libbreve.a */; };
 		4842D90207F9CAC100140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
 		4842D90907F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
-		4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FF07F9CAC100140407 /* libsndfile.a */; };
 		4842D91007F9CAC200140407 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FB07F9CAC100140407 /* libgsl.a */; };
 		4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D8FC07F9CAC100140407 /* libgslcblas.a */; };
 		4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4842D95B07F9CC0800140407 /* JavaVM.framework */; };
 		485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
+		485ED40E185DEA720035984A /* libexpat.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED40D185DEA720035984A /* libexpat.1.dylib */; };
+		485ED40F185DEA720035984A /* libexpat.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED40D185DEA720035984A /* libexpat.1.dylib */; };
+		485ED410185DEA720035984A /* libexpat.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED40D185DEA720035984A /* libexpat.1.dylib */; };
+		485ED41A185DED250035984A /* libpython2.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED419185DED250035984A /* libpython2.7.dylib */; };
+		485ED41B185DED250035984A /* libpython2.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED419185DED250035984A /* libpython2.7.dylib */; };
+		485ED41C185DED250035984A /* libpython2.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED419185DED250035984A /* libpython2.7.dylib */; };
+		485ED41E185DED550035984A /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED41D185DED550035984A /* libcurl.dylib */; };
+		485ED41F185DED550035984A /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED41D185DED550035984A /* libcurl.dylib */; };
+		485ED420185DED550035984A /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 485ED41D185DED550035984A /* libcurl.dylib */; };
 		4868E6F7091423CC0045591F /* simulation.gif in Resources */ = {isa = PBXBuildFile; fileRef = 4868E6F6091423CC0045591F /* simulation.gif */; };
 		4868E6FD091423F80045591F /* app_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 4868E6FC091423F80045591F /* app_icon.tiff */; };
 		489D8B1306B5541200740D0A /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B1106B5541200740D0A /* ScreenSaver.framework */; };
 		489D8B3F06B5543800740D0A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3B06B5543800740D0A /* GLUT.framework */; };
 		489D8B4006B5543800740D0A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3C06B5543800740D0A /* OpenGL.framework */; };
-		489D8B9B06B5548600740D0A /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8D06B5548600740D0A /* libexpat.a */; };
 		489D8B9D06B5548600740D0A /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8F06B5548600740D0A /* libpng.a */; };
 		489D8BAD06B554A200740D0A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BAB06B554A200740D0A /* libz.dylib */; };
 		489D8BBE06B554D600740D0A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BBA06B554D600740D0A /* AudioToolbox.framework */; };
@@ -57,16 +63,12 @@
 		489DE28E06B5591400740D0A /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
 		489DE2B106B5598B00740D0A /* Digitizer.tz in Resources */ = {isa = PBXBuildFile; fileRef = 489DE2B006B5598B00740D0A /* Digitizer.tz */; };
 		489DE2B906B559C100740D0A /* PainterSaver.tz in Resources */ = {isa = PBXBuildFile; fileRef = 489DE2B806B559C100740D0A /* PainterSaver.tz */; };
-		48ADBD1D06CA66E80059C23C /* brevePainter-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 489DE21806B5587400740D0A /* brevePainter-Info.plist */; };
 		48B9BEFB05EA641F002C7A42 /* slBreveSaver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5D8673B01169F20010BE436 /* slBreveSaver.h */; };
 		48B9BF0005EA6420002C7A42 /* slBreveSaver.mm in Sources */ = {isa = PBXBuildFile; fileRef = F5D8673C01169F20010BE436 /* slBreveSaver.mm */; };
 		48B9BF0505EA6422002C7A42 /* slBreveResearcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */; };
 		48B9BF0A05EA6422002C7A42 /* slBreveResearcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */; };
 		48B9BF1405EA6439002C7A42 /* Creatures.tz in Resources */ = {isa = PBXBuildFile; fileRef = 48941C8F0401A69200000116 /* Creatures.tz */; };
 		48B9BF3405EA6451002C7A42 /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
-		48BB26B30B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
-		48BB26B50B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
-		48BB26B60B2285DF006FA9E9 /* libpython.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BB26B20B2285DF006FA9E9 /* libpython.dylib */; };
 		48D907CA06BFC54300FF529F /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8CB706B5554900740D0A /* AppKit.framework */; };
 		48D907CB06BFC54300FF529F /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8BFA06B5551B00740D0A /* CoreAudio.framework */; };
 		48D907CD06BFC54400FF529F /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8D5D06B5558A00740D0A /* libode.a */; };
@@ -79,7 +81,6 @@
 		48D907F406BFC56B00FF529F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B3C06B5543800740D0A /* OpenGL.framework */; };
 		48D907F606BFC56C00FF529F /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B1106B5541200740D0A /* ScreenSaver.framework */; };
 		48D907F806BFC56D00FF529F /* libjpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8E06B5548600740D0A /* libjpeg.a */; };
-		48D907FC06BFC56E00FF529F /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 489D8B8D06B5548600740D0A /* libexpat.a */; };
 		48D90A3206BFD21D00FF529F /* classes in Resources */ = {isa = PBXBuildFile; fileRef = 4818575605CABFE300C48BE6 /* classes */; };
 		48D90A3406BFD24700FF529F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		48D90A3D06BFD26900FF529F /* brevePainter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 48D90A3B06BFD26900FF529F /* brevePainter.nib */; };
@@ -94,8 +95,12 @@
 		4842D87207F9A72700140407 /* libbreve.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbreve.a; path = ../lib/libbreve.a; sourceTree = SOURCE_ROOT; };
 		4842D8FB07F9CAC100140407 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = /usr/local/lib/libgsl.a; sourceTree = "<absolute>"; };
 		4842D8FC07F9CAC100140407 /* libgslcblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgslcblas.a; path = /usr/local/lib/libgslcblas.a; sourceTree = "<absolute>"; };
-		4842D8FF07F9CAC100140407 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = /usr/local/lib/libsndfile.a; sourceTree = "<absolute>"; };
 		4842D95B07F9CC0800140407 /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = /System/Library/Frameworks/JavaVM.framework; sourceTree = "<absolute>"; };
+		485ED40D185DEA720035984A /* libexpat.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libexpat.1.dylib; path = ../../../../../../usr/lib/libexpat.1.dylib; sourceTree = "<group>"; };
+		485ED419185DED250035984A /* libpython2.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpython2.7.dylib; path = ../../../../../../System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib; sourceTree = "<group>"; };
+		485ED41D185DED550035984A /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurl.dylib; path = ../../../../../../usr/lib/libcurl.dylib; sourceTree = "<group>"; };
+		485ED425185DF0250035984A /* brevePainter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "brevePainter-Info.plist"; sourceTree = "<group>"; };
+		485ED426185DF0250035984A /* breveResearcher-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "breveResearcher-Info.plist"; sourceTree = "<group>"; };
 		4868E6F6091423CC0045591F /* simulation.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = simulation.gif; sourceTree = "<group>"; };
 		4868E6FC091423F80045591F /* app_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = app_icon.tiff; sourceTree = "<group>"; };
 		48941C8F0401A69200000116 /* Creatures.tz */ = {isa = PBXFileReference; lastKnownFileType = text; name = Creatures.tz; path = "../demos/Physics-Examples/Creatures.tz"; sourceTree = "<group>"; };
@@ -104,7 +109,6 @@
 		489D8B1106B5541200740D0A /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = /System/Library/Frameworks/ScreenSaver.framework; sourceTree = "<absolute>"; };
 		489D8B3B06B5543800740D0A /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		489D8B3C06B5543800740D0A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
-		489D8B8D06B5548600740D0A /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = /usr/local/lib/libexpat.a; sourceTree = "<absolute>"; };
 		489D8B8E06B5548600740D0A /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /usr/local/lib/libjpeg.a; sourceTree = "<absolute>"; };
 		489D8B8F06B5548600740D0A /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = /usr/local/lib/libpng.a; sourceTree = "<absolute>"; };
 		489D8BAB06B554A200740D0A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
@@ -116,14 +120,11 @@
 		489D8CB706B5554900740D0A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		489D8D5D06B5558A00740D0A /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = /usr/local/lib/libode.a; sourceTree = "<absolute>"; };
 		489DE21706B5587300740D0A /* brevePainter.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = brevePainter.saver; sourceTree = BUILT_PRODUCTS_DIR; };
-		489DE21806B5587400740D0A /* brevePainter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "brevePainter-Info.plist"; path = "/Users/jk/dev/breveSaver/brevePainter-Info.plist"; sourceTree = "<absolute>"; };
 		489DE2B006B5598B00740D0A /* Digitizer.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Digitizer.tz; sourceTree = SOURCE_ROOT; };
 		489DE2B806B559C100740D0A /* PainterSaver.tz */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = PainterSaver.tz; sourceTree = "<group>"; };
 		48B9BDBC05EA6004002C7A42 /* breveResearcher.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breveResearcher.saver; sourceTree = BUILT_PRODUCTS_DIR; };
-		48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "breveResearcher-Info.plist"; path = "/Users/jk/dev/breveSaver/breveResearcher-Info.plist"; sourceTree = "<absolute>"; };
 		48B9BE2D05EA60B4002C7A42 /* slBreveResearcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slBreveResearcher.h; sourceTree = "<group>"; };
 		48B9BE2E05EA60B4002C7A42 /* slBreveResearcher.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = slBreveResearcher.mm; sourceTree = "<group>"; };
-		48BB26B20B2285DF006FA9E9 /* libpython.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpython.dylib; path = /usr/lib/libpython.dylib; sourceTree = "<absolute>"; };
 		48D90A3C06BFD26900FF529F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/brevePainter.nib; sourceTree = "<group>"; };
 		F5104130012D110B010BE436 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/breveWalker.nib; sourceTree = "<group>"; };
 		F5175CB20169B8F6010BE436 /* SwarmSaver.tz */ = {isa = PBXFileReference; lastKnownFileType = text; path = SwarmSaver.tz; sourceTree = "<group>"; };
@@ -144,22 +145,23 @@
 				489D8B1306B5541200740D0A /* ScreenSaver.framework in Frameworks */,
 				489D8B3F06B5543800740D0A /* GLUT.framework in Frameworks */,
 				489D8B4006B5543800740D0A /* OpenGL.framework in Frameworks */,
-				489D8B9B06B5548600740D0A /* libexpat.a in Frameworks */,
 				489D8B9D06B5548600740D0A /* libpng.a in Frameworks */,
 				489D8BAD06B554A200740D0A /* libz.dylib in Frameworks */,
 				489D8BBE06B554D600740D0A /* AudioToolbox.framework in Frameworks */,
+				485ED40E185DEA720035984A /* libexpat.1.dylib in Frameworks */,
 				489D8BBF06B554D600740D0A /* System.framework in Frameworks */,
 				489D8BFE06B5551B00740D0A /* CoreAudio.framework in Frameworks */,
 				489D8BFF06B5551B00740D0A /* CoreFoundation.framework in Frameworks */,
 				489D8C3F06B5553600740D0A /* Foundation.framework in Frameworks */,
 				4842D87507F9A72700140407 /* libbreve.a in Frameworks */,
+				485ED41E185DED550035984A /* libcurl.dylib in Frameworks */,
 				489D8CB906B5554900740D0A /* AppKit.framework in Frameworks */,
 				489D8D5F06B5558A00740D0A /* libode.a in Frameworks */,
 				4842D91007F9CAC200140407 /* libgsl.a in Frameworks */,
 				4842D91107F9CAC200140407 /* libgslcblas.a in Frameworks */,
 				4842D95E07F9CC0800140407 /* JavaVM.framework in Frameworks */,
 				485E9248090D1E6F0055AF56 /* libjpeg.a in Frameworks */,
-				48BB26B30B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
+				485ED41A185DED250035984A /* libpython2.7.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,20 +173,20 @@
 				48D907CB06BFC54300FF529F /* CoreAudio.framework in Frameworks */,
 				48D907CD06BFC54400FF529F /* libode.a in Frameworks */,
 				48D907CF06BFC54400FF529F /* GLUT.framework in Frameworks */,
+				485ED41C185DED250035984A /* libpython2.7.dylib in Frameworks */,
 				48D907D806BFC56000FF529F /* AudioToolbox.framework in Frameworks */,
 				48D907DA06BFC56100FF529F /* CoreFoundation.framework in Frameworks */,
 				48D907DC06BFC56100FF529F /* Foundation.framework in Frameworks */,
 				48D907EA06BFC56800FF529F /* libpng.a in Frameworks */,
+				485ED410185DEA720035984A /* libexpat.1.dylib in Frameworks */,
 				48D907F206BFC56B00FF529F /* libz.dylib in Frameworks */,
 				48D907F406BFC56B00FF529F /* OpenGL.framework in Frameworks */,
 				48D907F606BFC56C00FF529F /* ScreenSaver.framework in Frameworks */,
 				48D907F806BFC56D00FF529F /* libjpeg.a in Frameworks */,
-				48D907FC06BFC56E00FF529F /* libexpat.a in Frameworks */,
 				4842D87307F9A72700140407 /* libbreve.a in Frameworks */,
 				4842D90207F9CAC100140407 /* libgsl.a in Frameworks */,
+				485ED420185DED550035984A /* libcurl.dylib in Frameworks */,
 				4842D90307F9CAC100140407 /* libgslcblas.a in Frameworks */,
-				4842D90607F9CAC200140407 /* libsndfile.a in Frameworks */,
-				48BB26B60B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +196,7 @@
 			files = (
 				489D8BC006B554D600740D0A /* AudioToolbox.framework in Frameworks */,
 				489D8BC106B554D600740D0A /* System.framework in Frameworks */,
+				485ED41F185DED550035984A /* libcurl.dylib in Frameworks */,
 				489D8C0006B5551B00740D0A /* CoreAudio.framework in Frameworks */,
 				489D8C0106B5551B00740D0A /* CoreFoundation.framework in Frameworks */,
 				489D8C4006B5553600740D0A /* Foundation.framework in Frameworks */,
@@ -202,9 +205,9 @@
 				4842D87407F9A72700140407 /* libbreve.a in Frameworks */,
 				4842D90907F9CAC200140407 /* libgsl.a in Frameworks */,
 				4842D90A07F9CAC200140407 /* libgslcblas.a in Frameworks */,
-				4842D90D07F9CAC200140407 /* libsndfile.a in Frameworks */,
+				485ED40F185DEA720035984A /* libexpat.1.dylib in Frameworks */,
+				485ED41B185DED250035984A /* libpython2.7.dylib in Frameworks */,
 				4842D95D07F9CC0800140407 /* JavaVM.framework in Frameworks */,
-				48BB26B50B2285DF006FA9E9 /* libpython.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,8 +223,8 @@
 				19C28FB8FE9D52D311CA2CBB /* Products */,
 				4818572A05CABEEB00C48BE6 /* breveSwarm-info.plist */,
 				4818574E05CABEEB00C48BE6 /* breveWalker-Info.plist */,
-				48B9BDBD05EA6004002C7A42 /* breveResearcher-Info.plist */,
-				489DE21806B5587400740D0A /* brevePainter-Info.plist */,
+				485ED425185DF0250035984A /* brevePainter-Info.plist */,
+				485ED426185DF0250035984A /* breveResearcher-Info.plist */,
 			);
 			name = breveSaver;
 			sourceTree = "<group>";
@@ -274,7 +277,6 @@
 		489D8B2206B5541800740D0A /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				48BB26B20B2285DF006FA9E9 /* libpython.dylib */,
 				489D8C3D06B5553600740D0A /* Foundation.framework */,
 				489D8CB706B5554900740D0A /* AppKit.framework */,
 				489D8BFA06B5551B00740D0A /* CoreAudio.framework */,
@@ -286,13 +288,14 @@
 				489D8B3C06B5543800740D0A /* OpenGL.framework */,
 				489D8B1106B5541200740D0A /* ScreenSaver.framework */,
 				489D8B8F06B5548600740D0A /* libpng.a */,
+				485ED41D185DED550035984A /* libcurl.dylib */,
+				485ED419185DED250035984A /* libpython2.7.dylib */,
 				4842D87207F9A72700140407 /* libbreve.a */,
 				4842D8FB07F9CAC100140407 /* libgsl.a */,
 				4842D8FC07F9CAC100140407 /* libgslcblas.a */,
-				4842D8FF07F9CAC100140407 /* libsndfile.a */,
 				489D8D5D06B5558A00740D0A /* libode.a */,
 				489D8BAB06B554A200740D0A /* libz.dylib */,
-				489D8B8D06B5548600740D0A /* libexpat.a */,
+				485ED40D185DEA720035984A /* libexpat.1.dylib */,
 				489D8B8E06B5548600740D0A /* libjpeg.a */,
 			);
 			name = Libraries;
@@ -392,9 +395,16 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+			};
 			buildConfigurationList = 489B5F070AB79D2500244255 /* Build configuration list for PBXProject "breveSaver" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 089C166AFE841209C02AAC07 /* breveSaver */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -429,7 +439,6 @@
 				48D90A3206BFD21D00FF529F /* classes in Resources */,
 				48D90A3406BFD24700FF529F /* InfoPlist.strings in Resources */,
 				48D90A3D06BFD26900FF529F /* brevePainter.nib in Resources */,
-				48ADBD1D06CA66E80059C23C /* brevePainter-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,20 +532,19 @@
 		489B5EFC0AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = breveCreatures;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Development;
@@ -544,21 +552,20 @@
 		489B5EFD0AB79D2500244255 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
 				INFOPLIST_FILE = "breveWalker-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bundle";
 				PRODUCT_NAME = breveCreatures;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Deployment;
@@ -566,11 +573,11 @@
 		489B5F000AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
@@ -578,6 +585,10 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "breveResearcher-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -587,7 +598,6 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = breveResearcher;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = saver;
 				ZERO_LINK = YES;
 			};
@@ -596,9 +606,9 @@
 		489B5F010AB79D2500244255 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = 4;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_PREPROCESSOR_DEFINITIONS = MACOSX;
@@ -606,6 +616,10 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "breveResearcher-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Screen Savers";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -615,7 +629,6 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = breveResearcher;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = saver;
 				ZERO_LINK = NO;
 			};
@@ -624,17 +637,21 @@
 		489B5F040AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "brevePainter-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -646,7 +663,6 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = brevePainter;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = saver;
 				ZERO_LINK = YES;
 			};
@@ -655,15 +671,19 @@
 		489B5F050AB79D2500244255 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = 4;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "brevePainter-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -675,7 +695,6 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = brevePainter;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = saver;
 				ZERO_LINK = NO;
 			};
@@ -684,15 +703,18 @@
 		489B5F080AB79D2500244255 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					x86_64,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LIBRARY = "libc++";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = ../lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/usr/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "/usr/local/include ../include/breve";
 			};
 			name = Development;
@@ -700,15 +722,18 @@
 		489B5F090AB79D2500244255 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					x86_64,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LIBRARY = "libc++";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;
-				LIBRARY_SEARCH_PATHS = ../lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				LIBRARY_SEARCH_PATHS = (
+					../lib,
+					/usr/local/lib,
+					/usr/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "/usr/local/include ../include/breve";
 			};
 			name = Deployment;

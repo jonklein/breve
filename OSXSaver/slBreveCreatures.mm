@@ -42,7 +42,7 @@
 - (IBAction)resetEvolution:(id)sender {
     char *str;
 
-    str = (char*)[[NSString stringWithFormat: @"%@/breveCreatures.xml", outputDirectory] cString];
+    str = (char*)[[NSString stringWithFormat: @"%@/breveCreatures.xml", outputDirectory] UTF8String];
 
     if(str) unlink(str);
 

@@ -62,11 +62,7 @@ class slLink: public slWorldObject {
 		friend class slMultibody;
 
 		slLink(slWorld *w);
-
 		~slLink();
-
-		void draw( const slRenderGL& inRenderer ) {
-		}
 
 		void setLocation(slVector *rotation);
 		void setRotation(double rotation[3][3]);

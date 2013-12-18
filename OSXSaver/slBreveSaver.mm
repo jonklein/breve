@@ -33,7 +33,7 @@
 	simName = [self getSimName];
 
 	if(*simName != '/') {
-			simFile = strdup((char*)[[NSString stringWithFormat: @"%@/%s", inputDirectory, simName] cString]);
+			simFile = strdup((char*)[[NSString stringWithFormat: @"%@/%s", inputDirectory, simName] UTF8String]);
 	} else {
 			simFile = strdup(simName);
 	}

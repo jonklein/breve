@@ -52,7 +52,6 @@ enum atomicTypes {
 	AT_VECTOR,
 	AT_MATRIX,
 	AT_ARRAY,
-
 	AT_STRING,
 	AT_INSTANCE,
 	AT_LIST,
