@@ -339,7 +339,7 @@ Object : MorphologyParser {
 				jointRange = 0.8 + 1.5 * | connectionParams{ 9 } |.
 
 				joint set-double-spring with-max jointRange with-min -jointRange with-strength 20.
-				joint set-strength-limit to 1300.
+				joint set-strength-limit to 4500.
 
 				self parse from (child get-target) with-level n + 1 with-link childNode.
 				# self parse from (child get-target) with-level n + 1 with-link childNode flip 1.

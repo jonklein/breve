@@ -46,7 +46,7 @@ PhysicalControl : VirtualCreatures {
 
 
 	+ to init:
-		startTexture = (new Image load from "images/star_start.png").
+		startTexture = (new Image load from "images/star.png").
 
 		flag = new Mobile.
 		flag disable-physics.

@@ -11,7 +11,7 @@ Control : PhysicalControl [version 1.8] {
 
 	+ to init:
 		self set-integration-step to .0125.
-		self set-iteration-step to .025.
+		self set-iteration-step to .05.
 
 		self set-fast-physics-iterations to 40.
 
