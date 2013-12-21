@@ -46,7 +46,7 @@ PhysicalControl : VirtualCreatures {
 
 
 	+ to init:
-		startTexture = (new Image load from "images/star_start.png").
+		startTexture = (new Image load from "images/star.png").
 
 		flag = new Mobile.
 		flag disable-physics.
@@ -64,8 +64,9 @@ PhysicalControl : VirtualCreatures {
 		floor set-color to ( .8, .8, .8 ).
 
 		self enable-fast-physics.
-		self set-fast-physics-iterations to 30.
+		self set-fast-physics-iterations to 40.
 		self enable-shadow-volumes.
+
 
 		parser = new MorphologyParser.
 

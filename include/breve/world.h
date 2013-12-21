@@ -142,6 +142,7 @@ class slWorld {
 		
 		void					drawObjects( slRenderGL& inRenderer );
 
+
 		/**
 		 * Indicates that collision detection structures must be reinitialized.
 		 */
@@ -275,6 +276,10 @@ class slWorld {
 		slCamera 				_lightExposureCamera;
 
 	private:
+
+		void					renderObjectShadowVolumes(slRenderGL& inRenderer, slCamera *inCamera);
+		void 					renderShadowVolume( slRenderGL& inRenderer, slCamera *inCamera );
+
 		bool 					_detectLightExposure;
 		bool 					_drawLightExposure;
 

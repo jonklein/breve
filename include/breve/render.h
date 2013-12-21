@@ -75,6 +75,10 @@ class slRenderGL {
 		void				SetBlendColor( unsigned char *inColor ) const;
 		void				SetColorTransformsEnabled( bool inEnabled ) { _colorTransforms = inEnabled; }
 
+		void				PushLights( slLight *lights );
+		void				PopLights( slLight *lights );
+
+
 		void				PushLight( const slLight *inLight, bool inAmbientOnly = false );
 		void				PopLight();
 

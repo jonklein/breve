@@ -422,7 +422,7 @@ double Sensor::evaluate(){
 				//rayValues[i][j].distance);
 			}
 			if(verbose==1)
-				if((i ==columns/2)&&(j ==rows/2)||rows==1)	slMessage(DEBUG_ALL, "%.3f	",rayValues[i][j].distance);
+				if(( i ==columns/2 && j ==rows/2 ) || rows==1 )	slMessage(DEBUG_ALL, "%.3f	",rayValues[i][j].distance);
 			//laenge der strahlen auf die laenge des mittleren umrechnen falls es nciht shco nder mittelre ist
 
 			result = apply_distance_factor(result, frontDistance);

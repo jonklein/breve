@@ -25,7 +25,10 @@
 #include "camera.h"
 
 class slWorld;
+class slMultibody;
 class slStationary;
+class slFace;
+class slShape;
 
 typedef float slColor[4];
 

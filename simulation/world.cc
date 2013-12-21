@@ -223,21 +223,13 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 	
 	drawPatchGrids( inRenderer, inCamera );
 
-	if( inCamera -> _drawLights ) {
-		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
-			if( _lights[ n ]._type ) 
-				inRenderer.PushLight( &_lights[ n ] );
-		}
-	}
+	if( inCamera -> _drawLights && !inCamera -> _drawShadowVolumes )
+		inRenderer.PushLights(_lights);
 
 	drawObjects( inRenderer );
 
-	if( inCamera -> _drawLights ) {
-		for( int n = 0; n < MAX_LIGHTS; n++ ) { 
-			if( _lights[ n ]._type ) 
-				inRenderer.PopLight();
-		}
-	}
+	if( inCamera -> _drawLights && !inCamera -> _drawShadowVolumes )
+		inRenderer.PopLights(_lights);
 
 	inCamera -> processBillboards( this );
 	inCamera -> renderBillboards( inRenderer );	
@@ -255,11 +247,13 @@ void slWorld::draw( slRenderGL& inRenderer, slCamera *inCamera ) {
 		
 		inRenderer.EndFlatShadows();
 	}
+	
+	if( inCamera -> _drawShadowVolumes )
+		renderShadowVolume(inRenderer, inCamera);
 
 	if( inCamera -> _drawBlur ) 
 		inRenderer.ReadToTexture( *inCamera );
 }
-
 
 void slWorld::drawPatchGrids( slRenderGL& inRenderer, slCamera *inCamera ) {
 	for ( unsigned int n = 0; n < _patches.size(); n++ ) {

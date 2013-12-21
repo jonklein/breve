@@ -26,13 +26,12 @@
 #include "shadowvolume.h"
 #include "shape.h"
 
-void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
-#if 0
+void slShape::drawShadowVolume( slWorld *w, slCamera *c, slPosition *p ) {
 	std::vector< slEdge* >::iterator ei;
 	slVector light;
 	slVector lNormal;
 
-	slVectorCopy( &c->_lights[ 0 ]._location, &light );
+	slVectorCopy( &w->_lights[ 0 ]._location, &light );
 	slVectorCopy( &light, &lNormal );
 	slVectorNormalize( &lNormal );
 	slVectorMul( &light, 5, &light );
@@ -114,12 +113,10 @@ void slShape::drawShadowVolume( slCamera *c, slPosition *p ) {
 	}
 
 	glEnd();
-#endif
 }
 
-void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
+void slSphere::drawShadowVolume( slWorld *w, slCamera *c, slPosition *p ) {
 
-#if 0
 	slVector light, lNormal, x1, x2, lastV;
 	int n;
 	double diff;
@@ -128,9 +125,7 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	static int inited;
 	static float sineTable[361], cosineTable[361];
 
-	slVectorSub( &c->_lights[0]._location, &p->location, &light );
-
-	// slVectorCopy(&c->_lights[0]._location, &light);
+	slVectorSub( &w->_lights[0]._location, &p->location, &light );
 
 	slVectorCopy( &light, &lNormal );
 
@@ -218,14 +213,9 @@ void slSphere::drawShadowVolume( slCamera *c, slPosition *p ) {
 	}
 
 	glEnd();
-	
-#endif
 }
 
-void slCamera::renderShadowVolume( slWorld *w ) {
-#if 0
-	setupLights( 0 );
-
+void slWorld::renderShadowVolume( slRenderGL& inRenderer, slCamera *inCamera ) {
 	glClear( GL_STENCIL_BUFFER_BIT );
 
 	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
@@ -240,13 +230,13 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 	glStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
 
 	// stencil up shadow volume front faces to 1
-	renderObjectShadowVolumes( w );
+	renderObjectShadowVolumes( inRenderer, inCamera );
 
 	// stencil down shadow volume back faces to 0
 
 	glStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 	glCullFace( GL_FRONT );
-	renderObjectShadowVolumes( w );
+	renderObjectShadowVolumes( inRenderer, inCamera );
 
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 	glDepthMask( GL_TRUE );
@@ -258,37 +248,23 @@ void slCamera::renderShadowVolume( slWorld *w ) {
 
 	// draw the scene again, with lighting, only where the value is 0
 
-	// glColor3f(1, 0, 0);
-	renderObjects( w, DO_NO_ALPHA | DO_NO_SHADOWCATCHER );
-	glEnable( GL_BLEND );
-	renderObjects( w, DO_ONLY_SHADOWCATCHER, .65 );
-
-	// transparent objects cause problems, since they cannot simply
-	// be "drawn over" the way we do with the rest of the scene.
-	// once we've drawn it the first time, it's there to stay.
-	// what I think we should do here:
-	// 1) do not render the alphas at all for the first pass
-	// 2) render the unlit alphas where the stencil != 0
-
-	renderObjects( w, DO_ONLY_ALPHA );
-
-	if ( _billboardCount ) 
-		renderBillboards( 0 );
+  inRenderer.PushLights(_lights);
+  drawObjects(inRenderer);
+  inRenderer.PopLights(_lights);
 
 	glDisable( GL_STENCIL_TEST );
 	
-#endif
 }
 
-void slCamera::renderObjectShadowVolumes( slWorld *w ) {
+void slWorld::renderObjectShadowVolumes(slRenderGL& inRenderer, slCamera *inCamera) {
 	std::vector<slWorldObject*>::iterator wi;
 
 	glDisable( GL_BLEND );
 	glColor4f( 0, 0, 0, 1.0 );
 
-	for ( wi = w->_objects.begin(); wi != w->_objects.end(); wi++ ) {
+	for ( wi = _objects.begin(); wi != _objects.end(); wi++ ) {
 		if ( *wi && ( *wi )->_displayShape && !( *wi )->_drawAsPoint && ( *wi )->_drawShadow ) {
-			( *wi )->_displayShape->drawShadowVolume( this, &( *wi )->_position );
+			( *wi )->_displayShape->drawShadowVolume( this, inCamera, &( *wi )->_position );
 		}
 	}
 }

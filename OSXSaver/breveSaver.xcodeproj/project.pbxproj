@@ -705,6 +705,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;
@@ -724,6 +725,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				"GCC_ENABLE_OBJC_GC[sdk=macosx10.6][arch=x86_64]" = required;
 				INFOPLIST_PREPROCESS = YES;

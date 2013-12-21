@@ -354,12 +354,19 @@ void slRenderGL::Rotate( slMatrixMode inMode, float inAngle, float inX, float in
 	slgl( glRotatef( inAngle, inX, inY, inZ ) );
 }
 
+void slRenderGL::PushLights(slLight inLights[]) {
+  for( int n = 0; n < MAX_LIGHTS; n++ ) { 
+		if( inLights[ n ]._type ) 
+			PushLight( &inLights[ n ] );
+	}
+}
 
-//void slRenderGL::drawImage() {
-//
-//}
-
-// void slRenderGL::enableFog( ) {
+void slRenderGL::PopLights(slLight inLights[]) {
+  for( int n = 0; n < MAX_LIGHTS; n++ ) { 
+		if( inLights[ n ]._type ) 
+			PopLight();
+	}
+}
 
 void slRenderGL::PushLight( const slLight *inLight, bool inAmbientOnly ) {
 	if( inLight -> _type ) {

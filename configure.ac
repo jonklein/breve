@@ -82,7 +82,7 @@ case ${host_os} in
 				AC_DEFINE([MACOSX], [1], [Mac OS X])
 				custom_cblas="-framework vecLib"
 				LIBS="-framework Foundation -framework vecLib -framework OpenGL -framework GLUT"
-				EXTRAOPTFLAGS="-falign-loops=16 -ftree-vectorize -funroll-loops"
+				EXTRAOPTFLAGS="-ftree-vectorize -funroll-loops"
 				PLATFORM="macosx"
 			;;
 		esac

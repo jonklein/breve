@@ -98,8 +98,8 @@
 		};
 
 		if(!disableFX) {
-			format = [ [ [ NSOpenGLPixelFormat alloc ] initWithAttributes: attribs ] autorelease ];
-			theView = [ [ [ NSOpenGLView alloc ] initWithFrame: NSZeroRect pixelFormat: format ] autorelease ]; 
+			format = [ [ NSOpenGLPixelFormat alloc ] initWithAttributes: attribs ];
+			theView = [ [ NSOpenGLView alloc ] initWithFrame: NSZeroRect pixelFormat: format ];
 		}
 
 		if(disableFX || !format || !theView) {
@@ -110,12 +110,12 @@
 				(NSOpenGLPixelFormatAttribute)0
 			};
 
-			NSOpenGLPixelFormat *format = [ [ [ NSOpenGLPixelFormat alloc ] initWithAttributes: attribs ] autorelease ];
+			NSOpenGLPixelFormat *format = [ [ NSOpenGLPixelFormat alloc ] initWithAttributes: attribs ];
 
 			nofx = YES;
 
 			NSLog(@"breveSaver view initialization failed first attempt");
-			theView = [[[NSOpenGLView alloc] initWithFrame:NSZeroRect pixelFormat:format] autorelease]; 
+			theView = [[NSOpenGLView alloc] initWithFrame:NSZeroRect pixelFormat:format];
 
 			if(!theView) {
 				NSLog(@"breveSaver unable to create OpenGL view");
@@ -128,7 +128,7 @@
 		NSLog(@"breveSaver error during superview initialization");
 	}
 
-	inputDirectory = [[[NSBundle bundleForClass: [self class]] resourcePath] retain];
+	inputDirectory = [[NSBundle bundleForClass: [self class]] resourcePath];
 
 	glInited = NO;
 
@@ -148,7 +148,7 @@
 	paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 
 	if([paths count] > 0) { 
-		outputDirectory = [[[paths objectAtIndex: 0] stringByAppendingString: @"/Preferences/"] retain];
+		outputDirectory = [[paths objectAtIndex: 0] stringByAppendingString: @"/Preferences/"];
 		brEngineSetIOPath( viewEngine, [outputDirectory UTF8String] );
 	}
 		
@@ -318,11 +318,7 @@
 
 - (void)dealloc {
 	delete viewEngine;
-
-	[outputDirectory release];
-	[inputDirectory release];
 	[theView removeFromSuperview];
-	[super dealloc];
 }
 
 /* this should be overriden by subclasses */

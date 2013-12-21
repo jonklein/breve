@@ -337,12 +337,18 @@ int brIRealSetTextureScale( brEval args[], brEval *target, brInstance *i ) {
 
 int brIRealSetBitmap( brEval args[], brEval *target, brInstance *i ) {
 	slWorldObject *o = BRWORLDOBJECTPOINTER( &args[ 0 ] );
-	slTexture2D *t = ( (brImageData*)BRPOINTER( &args[ 1 ] ) ) -> getTexture();
+	brImageData *b = (brImageData*)BRPOINTER( &args[ 1 ] );
 
-	o->setTexture( t );
-	o->setTextureMode( slBitmap );
+	if(b && o) {
+		slTexture2D *t = b -> getTexture();
 
-	return EC_OK;
+		o->setTexture( t );
+		o->setTextureMode( slBitmap );
+
+		return EC_OK;
+	} else {
+		return EC_ERROR;
+	}
 }
 
 

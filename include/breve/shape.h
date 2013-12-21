@@ -30,6 +30,7 @@
 
 class slRenderGL;
 class slVertexBufferGL;
+class slWorld;
 
 enum shapeTypes {
 	ST_MESH,
@@ -194,7 +195,7 @@ class slShape {
 
 		static slShape* 					deserialize( slSerializedShapeHeader* inData );
 
-		virtual void 						drawShadowVolume(slCamera *camera, slPosition *position);
+		virtual void 						drawShadowVolume(slWorld *w, slCamera *camera, slPosition *position);
 
 		virtual void 						draw( const slRenderGL& inRender );
 
@@ -261,7 +262,7 @@ class slSphere : public slShape {
 
 		slSerializedShapeHeader*		serialize(int *length);
 
-		void 					drawShadowVolume(slCamera *camera, slPosition *position);
+		void 					drawShadowVolume(slWorld *w, slCamera *camera, slPosition *position);
 
 		float					radius() const { return _radius; } 
 
