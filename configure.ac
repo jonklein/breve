@@ -81,7 +81,7 @@ case ${host_os} in
 			i386* )
 				AC_DEFINE([MACOSX], [1], [Mac OS X])
 				custom_cblas="-framework vecLib"
-				LIBS="-framework Foundation -framework vecLib -framework OpenGL -framework GLUT"
+				LIBS="-framework Foundation -framework OpenGL -framework GLUT"
 				EXTRAOPTFLAGS="-ftree-vectorize -funroll-loops"
 				PLATFORM="macosx"
 			;;
@@ -91,12 +91,6 @@ case ${host_os} in
 		QUICKTIMEFLAGS="-framework QuickTime -framework Carbon"
 		ARCHIVER="tar czf"
 		ARCHIVE_SUFFIX="tar.gz"
-
-		if test "x$osxcompat104" = "xyes"; then 
-			CPPFLAGS="${CPPFLAGS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
-			LDFLAGS="${LDFLAGS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
-			PYTHONROOT="/Developer/SDKs/MacOSX10.4u.sdk/usr"
-		fi
 
 		;;
 
@@ -149,6 +143,10 @@ if test "x$python" = "xyes"; then
 	AC_CHECK_LIB([python24],  [Py_Initialize], [LIBS="$LIBS -lpython2.4" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.4"])
 	AC_CHECK_LIB([python2.5], [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
 	AC_CHECK_LIB([python25],  [Py_Initialize], [LIBS="$LIBS -lpython2.5" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.5"])
+	AC_CHECK_LIB([python2.6], [Py_Initialize], [LIBS="$LIBS -lpython2.6" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.6"])
+	AC_CHECK_LIB([python26],  [Py_Initialize], [LIBS="$LIBS -lpython2.6" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.6"])
+	AC_CHECK_LIB([python2.7], [Py_Initialize], [LIBS="$LIBS -lpython2.6" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.7"])
+	AC_CHECK_LIB([python27],  [Py_Initialize], [LIBS="$LIBS -lpython2.6" PYTHONINCLUDE="$PYTHONINCLUDE -I${PYTHONROOT}/include/python2.7"])
 
 	if test "x$PYTHONINCLUDE" != "x"; then
 		AC_DEFINE( [HAVE_LIBPYTHON], [], [Have the required Python libraries] )
